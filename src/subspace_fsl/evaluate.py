@@ -170,7 +170,7 @@ def random_bases(torch, classes: int, dimension: int, rank: int, seed: int, devi
     return torch.stack(bases).to(device)
 
 
-def distances(torch, query, prototypes, basis=None):
+def distances(torch, query, prototypes, basis=None, beta: float = 1.0):
     delta = query[:, :, None, :] - prototypes[:, None, :, :]
     squared = delta.square().sum(dim=-1)
     if basis is None:
@@ -179,7 +179,7 @@ def distances(torch, query, prototypes, basis=None):
         projected = torch.einsum("eqnd,dr->eqnr", delta, basis)
     else:
         projected = torch.einsum("eqnd,ndr->eqnr", delta, basis)
-    return (squared - projected.square().sum(dim=-1)).clamp_min_(0)
+    return (squared - beta * projected.square().sum(dim=-1)).clamp_min_(0)
 
 
 def metrics(torch, distance, targets, classes: int) -> dict[str, float]:
@@ -224,19 +224,19 @@ def evaluate_stage(
     device,
 ):
     stage_offset = 0 if stage == "validation" else 1_000_000
+    max_shots = max(args.shots)
     oracle_indices, support_indices, query_indices = make_episode_plan(
         torch,
         indices_by_class,
         class_ids,
         args.oracle_size,
         args.episodes,
-        args.shots,
+        max_shots,
         args.queries,
         seed + stage_offset,
     )
     support = take_features(features, support_indices, device)
     query = take_features(features, query_indices, device)
-    prototypes = support.mean(dim=2)
     query = query.reshape(args.episodes, len(class_ids) * args.queries, -1)
     targets = (
         torch.arange(len(class_ids), device=device)
@@ -257,63 +257,108 @@ def evaluate_stage(
         device,
     )
     rows = []
-    proto_metrics = metrics(
-        torch, distances(torch, query, prototypes), targets, len(class_ids)
-    )
-    rows.append(
-        {"stage": stage, "seed": seed, "method": "protonet", "rank": 0, **proto_metrics}
-    )
-    for rank in ranks:
-        for method, basis in (
-            ("random_subspace", random_basis[:, :, :rank]),
-            ("global_subspace", global_basis[:, :rank]),
-            ("oracle_subspace", oracle_basis[:, :, :rank]),
-        ):
-            result = metrics(
-                torch,
-                distances(torch, query, prototypes, basis),
-                targets,
-                len(class_ids),
-            )
-            rows.append(
-                {"stage": stage, "seed": seed, "method": method, "rank": rank, **result}
-            )
+    for shots in args.shots:
+        # Nested supports: 1-shot is a subset of 3-shot, which is a subset of
+        # 5-shot. All shot settings use the exact same episode queries.
+        prototypes = support[:, :, :shots].mean(dim=2)
+        proto_metrics = metrics(
+            torch, distances(torch, query, prototypes), targets, len(class_ids)
+        )
+        rows.append(
+            {
+                "stage": stage,
+                "shots": shots,
+                "seed": seed,
+                "method": "protonet",
+                "rank": 0,
+                "beta": 0.0,
+                **proto_metrics,
+            }
+        )
+        for rank in ranks:
+            for method, basis in (
+                ("random_subspace", random_basis[:, :, :rank]),
+                ("global_subspace", global_basis[:, :rank]),
+                ("oracle_subspace", oracle_basis[:, :, :rank]),
+            ):
+                for beta in args.betas:
+                    result = metrics(
+                        torch,
+                        distances(torch, query, prototypes, basis, beta),
+                        targets,
+                        len(class_ids),
+                    )
+                    rows.append(
+                        {
+                            "stage": stage,
+                            "shots": shots,
+                            "seed": seed,
+                            "method": method,
+                            "rank": rank,
+                            "beta": beta,
+                            **result,
+                        }
+                    )
     return rows
 
 
-def select_ranks(rows: list[dict[str, object]], ranks: list[int]) -> dict[str, int]:
-    selected = {"protonet": 0}
-    for method in METHODS[1:]:
-        means = {}
-        for rank in ranks:
-            values = [
-                float(row["macro_auroc"])
-                for row in rows
-                if row["stage"] == "validation"
-                and row["method"] == method
-                and row["rank"] == rank
-            ]
-            means[rank] = statistics.mean(values)
-        selected[method] = max(ranks, key=lambda rank: (means[rank], -rank))
+def select_hyperparameters(
+    rows: list[dict[str, object]],
+    ranks: list[int],
+    betas: list[float],
+    shot_values: list[int],
+):
+    selected = {}
+    for shots in shot_values:
+        selected[shots] = {"protonet": {"rank": 0, "beta": 0.0}}
+        for method in METHODS[1:]:
+            means = {}
+            for rank in ranks:
+                for beta in betas:
+                    values = [
+                        float(row["macro_auroc"])
+                        for row in rows
+                        if row["stage"] == "validation"
+                        and row["shots"] == shots
+                        and row["method"] == method
+                        and row["rank"] == rank
+                        and row["beta"] == beta
+                    ]
+                    means[(rank, beta)] = statistics.mean(values)
+            rank, beta = max(
+                means, key=lambda setting: (means[setting], -setting[0], -setting[1])
+            )
+            selected[shots][method] = {"rank": rank, "beta": beta}
     return selected
 
 
-def summarize(rows: list[dict[str, object]], selected: dict[str, int]):
+def summarize(rows: list[dict[str, object]], selected, shot_values: list[int]):
     summary = []
-    for method in METHODS:
-        chosen = [
-            row
-            for row in rows
-            if row["stage"] == "test"
-            and row["method"] == method
-            and row["rank"] == selected[method]
-        ]
-        result: dict[str, object] = {"method": method, "rank": selected[method]}
-        for metric in ("accuracy", "macro_f1", "macro_auroc"):
-            values = [float(row[metric]) for row in chosen]
-            result[f"{metric}_mean"] = statistics.mean(values)
-            result[f"{metric}_std"] = statistics.stdev(values) if len(values) > 1 else 0.0
-        summary.append(result)
+    for shots in shot_values:
+        for method in METHODS:
+            setting = selected[shots][method]
+            chosen = [
+                row
+                for row in rows
+                if row["stage"] == "test"
+                and row["shots"] == shots
+                and row["method"] == method
+                and row["rank"] == setting["rank"]
+                and row["beta"] == setting["beta"]
+            ]
+            result: dict[str, object] = {
+                "shots": shots,
+                "method": method,
+                "rank": setting["rank"],
+                "beta": setting["beta"],
+            }
+            for metric in ("accuracy", "macro_f1", "macro_auroc"):
+                values = [float(row[metric]) for row in chosen]
+                result[f"{metric}_mean"] = statistics.mean(values)
+                result[f"{metric}_std"] = (
+                    statistics.stdev(values) if len(values) > 1 else 0.0
+                )
+            summary.append(result)
     return summary
 
 
@@ -330,6 +375,10 @@ def run(args: argparse.Namespace) -> None:
     except ImportError as error:
         raise SystemExit("PyTorch is missing. Install with: pip install -e '.[gpu]'") from error
 
+    args.shots = sorted(set(args.shots if isinstance(args.shots, list) else [args.shots]))
+    args.betas = sorted(set(float(beta) for beta in args.betas))
+    if any(beta <= 0 or beta > 1 for beta in args.betas):
+        raise ValueError("Every beta must be in the interval (0, 1]")
     device = choose_device(torch, args.device)
     if device.type == "cuda":
         torch.backends.cuda.matmul.allow_tf32 = True
@@ -353,7 +402,7 @@ def run(args: argparse.Namespace) -> None:
         for class_id in range(len(class_names))
     }
     base_ids = [name_to_id[name] for name in split["base"]]
-    required_novel = args.oracle_size + args.shots + args.queries
+    required_novel = args.oracle_size + max(args.shots) + args.queries
     insufficient = {
         name: len(indices_by_class[name_to_id[name]])
         for stage in ("validation", "test")
@@ -389,7 +438,11 @@ def run(args: argparse.Namespace) -> None:
         for seed in args.seeds:
             for stage in ("validation", "test"):
                 class_ids = [name_to_id[name] for name in split[stage]]
-                print(f"{stage}: seed {seed}, {args.episodes} episodes", flush=True)
+                print(
+                    f"{stage}: seed {seed}, shots={args.shots}, "
+                    f"{args.episodes} episodes",
+                    flush=True,
+                )
                 all_rows.extend(
                     evaluate_stage(
                         torch,
@@ -405,16 +458,16 @@ def run(args: argparse.Namespace) -> None:
                     )
                 )
 
-    selected = select_ranks(all_rows, ranks)
-    summary = summarize(all_rows, selected)
+    selected = select_hyperparameters(all_rows, ranks, args.betas, args.shots)
+    summary = summarize(all_rows, selected, args.shots)
     args.output_dir.mkdir(parents=True, exist_ok=True)
-    write_csv(args.output_dir / "per_seed_all_ranks.csv", all_rows)
+    write_csv(args.output_dir / "per_seed_all_settings.csv", all_rows)
     write_csv(args.output_dir / "test_selected_summary.csv", summary)
     with (args.output_dir / "experiment.json").open("w", encoding="utf-8") as handle:
         json.dump(
             {
                 "split": split,
-                "selected_ranks_by_validation_macro_auroc": selected,
+                "selected_rank_and_beta_by_validation_macro_auroc": selected,
                 "seeds": args.seeds,
                 "episodes": args.episodes,
                 "shots": args.shots,
@@ -432,7 +485,8 @@ def run(args: argparse.Namespace) -> None:
     print("\nValidation-selected test results (mean +/- sd over seeds)")
     for row in summary:
         print(
-            f"{row['method']:18s} r={int(row['rank']):>2d}  "
+            f"{int(row['shots'])}-shot  {row['method']:18s} "
+            f"r={int(row['rank']):>2d} beta={float(row['beta']):.2f}  "
             f"AUROC {row['macro_auroc_mean']:.4f} +/- {row['macro_auroc_std']:.4f}  "
             f"F1 {row['macro_f1_mean']:.4f} +/- {row['macro_f1_std']:.4f}  "
             f"Acc {row['accuracy_mean']:.4f} +/- {row['accuracy_std']:.4f}"
@@ -450,12 +504,15 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--keep-features-cpu", action="store_true")
     parser.add_argument("--split-json", type=Path)
     parser.add_argument("--split-seed", type=int, default=2026)
-    parser.add_argument("--shots", type=int, default=5)
+    parser.add_argument("--shots", type=int, nargs="+", default=[1, 3, 5])
     parser.add_argument("--queries", type=int, default=1)
     parser.add_argument("--episodes", type=int, default=500)
     parser.add_argument("--seeds", type=int, nargs="+", default=[0, 1, 2, 3, 4])
     parser.add_argument("--oracle-size", type=int, default=512)
     parser.add_argument("--ranks", type=int, nargs="+", default=[1, 2, 4, 8])
+    parser.add_argument(
+        "--betas", type=float, nargs="+", default=[0.1, 0.25, 0.5, 0.75]
+    )
     parser.add_argument(
         "--base-samples-per-class",
         type=int,

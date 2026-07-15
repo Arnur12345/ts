@@ -170,21 +170,33 @@ class EvaluationTests(unittest.TestCase):
                     keep_features_cpu=True,
                     split_json=None,
                     split_seed=2026,
-                    shots=5,
+                    shots=[1, 3, 5],
                     queries=1,
                     episodes=3,
                     seeds=[0, 1],
                     oracle_size=8,
                     ranks=[1, 2, 4],
+                    betas=[0.1, 0.5],
                     base_samples_per_class=20,
                     chunk_size=32,
                 )
             )
-            self.assertTrue((output / "per_seed_all_ranks.csv").exists())
+            self.assertTrue((output / "per_seed_all_settings.csv").exists())
             with (output / "experiment.json").open(encoding="utf-8") as handle:
                 experiment = json.load(handle)
-            self.assertEqual(experiment["shots"], 5)
+            self.assertEqual(experiment["shots"], [1, 3, 5])
             self.assertEqual(experiment["queries_per_class"], 1)
+
+    def test_hybrid_distance_retains_prototype_penalty(self):
+        import torch
+
+        from subspace_fsl.evaluate import distances
+
+        query = torch.tensor([[[1.0, 0.0]]])
+        prototype = torch.tensor([[[0.0, 0.0]]])
+        basis = torch.tensor([[1.0], [0.0]])
+        hybrid = distances(torch, query, prototype, basis, beta=0.25)
+        self.assertAlmostEqual(hybrid.item(), 0.75, places=6)
 
 
 if __name__ == "__main__":

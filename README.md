@@ -70,28 +70,29 @@ mimic-evaluate \
   --embeddings data/embeddings/biomedclip.pt \
   --split-json configs/mimic_split_seed_2026.json \
   --episodes 500 \
-  --shots 5 \
+  --shots 1 3 5 \
   --queries 1 \
   --seeds 0 1 2 3 4 \
   --oracle-size 512 \
-  --ranks 1 2 4 8
+  --ranks 1 2 4 8 \
+  --betas 0.1 0.25 0.5 0.75
 ```
 
 The evaluator uses 8 base, 3 validation, and 3 held-out test classes. The included split is a deterministic random split, not a claim about the unpublished exact class assignment in Mahawar et al. Replace the JSON if you obtain their original split.
 
-Ranks are selected using mean validation macro AUROC, then frozen for test reporting. Results are written to:
+Rank and hybrid weight beta are selected using mean validation macro AUROC separately for each shot setting, then frozen for test reporting. Results are written to:
 
-- `outputs/first_experiment/per_seed_all_ranks.csv`
+- `outputs/first_experiment/per_seed_all_settings.csv`
 - `outputs/first_experiment/test_selected_summary.csv`
 - `outputs/first_experiment/experiment.json`
 
-Each 3-way episode has exactly 5 support and 1 query image per class. The oracle pool contains 512 additional labeled images per novel class and is sampled before support/query generation, so it is disjoint by construction.
+Each 3-way episode has nested 1/3/5-shot supports and one shared query per class. The oracle pool contains 512 additional labeled images per novel class and is sampled before support/query generation, so it is disjoint by construction.
 
 The four distances are:
 
 ```text
 ProtoNet:          ||z - mu_c||^2
-Subspace methods:  ||z - mu_c||^2 - ||B_c^T (z - mu_c)||^2
+Hybrid subspace:   ||z - mu_c||^2 - beta ||B_c^T (z - mu_c)||^2
 ```
 
 For the global method, a single basis is learned from within-class residuals of base classes. Each base covariance is normalized before averaging, so abundant classes do not dominate. The default samples at most 4,096 images per base class for speed; use `--base-samples-per-class 0` to use all base images. Random and oracle methods use class-specific bases. Oracle PCA uses only the separate oracle pool; the affine center `mu_c` always comes from the 5-shot support set.
