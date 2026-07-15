@@ -1,0 +1,17 @@
+{
+  "Atelectasis": "a chest X-ray showing atelectasis",
+  "Cardiomegaly": "a chest X-ray showing cardiomegaly",
+  "Consolidation": "a chest X-ray showing pulmonary consolidation",
+  "Edema": "a chest X-ray showing pulmonary edema",
+  "Enlarged Cardiomediastinum": "a chest X-ray showing an enlarged cardiomediastinum",
+  "Fracture": "a chest X-ray showing a fracture",
+  "Lung Lesion": "a chest X-ray showing a lung lesion",
+  "Lung Opacity": "a chest X-ray showing a lung opacity",
+  "No Finding": "a normal chest X-ray with no abnormal finding",
+  "Pleural Effusion": "a chest X-ray showing pleural effusion",
+  "Pleural Other": "a chest X-ray showing another pleural abnormality",
+  "Pneumonia": "a chest X-ray showing pneumonia",
+  "Pneumothorax": "a chest X-ray showing pneumothorax",
+  "Support Devices": "a chest X-ray showing medical support devices"
+}
+

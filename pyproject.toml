@@ -20,7 +20,9 @@ gpu = [
 [project.scripts]
 mimic-prepare = "subspace_fsl.prepare_data:main"
 mimic-embed = "subspace_fsl.extract_embeddings:main"
+mimic-embed-text = "subspace_fsl.extract_text_embeddings:main"
 mimic-evaluate = "subspace_fsl.evaluate:main"
+mimic-evaluate-text = "subspace_fsl.evaluate_text:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]

@@ -197,13 +197,25 @@ def metrics(torch, distance, targets, classes: int) -> dict[str, float]:
         fn = (positive & ~predicted_positive).sum().float()
         f1_values.append((2 * tp / (2 * tp + fp + fn).clamp_min(1)))
 
-        positive_scores = scores[positive, class_index]
-        negative_scores = scores[~positive, class_index]
-        comparisons = (positive_scores[:, None] > negative_scores[None, :]).float()
-        comparisons += 0.5 * (
-            positive_scores[:, None] == negative_scores[None, :]
-        ).float()
-        auc_values.append(comparisons.mean())
+        class_scores = scores[:, class_index]
+        order = torch.argsort(class_scores)
+        sorted_scores = class_scores[order]
+        new_group = torch.ones_like(sorted_scores, dtype=torch.bool)
+        new_group[1:] = sorted_scores[1:] != sorted_scores[:-1]
+        group_ids = new_group.long().cumsum(dim=0) - 1
+        counts = torch.bincount(group_ids)
+        ends = counts.cumsum(dim=0).float()
+        starts = ends - counts.float() + 1.0
+        average_group_ranks = (starts + ends) / 2.0
+        ranks = torch.empty_like(class_scores, dtype=torch.float32)
+        ranks[order] = average_group_ranks[group_ids]
+        positive_count = positive.sum().float()
+        negative_count = (~positive).sum().float()
+        rank_sum = ranks[positive].sum()
+        auc_values.append(
+            (rank_sum - positive_count * (positive_count + 1.0) / 2.0)
+            / (positive_count * negative_count)
+        )
     return {
         "accuracy": float(accuracy.item()),
         "macro_f1": float(torch.stack(f1_values).mean().item()),

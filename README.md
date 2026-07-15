@@ -106,3 +106,33 @@ python -m unittest discover -s tests -v
 ```
 
 The tests check single-label filtering, oracle/support/query disjointness, and a complete synthetic 8/3/3 run.
+
+## Text-conditioned experiment
+
+Text means one fixed description per class, not patient radiology reports. Cache the 14 normalized BioMedCLIP text embeddings once:
+
+```bash
+mimic-embed-text \
+  --descriptions configs/mimic_class_descriptions.json \
+  --output data/embeddings/biomedclip_text.pt
+```
+
+Then compare ProtoNet, ProtoNet + text, oracle subspace, oracle subspace + text, and their shuffled-text controls:
+
+```bash
+mimic-evaluate-text \
+  --embeddings data/embeddings/biomedclip.pt \
+  --text-embeddings data/embeddings/biomedclip_text.pt \
+  --split-json configs/mimic_split_seed_2026.json \
+  --output-dir outputs/text_experiment \
+  --episodes 500 \
+  --seeds 0 1 2 3 4 \
+  --shots 1 3 5 \
+  --queries 1 \
+  --oracle-size 256 \
+  --ranks 1 2 4 8 \
+  --alphas 0 0.1 0.25 0.5 0.75 \
+  --betas 0 0.1 0.25 0.5 0.75 1
+```
+
+Rank, alpha, and beta are selected using validation macro AUROC separately for every method and shot setting. The test query sets are shared across nested 1/3/5-shot supports. Shuffled text uses a class derangement with no fixed labels. Inspect `test_selected_summary.csv` for the main results and `semantic_sanity_summary.csv` for paired correct-minus-shuffled AUROC. A non-positive shuffled-control delta means there is no evidence that any text gain is semantic.

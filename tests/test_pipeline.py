@@ -128,7 +128,8 @@ class EvaluationTests(unittest.TestCase):
     def test_oracle_is_disjoint_and_end_to_end_runs(self):
         import torch
 
-        from subspace_fsl.evaluate import make_episode_plan, run
+        from subspace_fsl.evaluate import make_episode_plan, run as geometry_run
+        from subspace_fsl.evaluate_text import run as text_run
 
         indices = {0: torch.arange(30), 1: torch.arange(30, 60), 2: torch.arange(60, 90)}
         oracle, support, query = make_episode_plan(
@@ -162,7 +163,7 @@ class EvaluationTests(unittest.TestCase):
                 embeddings,
             )
             output = root / "output"
-            run(
+            geometry_run(
                 argparse.Namespace(
                     embeddings=embeddings,
                     output_dir=output,
@@ -186,6 +187,43 @@ class EvaluationTests(unittest.TestCase):
                 experiment = json.load(handle)
             self.assertEqual(experiment["shots"], [1, 3, 5])
             self.assertEqual(experiment["queries_per_class"], 1)
+
+            text_embeddings = root / "text_embeddings.pt"
+            torch.save(
+                {
+                    "features": centers.float(),
+                    "class_names": list(CHEXPERT_LABELS),
+                    "descriptions": [f"a chest X-ray showing {name}" for name in CHEXPERT_LABELS],
+                    "normalized": True,
+                },
+                text_embeddings,
+            )
+            text_output = root / "text_output"
+            text_run(
+                argparse.Namespace(
+                    embeddings=embeddings,
+                    text_embeddings=text_embeddings,
+                    output_dir=text_output,
+                    device="cpu",
+                    keep_features_cpu=True,
+                    split_json=None,
+                    split_seed=2026,
+                    shots=[1, 3, 5],
+                    queries=1,
+                    episodes=2,
+                    seeds=[0, 1],
+                    oracle_size=8,
+                    ranks=[1, 2],
+                    alphas=[0.0, 0.25],
+                    betas=[0.0, 0.5],
+                )
+            )
+            self.assertTrue((text_output / "per_seed_all_settings.csv").exists())
+            self.assertTrue((text_output / "semantic_sanity_summary.csv").exists())
+            with (text_output / "test_selected_summary.csv").open(
+                newline="", encoding="utf-8"
+            ) as handle:
+                self.assertEqual(len(list(csv.DictReader(handle))), 18)
 
     def test_hybrid_distance_retains_prototype_penalty(self):
         import torch
