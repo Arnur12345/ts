@@ -1,0 +1,23 @@
+{
+  "base": [
+    "Atelectasis",
+    "Pleural Effusion",
+    "Consolidation",
+    "Pleural Other",
+    "Pneumothorax",
+    "Enlarged Cardiomediastinum",
+    "Lung Opacity",
+    "Lung Lesion"
+  ],
+  "validation": [
+    "Edema",
+    "Support Devices",
+    "Pneumonia"
+  ],
+  "test": [
+    "No Finding",
+    "Fracture",
+    "Cardiomegaly"
+  ]
+}
+

@@ -1,0 +1,26 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "mimic-subspace-fsl"
+version = "0.1.0"
+description = "Fast frozen-BioMedCLIP ProtoNet and affine-subspace experiments on MIMIC-CXR"
+requires-python = ">=3.10"
+dependencies = ["numpy>=1.24,<3", "Pillow>=10"]
+
+[project.optional-dependencies]
+gpu = [
+  "torch>=2.1",
+  "torchvision>=0.16",
+  "open-clip-torch==2.23.0",
+  "transformers==4.35.2",
+]
+
+[project.scripts]
+mimic-prepare = "subspace_fsl.prepare_data:main"
+mimic-embed = "subspace_fsl.extract_embeddings:main"
+mimic-evaluate = "subspace_fsl.evaluate:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]

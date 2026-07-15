@@ -1,0 +1,14 @@
+.venv/
+__pycache__/
+*.py[cod]
+*.egg-info/
+
+# Restricted/large data and generated artifacts
+Untitled.csv
+files/
+data/
+outputs/
+
+# Local scratch files
+tmp/
+.DS_Store
