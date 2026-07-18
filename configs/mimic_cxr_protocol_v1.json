@@ -1,0 +1,97 @@
+{
+  "protocol_id": "mimic-cxr-fsl-v1",
+  "protocol_version": 1,
+  "class_partition_provenance": {
+    "method": "random.Random(2026).shuffle(canonical_label_order); take 8/3/3",
+    "seed": 2026,
+    "selected_before_model_evaluation": true
+  },
+  "labels": [
+    "Atelectasis",
+    "Cardiomegaly",
+    "Consolidation",
+    "Edema",
+    "Enlarged Cardiomediastinum",
+    "Fracture",
+    "Lung Lesion",
+    "Lung Opacity",
+    "No Finding",
+    "Pleural Effusion",
+    "Pleural Other",
+    "Pneumonia",
+    "Pneumothorax",
+    "Support Devices"
+  ],
+  "class_partitions": {
+    "base": [
+      "Atelectasis",
+      "Pleural Effusion",
+      "Consolidation",
+      "Pleural Other",
+      "Pneumothorax",
+      "Enlarged Cardiomediastinum",
+      "Lung Opacity",
+      "Lung Lesion"
+    ],
+    "validation_novel": [
+      "Edema",
+      "Support Devices",
+      "Pneumonia"
+    ],
+    "test_novel": [
+      "No Finding",
+      "Fracture",
+      "Cardiomegaly"
+    ]
+  },
+  "official_split_for_partition": {
+    "base": "train",
+    "validation_novel": "validate",
+    "test_novel": "test"
+  },
+  "sample_policy": {
+    "views": [
+      "PA",
+      "AP"
+    ],
+    "view_preference": [
+      "PA",
+      "AP"
+    ],
+    "unit": "study",
+    "missing_label_value": 0,
+    "uncertain_label_policy": "drop_study",
+    "class_policy": "exactly_one_certain_positive",
+    "one_image_per_study": true
+  },
+  "episodes": {
+    "ways": 3,
+    "shots": [
+      1,
+      3,
+      5
+    ],
+    "queries_per_class": 15,
+    "episodes_per_seed": 500,
+    "seeds": [
+      0,
+      1,
+      2,
+      3,
+      4
+    ],
+    "partitions": [
+      "base",
+      "validation_novel",
+      "test_novel"
+    ],
+    "patient_disjoint_within_episode": true,
+    "nested_shots": true,
+    "shared_queries_across_shots": true
+  },
+  "source_files": {
+    "metadata": "mimic-cxr-2.0.0-metadata.csv.gz",
+    "labels": "mimic-cxr-2.0.0-chexpert.csv.gz",
+    "official_split": "mimic-cxr-2.0.0-split.csv.gz"
+  }
+}

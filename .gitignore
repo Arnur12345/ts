@@ -12,3 +12,5 @@ outputs/
 # Local scratch files
 tmp/
 .DS_Store
+
+abstract.txt
