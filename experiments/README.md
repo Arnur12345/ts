@@ -40,3 +40,39 @@ validation-novel classes only. It writes:
 Every text-aware method also gets a deranged, shuffled-text control. These
 experiments use report prototypes derived from the labeled support studies;
 they are therefore “zero visual-shot,” not conventional prompt-only zero-shot.
+
+## Control-only rerun
+
+Run this on the GPU server from `~/ts`; it does not train a new architecture:
+
+```bash
+PYTHONPATH=. python3 -m experiments.run_controls \
+  --embeddings outputs/biomedclip_pairs_7000.pt \
+  --manifest outputs/biomedclip_pairs_7000.csv \
+  --output-dir outputs/controls_v2
+```
+
+This run uses ten seeds, 500 episodes per seed, and five rotating 8-base /
+3-validation-novel / 3-test-novel splits. The five test folds cover all 14
+classes. Each episode stores one query and an ordered five-support set, so the
+same query is used at every shot and `S1` is nested in `S3`, which is nested in
+`S5`. Every episode contains 18 distinct patients at five-shot.
+Because these controls operate on frozen embeddings, the eight base classes
+define each split but are not used for an additional training stage.
+
+Only these diagnostics run:
+
+- report-prototype text-only;
+- visual ProtoNet with independent supports;
+- ProtoNet + report prototypes;
+- ProtoNet + shuffled reports, using the unshuffled temperature;
+- visual ProtoNet with cyclically permuted support labels;
+- visual ProtoNet with its first support duplicated instead of independent
+  3/5-shot supports.
+
+The support-label and duplicated-support controls reuse the visual ProtoNet
+temperature. `episode_ids.csv.gz` records subject, DICOM, support, and query
+IDs. `per_query_predictions.csv.gz` records raw logits, calibrated
+probabilities, targets, predictions, and episode IDs. Aggregate CSVs retain all
+requested metrics. `decision.md` and `decision.json` apply the preregistered
+paired-control rules; inspect the evidence before accepting the branch.

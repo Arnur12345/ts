@@ -125,3 +125,13 @@ PYTHONPATH=. python3 -m experiments.run \
 
 See [`experiments/README.md`](experiments/README.md) for method definitions and
 the generated overall, per-seed, and per-class metric files.
+
+For the diagnostic rerun with nested patient-disjoint episodes, rotating class
+splits, saved per-query predictions, and no new architectures, run:
+
+```bash
+PYTHONPATH=. python3 -m experiments.run_controls \
+  --embeddings outputs/biomedclip_pairs_7000.pt \
+  --manifest outputs/biomedclip_pairs_7000.csv \
+  --output-dir outputs/controls_v2
+```
