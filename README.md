@@ -83,7 +83,7 @@ Use `protocol_samples.csv.gz`, not the broader audit rows in
 ## Test
 
 ```bash
-python -m unittest discover -s tests -v
+PYTHONPATH=src python3 -m unittest discover -s tests -v
 ```
 
 The tests build two complete synthetic protocols, prove byte-identical episode
@@ -113,3 +113,15 @@ The saved report vectors come from the radiology report associated with each
 study, not from prompts such as “a picture with pneumonia.” Query reports often
 state the diagnosis, so they must not be provided to an image-only test-time
 classifier; use them only in an explicitly labeled report-aware experiment.
+
+## Run all embedding experiments
+
+```bash
+PYTHONPATH=. python3 -m experiments.run \
+  --embeddings outputs/biomedclip_pairs_7000.pt \
+  --manifest outputs/biomedclip_pairs_7000.csv \
+  --output-dir outputs/experiments
+```
+
+See [`experiments/README.md`](experiments/README.md) for method definitions and
+the generated overall, per-seed, and per-class metric files.
