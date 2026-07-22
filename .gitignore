@@ -14,3 +14,5 @@ tmp/
 .DS_Store
 
 abstract.txt
+results/controls_v2
+results/initial
