@@ -77,26 +77,42 @@ def generate_episodes(
 
     generator = torch.Generator().manual_seed(seed)
     positive_runs, negative_runs, query_runs, target_runs = [], [], [], []
+    positive_order = sorted(
+        range(len(pools)),
+        key=lambda position: len({data.subject_ids[index] for index in pools[position][0].tolist()}),
+    )
     for _ in range(episode_count):
         last_error: Exception | None = None
         for _attempt in range(max_attempts):
             used: set[str] = set()
-            positive_support, negative_support = [], []
-            queries: list[int] = []
+            positive_support: list[list[int] | None] = [None] * len(pools)
+            positive_queries: list[list[int] | None] = [None] * len(pools)
+            negative_support: list[list[int]] = []
+            negative_queries: list[list[int]] = []
             try:
-                # Scarce positives are allocated before the usually abundant controls.
-                for positive, _ in pools:
-                    positive_support.append(_draw(positive, positive_shots, used, data.subject_ids, generator))
+                # Reserve all scarce positive supports and queries before abundant controls.
+                for position in positive_order:
+                    positive, _ = pools[position]
+                    positive_support[position] = _draw(
+                        positive, positive_shots, used, data.subject_ids, generator
+                    )
+                    positive_queries[position] = _draw(
+                        positive, queries_per_class, used, data.subject_ids, generator
+                    )
                 for _, negative in pools:
                     negative_support.append(_draw(negative, negative_shots, used, data.subject_ids, generator))
                 if regime == "single_label":
-                    for positive, _ in pools:
-                        queries.extend(_draw(positive, queries_per_class, used, data.subject_ids, generator))
+                    queries = [index for class_queries in positive_queries for index in class_queries]
                     targets = torch.arange(len(class_ids)).repeat_interleave(queries_per_class)
                 else:
-                    for positive, negative in pools:
-                        queries.extend(_draw(positive, queries_per_class, used, data.subject_ids, generator))
-                        queries.extend(_draw(negative, queries_per_class, used, data.subject_ids, generator))
+                    for _, negative in pools:
+                        negative_queries.append(
+                            _draw(negative, queries_per_class, used, data.subject_ids, generator)
+                        )
+                    queries = []
+                    for positive_query, negative_query in zip(positive_queries, negative_queries):
+                        queries.extend(positive_query)
+                        queries.extend(negative_query)
                     query_known = data.known[queries][:, class_ids]
                     query_labels = data.labels[queries][:, class_ids].float()
                     targets = torch.where(query_known, query_labels, -torch.ones_like(query_labels))
