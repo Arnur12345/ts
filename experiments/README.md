@@ -76,3 +76,11 @@ IDs. `per_query_predictions.csv.gz` records raw logits, calibrated
 probabilities, targets, predictions, and episode IDs. Aggregate CSVs retain all
 requested metrics. `decision.md` and `decision.json` apply the preregistered
 paired-control rules; inspect the evidence before accepting the branch.
+
+## PAIR-FSL residual pilot
+
+The single-label and native multi-label matched-control experiments live in
+[`residuals/README.md`](residuals/README.md). They build a separate cache that
+retains comorbid labels and compare positive prototypes, subtraction controls,
+metadata/full-embedding matching, anatomy-masked matching, and a shuffled
+matching control under both `K+/K-` and `K+/M-` support.
