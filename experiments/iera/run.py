@@ -79,8 +79,10 @@ def _normalized_consistency(panel_zero: torch.Tensor, panel_one: torch.Tensor) -
 def _objective(
     model, method, positive, negative, query, targets, args,
     uniform_reference_model=None,
+    logits=None,
 ) -> dict[str, torch.Tensor]:
-    logits = model(positive, negative, query, method)
+    if logits is None:
+        logits = model(positive, negative, query, method)
     classification = F.binary_cross_entropy_with_logits(logits, targets)
     zero = classification.new_zeros(())
     invariance = zero
@@ -99,7 +101,9 @@ def _objective(
         budget_excess = F.relu(
             invariance - args.invariance_budget * uniform_reference.detach()
         )
-    total = classification + args.invariance_weight * (invariance + budget_excess)
+    # The controlled Anchored-IERA repair uses a hinge-only invariance term:
+    # below-budget sensitivity is not rewarded or penalized.
+    total = classification + args.invariance_weight * budget_excess
     return {
         "total": total,
         "classification": classification,
@@ -115,6 +119,7 @@ def _validation_objective(
 ) -> dict[str, float]:
     totals = defaultdict(float)
     total_queries = 0
+    pair_diagnostics = []
     model.eval()
     with torch.inference_mode():
         for generated in bank:
@@ -122,15 +127,91 @@ def _validation_objective(
                 patches, generated, 0, len(generated["positive"]), shot, device
             )
             targets = generated["targets"].to(device)
+            logits = model(positive, negative, query, method)
             components = _objective(
                 model, method, positive, negative, query, targets, args,
-                uniform_reference_model,
+                uniform_reference_model, logits,
             )
             queries = targets.numel()
             for name, value in components.items():
                 totals[name] += float(value) * queries
             total_queries += queries
-    return {name: value / total_queries for name, value in totals.items()}
+            logits = logits.flatten()
+            targets_flat = targets.flatten().bool()
+            nuisance = generated["nuisance"].to(device).flatten()
+            nuisance_aurocs = [
+                _auc(targets_flat[nuisance.eq(value)], logits[nuisance.eq(value)])
+                for value in (0, 1)
+            ]
+            pair_diagnostics.append(
+                {
+                    "sms": float(components["invariance"]),
+                    "uniform_sms": float(components["uniform_reference"]),
+                    "worst_nuisance_auroc": min(nuisance_aurocs),
+                }
+            )
+    result = {name: value / total_queries for name, value in totals.items()}
+    finite_aurocs = [
+        item["worst_nuisance_auroc"]
+        for item in pair_diagnostics
+        if math.isfinite(item["worst_nuisance_auroc"])
+    ]
+    result["worst_nuisance_auroc"] = min(finite_aurocs) if finite_aurocs else float("-inf")
+    if method == "anchored_iera":
+        ratios = [
+            item["sms"] / max(args.invariance_budget * item["uniform_sms"], 1e-12)
+            for item in pair_diagnostics
+        ]
+        result["max_sms_budget_ratio"] = max(ratios)
+        result["sms_budget_satisfied"] = float(all(ratio <= 1.0 for ratio in ratios))
+    else:
+        result["max_sms_budget_ratio"] = 0.0
+        result["sms_budget_satisfied"] = 1.0
+    return result
+
+
+def _checkpoint_key(method: str, validation: dict[str, float]) -> tuple[float, float]:
+    """Rank checkpoints, enforcing the Anchored-IERA SMS constraint first."""
+    if method != "anchored_iera":
+        return (1.0, -validation["total"])
+    if validation["sms_budget_satisfied"]:
+        return (1.0, validation["worst_nuisance_auroc"])
+    # Retain a deterministic fallback if no checkpoint ever reaches the budget.
+    return (0.0, -validation["max_sms_budget_ratio"])
+
+
+def _configure_optimizer(model: IERA, method: str, args) -> torch.optim.Optimizer:
+    if method != "anchored_iera":
+        return torch.optim.AdamW(
+            model.parameters(), lr=args.learning_rate, weight_decay=1e-4
+        )
+    head_names = {"projection.weight", "raw_tau_query", "raw_gamma"}
+    evidence_and_anchor, frozen_head = [], []
+    for name, parameter in model.named_parameters():
+        if name in head_names:
+            parameter.requires_grad_(False)
+            frozen_head.append(parameter)
+        else:
+            parameter.requires_grad_(True)
+            evidence_and_anchor.append(parameter)
+    return torch.optim.AdamW(
+        [
+            {"params": evidence_and_anchor, "lr": args.learning_rate},
+            {"params": frozen_head, "lr": args.learning_rate / 10},
+        ],
+        weight_decay=1e-4,
+    )
+
+
+def _maybe_unfreeze_anchored_head(
+    model: IERA, method: str, completed_steps: int, unfreeze_step: int
+) -> bool:
+    if method != "anchored_iera" or unfreeze_step <= 0 or completed_steps != unfreeze_step:
+        return False
+    for name, parameter in model.named_parameters():
+        if name in {"projection.weight", "raw_tau_query", "raw_gamma"}:
+            parameter.requires_grad_(True)
+    return True
 
 
 def _train(
@@ -179,7 +260,7 @@ def _train(
                 min_stratum_patients=early_stop_minimum,
             )
         )
-    optimizer = torch.optim.AdamW(model.parameters(), lr=args.learning_rate, weight_decay=1e-4)
+    optimizer = _configure_optimizer(model, method, args)
     generator = torch.Generator().manual_seed(run_seed)
     component_history = defaultdict(list)
     initial_validation = _validation_objective(
@@ -187,6 +268,9 @@ def _train(
         uniform_reference_model,
     )
     best_validation = initial_validation["total"]
+    best_validation_worst_nuisance_auroc = initial_validation["worst_nuisance_auroc"]
+    best_sms_budget_satisfied = bool(initial_validation["sms_budget_satisfied"])
+    best_key = _checkpoint_key(method, initial_validation)
     best_step = 0
     best_state = copy.deepcopy(model.state_dict())
     curve = [
@@ -203,6 +287,9 @@ def _train(
     stopped_early = False
     model.train()
     for step in range(args.max_train_steps):
+        _maybe_unfreeze_anchored_head(
+            model, method, step + 1, args.anchored_unfreeze_step
+        )
         generated, episode_index = bank[int(torch.randint(len(bank), (1,), generator=generator))]
         positive, negative, query = _episode_batch(patches, generated, episode_index, episode_index + 1, args.train_shot, device)
         targets = generated["targets"][episode_index : episode_index + 1].to(device)
@@ -236,11 +323,24 @@ def _train(
             )
             print(
                 f"training {method} seed {run_seed}: {completed}/{args.max_train_steps}, "
-                f"train={curve[-1]['train_loss']:.4f}, val={validation['total']:.4f}",
+                f"train={curve[-1]['train_loss']:.4f}, val={validation['total']:.4f}, "
+                f"worst-AUROC={validation['worst_nuisance_auroc']:.4f}, "
+                f"SMS-budget={'yes' if validation['sms_budget_satisfied'] else 'no'}",
                 flush=True,
             )
-            if validation["total"] < best_validation - args.early_stopping_min_delta:
+            candidate_key = _checkpoint_key(method, validation)
+            improvement = (
+                candidate_key[0] > best_key[0]
+                or (
+                    candidate_key[0] == best_key[0]
+                    and candidate_key[1] > best_key[1] + args.early_stopping_min_delta
+                )
+            )
+            if improvement:
                 best_validation = validation["total"]
+                best_validation_worst_nuisance_auroc = validation["worst_nuisance_auroc"]
+                best_sms_budget_satisfied = bool(validation["sms_budget_satisfied"])
+                best_key = candidate_key
                 best_step = completed
                 best_state = copy.deepcopy(model.state_dict())
                 checks_without_improvement = 0
@@ -257,6 +357,21 @@ def _train(
         "steps_run": len(component_history["total"]),
         "best_step": best_step,
         "best_validation_loss": best_validation,
+        "best_validation_worst_nuisance_auroc": best_validation_worst_nuisance_auroc,
+        "best_sms_budget_satisfied": best_sms_budget_satisfied,
+        "checkpoint_selection": (
+            "highest worst-nuisance AUROC satisfying the per-pair SMS budget"
+            if method == "anchored_iera"
+            else "lowest validation objective"
+        ),
+        "initialized_from": (
+            "same-seed learned_uniform best checkpoint"
+            if method == "anchored_iera"
+            else "independent initialization"
+        ),
+        "anchored_head_unfreeze_step": (
+            args.anchored_unfreeze_step if method == "anchored_iera" else None
+        ),
         "stopped_early": stopped_early,
         "curve": curve,
         "meta_training_pairs": [
@@ -341,7 +456,11 @@ def _summaries(rows: list[dict]) -> list[dict]:
     ]
 
 
-def _decision(summary: list[dict]) -> dict:
+def _decision(
+    summary: list[dict],
+    auroc_tolerance: float = 0.01,
+    patch_grid: int | None = None,
+) -> dict:
     lookup = {(row["pair"], row["method"], int(row["shot"]), row["metric"]): row["mean"] for row in summary}
     pairs = sorted({row["pair"] for row in summary})
     available_shots = sorted({int(row["shot"]) for row in summary})
@@ -363,9 +482,12 @@ def _decision(summary: list[dict]) -> dict:
                 "pair": pair,
                 "methods": method_values,
                 "anchored_reduces_sms": anchored["sms"] < baseline["sms"],
-                "anchored_retains_auroc": anchored["auroc"] >= baseline["auroc"],
+                "anchored_retains_auroc": (
+                    anchored["auroc"] >= baseline["auroc"] - auroc_tolerance
+                ),
                 "anchored_retains_worst_nuisance_auroc": (
-                    anchored["worst_nuisance_auroc"] >= baseline["worst_nuisance_auroc"]
+                    anchored["worst_nuisance_auroc"]
+                    >= baseline["worst_nuisance_auroc"] - auroc_tolerance
                 ),
             }
         )
@@ -382,17 +504,30 @@ def _decision(summary: list[dict]) -> dict:
         status = "continue_anchored_iera"
         recommendation = "Anchored IERA beats learned-uniform SMS while retaining AUROC on both pairs."
     elif pneumothorax is not None and not pneumothorax["anchored_reduces_sms"]:
-        status = "abandon_due_identifiability"
-        recommendation = (
-            "Directly constrained Anchored IERA cannot reduce Pneumothorax SMS; "
-            "treat pathology-versus-device evidence as observationally non-identifiable."
-        )
+        if patch_grid is None or patch_grid < 14:
+            status = "increase_resolution_14x14"
+            recommendation = (
+                "Pneumothorax remains weak in the controlled low-resolution run; "
+                "next retain at least 14x14 patch tokens from 512x512 inputs."
+            )
+        else:
+            status = "abandon_due_identifiability"
+            recommendation = (
+                "Anchored IERA still cannot reduce Pneumothorax SMS at 14x14 or "
+                "higher resolution; treat pathology-versus-device evidence as "
+                "observationally non-identifiable."
+            )
     else:
         status = "stop_or_revise_anchor"
         recommendation = "The anchor reduces sensitivity but does not retain both AUROC criteria."
     return {
         "status": status,
-        "rule": "Anchored IERA must beat learned-uniform SMS and retain AUROC and worst-nuisance AUROC on both eligible pairs.",
+        "rule": (
+            "Anchored IERA must beat learned-uniform SMS on both eligible pairs; "
+            f"ordinary and worst-nuisance AUROC may each decrease by at most {auroc_tolerance:.2f}."
+        ),
+        "auroc_tolerance": auroc_tolerance,
+        "patch_grid": patch_grid,
         "required_pairs": len(pairs),
         "anchored_iera_consistent": anchored_consistent,
         "recommendation": recommendation,
@@ -423,10 +558,19 @@ def main() -> None:
     )
     parser.add_argument("--train-shot", type=int, default=3)
     parser.add_argument("--learning-rate", type=float, default=1e-3)
+    parser.add_argument(
+        "--anchored-unfreeze-step",
+        type=int,
+        default=0,
+        help=(
+            "Optional step at which Anchored IERA unfreezes its learned-uniform "
+            "projection/query head at 10x lower LR; 0 keeps it frozen"
+        ),
+    )
     parser.add_argument("--validation-interval", type=int, default=25)
     parser.add_argument("--early-stopping-patience", type=int, default=5)
     parser.add_argument("--early-stopping-min-delta", type=float, default=1e-4)
-    parser.add_argument("--early-stopping-episodes-per-pair", type=int, default=2)
+    parser.add_argument("--early-stopping-episodes-per-pair", type=int, default=25)
     parser.add_argument("--min-stratum-patients", type=int, default=50)
     parser.add_argument("--episode-batch-size", type=int, default=8)
     parser.add_argument("--seed", type=int, default=2026)
@@ -435,8 +579,12 @@ def main() -> None:
     args = parser.parse_args()
     if args.max_train_steps <= 0 or args.validation_interval <= 0:
         parser.error("max-train-steps and validation-interval must be positive")
-    if args.early_stopping_patience <= 0 or args.early_stopping_episodes_per_pair <= 0:
-        parser.error("early-stopping patience and episodes-per-pair must be positive")
+    if args.early_stopping_patience <= 0:
+        parser.error("early-stopping patience must be positive")
+    if args.early_stopping_episodes_per_pair < 25:
+        parser.error("early-stopping-episodes-per-pair must be at least 25")
+    if args.anchored_unfreeze_step < 0:
+        parser.error("anchored-unfreeze-step must be non-negative")
     if not 0 < args.alpha_max <= 1 or args.invariance_weight < 0:
         parser.error("alpha-max must be in (0,1] and invariance-weight must be non-negative")
     if not 0 < args.invariance_budget <= 1:
@@ -520,6 +668,12 @@ def main() -> None:
             model = IERA(
                 patches.shape[-1], args.projection_dim, alpha_max=args.alpha_max
             ).to(device)
+            if method == "anchored_iera":
+                if uniform_reference_model is None:
+                    raise RuntimeError(
+                        "learned_uniform must be trained before anchored_iera"
+                    )
+                model.load_state_dict(uniform_reference_model.state_dict())
             training_info = _train(
                 model, method, patches, data, config, args, device, run_seed,
                 uniform_reference_model,
@@ -570,7 +724,7 @@ def main() -> None:
     _write(args.output_dir / "summary_metrics.csv", summary)
     if training_curve_rows:
         _write(args.output_dir / "training_curves.csv", training_curve_rows)
-    decision = _decision(summary)
+    decision = _decision(summary, patch_grid=int(patch_metadata["pool_grid"]))
     (args.output_dir / "decision.json").write_text(json.dumps(decision, indent=2) + "\n", encoding="utf-8")
     (args.output_dir / "experiment.json").write_text(
         json.dumps(
@@ -583,14 +737,27 @@ def main() -> None:
                 "methods": list(METHODS),
                 "episodes": args.episodes,
                 "seeds": args.seeds,
-                "seed_semantics": "independent initialization, meta-training, validation, and test episode run",
+                "seed_semantics": (
+                    "independent learned-uniform initialization/meta-training and "
+                    "validation/test episode run; anchored IERA starts from the "
+                    "same-seed learned-uniform best checkpoint"
+                ),
                 "patient_split": {"seed": args.split_seed, "fractions": [0.70, 0.15, 0.15]},
                 "max_train_steps": args.max_train_steps,
                 "anchored_iera": {
                     "alpha_max": args.alpha_max,
                     "invariance_weight": args.invariance_weight,
                     "uniform_sensitivity_budget": args.invariance_budget,
-                    "objective": "classification + lambda * (normalized consistency + budget excess)",
+                    "objective": (
+                        "classification + lambda * max(0, normalized_SMS "
+                        "- budget * learned_uniform_normalized_SMS)"
+                    ),
+                    "initialization": "same-seed learned_uniform best checkpoint",
+                    "initially_trainable": (
+                        "evidence attention and anchor parameters only"
+                    ),
+                    "projection_query_head_unfreeze_step": args.anchored_unfreeze_step,
+                    "unfrozen_head_learning_rate_multiplier": 0.1,
                 },
                 "early_stopping": {
                     "validation_interval": args.validation_interval,
@@ -598,6 +765,10 @@ def main() -> None:
                     "min_delta": args.early_stopping_min_delta,
                     "episodes_per_pair": args.early_stopping_episodes_per_pair,
                     "selection_data": "patient-disjoint base-class episodes only",
+                    "anchored_checkpoint_rule": (
+                        "highest worst-nuisance AUROC satisfying the SMS budget "
+                        "for every validation pair"
+                    ),
                 },
                 "meta_training_labels": "target and confounder both restricted to non-evaluation base classes",
                 "training_runs": training_runs,

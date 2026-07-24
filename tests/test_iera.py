@@ -13,7 +13,15 @@ import torch.nn as nn
 from experiments.iera.episodes import generate_pair_episodes, validate_pair_episodes
 from experiments.iera.model import IERA, METHODS
 from experiments.iera.patch_cache import MODEL, extract_patch_tokens, load_patch_cache
-from experiments.iera.run import _decision, _meta_split, _metrics, _normalized_consistency, _objective
+from experiments.iera.run import (
+    _checkpoint_key,
+    _configure_optimizer,
+    _decision,
+    _meta_split,
+    _metrics,
+    _normalized_consistency,
+    _objective,
+)
 from experiments.residuals.data import ResidualDataset
 
 
@@ -139,11 +147,49 @@ class IERATest(unittest.TestCase):
             model, "anchored_iera", positive, negative, query, targets, args,
             uniform_reference_model=reference,
         )
-        self.assertGreaterEqual(float(components["total"]), float(components["classification"]))
+        expected = (
+            components["classification"]
+            + args.invariance_weight * components["budget_excess"]
+        )
+        torch.testing.assert_close(components["total"], expected)
         self.assertGreaterEqual(float(components["budget_excess"]), 0.0)
         components["total"].backward()
         self.assertIsNotNone(model.raw_anchor_bias.grad)
         self.assertTrue(all(parameter.grad is None for parameter in reference.parameters()))
+
+    def test_anchored_optimizer_initially_freezes_uniform_head(self) -> None:
+        model = IERA(6, 4)
+        args = SimpleNamespace(learning_rate=1e-3)
+        optimizer = _configure_optimizer(model, "anchored_iera", args)
+        parameters = dict(model.named_parameters())
+        self.assertFalse(parameters["projection.weight"].requires_grad)
+        self.assertFalse(parameters["raw_tau_query"].requires_grad)
+        self.assertFalse(parameters["raw_gamma"].requires_grad)
+        self.assertTrue(parameters["raw_tau_attention"].requires_grad)
+        self.assertTrue(parameters["raw_anchor_bias"].requires_grad)
+        self.assertEqual(optimizer.param_groups[1]["lr"], args.learning_rate / 10)
+
+    def test_anchored_checkpoint_prefers_feasible_worst_auc(self) -> None:
+        infeasible = {
+            "total": 0.1, "sms_budget_satisfied": 0.0,
+            "max_sms_budget_ratio": 1.01, "worst_nuisance_auroc": 0.99,
+        }
+        feasible_low = {
+            "total": 0.8, "sms_budget_satisfied": 1.0,
+            "max_sms_budget_ratio": 0.9, "worst_nuisance_auroc": 0.60,
+        }
+        feasible_high = {
+            "total": 1.2, "sms_budget_satisfied": 1.0,
+            "max_sms_budget_ratio": 0.8, "worst_nuisance_auroc": 0.70,
+        }
+        self.assertGreater(
+            _checkpoint_key("anchored_iera", feasible_low),
+            _checkpoint_key("anchored_iera", infeasible),
+        )
+        self.assertGreater(
+            _checkpoint_key("anchored_iera", feasible_high),
+            _checkpoint_key("anchored_iera", feasible_low),
+        )
 
     def test_patch_cache_requires_complete_consistent_file(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
@@ -204,6 +250,29 @@ class IERATest(unittest.TestCase):
         decision = _decision(rows)
         self.assertEqual(decision["required_pairs"], 2)
         self.assertEqual(decision["status"], "continue_anchored_iera")
+
+    def test_decision_allows_one_point_auroc_loss(self) -> None:
+        rows = []
+        for pair in ("pair_a", "pair_b"):
+            for method, values in {
+                "frozen_protonet": (1.1, 0.58, 0.68),
+                "learned_uniform": (1.0, 0.70, 0.75),
+                "iera": (0.9, 0.69, 0.74),
+                "anchored_iera": (0.8, 0.69, 0.74),
+            }.items():
+                for metric, mean in zip(
+                    ("sms_normalized_logit", "worst_nuisance_auroc", "auroc"),
+                    values,
+                ):
+                    rows.append(
+                        {
+                            "pair": pair, "method": method, "shot": 3,
+                            "metric": metric, "mean": mean,
+                        }
+                    )
+        decision = _decision(rows)
+        self.assertEqual(decision["status"], "continue_anchored_iera")
+        self.assertEqual(decision["auroc_tolerance"], 0.01)
 
 
 if __name__ == "__main__":
