@@ -34,10 +34,13 @@ Anchored IERA interpolates from the learned-uniform prototype toward IERA's
 evidence-weighted proposal. A support-dependent gate is bounded by
 `--alpha-max 0.25`, preventing attention from replacing the stable prototype.
 Its hinge-only objective penalizes sensitivity only when normalized SMS exceeds
-`--invariance-budget 0.7` times the fixed learned-uniform reference. There is
-no additional raw invariance penalty. Its projection and query head initially
-remain frozen while evidence-attention and anchor parameters train. Optional
-later unfreezing uses a 10x lower learning rate.
+`--invariance-budget 0.7` times the fixed learned-uniform reference. Training
+SMS is exactly the reported quantity: mean absolute panel-logit shift divided
+by pooled panel-logit standard deviation. A projected dual-ascent Lagrange
+multiplier adapts during training instead of remaining fixed. There is no
+additional raw invariance penalty. The learned-uniform projection and query
+head remain frozen. An anchored-only bottleneck residual adapter modifies
+support tokens, while query tokens remain in the original frozen space.
 
 The four fixed stress pairs are pneumothorax/support devices,
 edema/cardiomegaly, pleural effusion/atelectasis, and
@@ -60,26 +63,11 @@ normalized by the method's pooled panel-logit standard deviation; support-swap
 flip rate and panel error metrics use the validation-selected calibrated
 threshold. Calibration can no longer suppress the primary SMS value.
 
-## 1. Build the patch cache
+## 1. Use the existing low-resolution patch cache
 
-The existing global embedding cache cannot support patch attention. Build a
-7x7 pooled patch-token cache aligned to the same 167,183-row manifest:
-
-```bash
-PYTHONPATH=. python3 -m experiments.iera.patch_cache \
-  --data-root ~/data/mimic-cxr-jpg-2.1.0 \
-  --manifest outputs/residuals/multilabel_manifest.csv \
-  --output-dir outputs/iera/patch_cache \
-  --pool-grid 7 \
-  --batch-size 128 \
-  --device cuda
-```
-
-The cache is written incrementally as a float16 memory map and flushed every
-20 batches. Its expected size is approximately 12 GB for 49 x 768 tokens; the
-exact width depends on the BioMedCLIP visual trunk. Progress metadata is saved
-with every flush, so rerunning the identical command resumes an interrupted
-cache instead of starting again.
+Use `outputs/iera/patch_cache_4x4`; it remains valid and must not be rebuilt for
+this repair. Do not build 14x14/512x512 tokens unless the 30% constraint first
+becomes feasible on every same-seed base-validation run.
 
 ## 2. Run the pilot
 
@@ -89,7 +77,7 @@ PYTHONPATH=. python3 -m experiments.iera.run \
   --manifest outputs/residuals/multilabel_manifest.csv \
   --patch-cache outputs/iera/patch_cache_4x4 \
   --raw-labels ~/data/mimic-cxr-jpg-2.1.0/mimic-cxr-2.0.0-chexpert.csv.gz \
-  --output-dir outputs/iera/controlled_anchor_v2 \
+  --output-dir outputs/iera/adaptive_anchor_v3 \
   --shots 1 3 5 10 \
   --episodes 100 \
   --queries-per-stratum 1 \
@@ -99,8 +87,11 @@ PYTHONPATH=. python3 -m experiments.iera.run \
   --early-stopping-patience 5 \
   --early-stopping-episodes-per-pair 25 \
   --alpha-max 0.25 \
-  --invariance-weight 1.0 \
+  --support-adapter-dim 16 \
   --invariance-budget 0.7 \
+  --lagrange-initial 1.0 \
+  --lagrange-learning-rate 0.05 \
+  --lagrange-max 100 \
   --device cuda
 ```
 
@@ -116,6 +107,8 @@ episodes, never either evaluated pair. Among checkpoints satisfying the SMS
 budget on every validation pair, it selects the highest worst-nuisance AUROC,
 not the lowest combined loss. `training_curves.csv` records all selection
 diagnostics, and every saved model contains the restored selected checkpoint.
+The training curves also record the signed constraint violation and adaptive
+Lagrange multiplier.
 
 For a fast server smoke test, use `--shots 1 3 --episodes 2 --seeds 0
 --max-train-steps 25 --validation-interval 5 --early-stopping-patience 2`.
@@ -127,9 +120,10 @@ and exact episode indices.
 blank labels to zero. IERA reloads the original table and treats only explicit
 0/1 values as verified target status; blank and -1 values are excluded.
 
-`decision.json` requires Anchored IERA to beat the learned-uniform baseline on
-normalized SMS on both eligible pairs, while allowing at most a 0.01 decrease
-in ordinary or worst-nuisance AUROC. Run this controlled 4x4-token repair before
-changing resolution. If Pneumothorax remains weak, rebuild at 512x512 with at
-least 14x14 retained patch tokens and rerun; only continued failure is reported
-as evidence of pathology-versus-device non-identifiability.
+`decision.json` requires normalized SMS at or below 0.70 times learned uniform
+on both eligible pairs—a real 30% reduction—while allowing at most a 0.01
+decrease in ordinary or worst-nuisance AUROC. It also records whether every
+same-seed base-validation run found a budget-feasible checkpoint. High
+resolution is blocked when that field is false. Only when it is true and
+Pneumothorax still misses the evaluation budget should 512x512 inputs with at
+least 14x14 retained patch tokens be tested.

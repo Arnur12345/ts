@@ -1,0 +1,67 @@
+{
+  "status": "increase_resolution_14x14",
+  "rule": "Anchored IERA must beat learned-uniform SMS on both eligible pairs; ordinary and worst-nuisance AUROC may each decrease by at most 0.01.",
+  "auroc_tolerance": 0.01,
+  "patch_grid": 4,
+  "required_pairs": 2,
+  "anchored_iera_consistent": false,
+  "recommendation": "Pneumothorax remains weak in the controlled low-resolution run; next retain at least 14x14 patch tokens from 512x512 inputs.",
+  "evidence": [
+    {
+      "pair": "Edema__Cardiomegaly",
+      "methods": {
+        "frozen_protonet": {
+          "sms": 0.6859653234481812,
+          "worst_nuisance_auroc": 0.6157599925994873,
+          "auroc": 0.6553200006484985
+        },
+        "learned_uniform": {
+          "sms": 0.48534674644470216,
+          "worst_nuisance_auroc": 0.7229599952697754,
+          "auroc": 0.7874600052833557
+        },
+        "iera": {
+          "sms": 0.7268465161323547,
+          "worst_nuisance_auroc": 0.6763200044631958,
+          "auroc": 0.7376999974250793
+        },
+        "anchored_iera": {
+          "sms": 0.4659189760684967,
+          "worst_nuisance_auroc": 0.7265599966049194,
+          "auroc": 0.7891200184822083
+        }
+      },
+      "anchored_reduces_sms": true,
+      "anchored_retains_auroc": true,
+      "anchored_retains_worst_nuisance_auroc": true
+    },
+    {
+      "pair": "Pneumothorax__Support Devices",
+      "methods": {
+        "frozen_protonet": {
+          "sms": 0.8724811673164368,
+          "worst_nuisance_auroc": 0.4179199993610382,
+          "auroc": 0.45681999921798705
+        },
+        "learned_uniform": {
+          "sms": 1.0088415026664734,
+          "worst_nuisance_auroc": 0.4556799948215485,
+          "auroc": 0.4834600031375885
+        },
+        "iera": {
+          "sms": 1.0756604313850402,
+          "worst_nuisance_auroc": 0.4840000033378601,
+          "auroc": 0.5115199983119965
+        },
+        "anchored_iera": {
+          "sms": 1.0183116436004638,
+          "worst_nuisance_auroc": 0.46128000020980836,
+          "auroc": 0.48925999999046327
+        }
+      },
+      "anchored_reduces_sms": false,
+      "anchored_retains_auroc": true,
+      "anchored_retains_worst_nuisance_auroc": true
+    }
+  ]
+}

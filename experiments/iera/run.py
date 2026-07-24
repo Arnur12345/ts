@@ -71,15 +71,26 @@ def _meta_split(data, indices, split_seed):
     return torch.tensor(train, dtype=torch.long), torch.tensor(validation, dtype=torch.long)
 
 
-def _normalized_consistency(panel_zero: torch.Tensor, panel_one: torch.Tensor) -> torch.Tensor:
-    variance = torch.cat((panel_zero, panel_one), dim=-1).var(unbiased=False)
-    return (panel_zero - panel_one).square().mean() / (variance + 1e-6)
+def _normalized_sms(panel_zero: torch.Tensor, panel_one: torch.Tensor) -> torch.Tensor:
+    # Exactly the evaluated normalized SMS: mean absolute support-panel logit
+    # shift divided by the pooled panel-logit standard deviation.
+    raw_shift = (panel_one - panel_zero).abs().mean()
+    shift_scale = torch.cat((panel_zero, panel_one), dim=-1).std().clamp_min(1e-6)
+    return raw_shift / shift_scale
+
+
+def _normalized_consistency(
+    panel_zero: torch.Tensor, panel_one: torch.Tensor
+) -> torch.Tensor:
+    """Backward-compatible name for the exact normalized SMS."""
+    return _normalized_sms(panel_zero, panel_one)
 
 
 def _objective(
     model, method, positive, negative, query, targets, args,
     uniform_reference_model=None,
     logits=None,
+    lagrange_multiplier: float | torch.Tensor | None = None,
 ) -> dict[str, torch.Tensor]:
     if logits is None:
         logits = model(positive, negative, query, method)
@@ -87,35 +98,49 @@ def _objective(
     zero = classification.new_zeros(())
     invariance = zero
     budget_excess = zero
+    constraint_violation = zero
     uniform_reference = zero
     if method == "anchored_iera":
         panel_zero, panel_one = model.swapped_logits(positive, negative, query, method)
-        invariance = _normalized_consistency(panel_zero, panel_one)
+        invariance = _normalized_sms(panel_zero, panel_one)
         if uniform_reference_model is None:
             raise ValueError("anchored_iera requires a fixed learned-uniform reference model")
         with torch.no_grad():
             uniform_zero, uniform_one = uniform_reference_model.swapped_logits(
                 positive, negative, query, "learned_uniform"
             )
-            uniform_reference = _normalized_consistency(uniform_zero, uniform_one)
-        budget_excess = F.relu(
+            uniform_reference = _normalized_sms(uniform_zero, uniform_one)
+        constraint_violation = (
             invariance - args.invariance_budget * uniform_reference.detach()
         )
+        budget_excess = F.relu(constraint_violation)
+    if lagrange_multiplier is None:
+        lagrange_multiplier = (
+            getattr(args, "lagrange_initial", 1.0)
+            if method == "anchored_iera"
+            else 0.0
+        )
+    multiplier = torch.as_tensor(
+        lagrange_multiplier, dtype=classification.dtype, device=classification.device
+    ).detach()
     # The controlled Anchored-IERA repair uses a hinge-only invariance term:
     # below-budget sensitivity is not rewarded or penalized.
-    total = classification + args.invariance_weight * budget_excess
+    total = classification + multiplier * budget_excess
     return {
         "total": total,
         "classification": classification,
         "invariance": invariance,
+        "constraint_violation": constraint_violation,
         "budget_excess": budget_excess,
         "uniform_reference": uniform_reference,
+        "lagrange_multiplier": multiplier,
     }
 
 
 def _validation_objective(
     model, method, patches, bank, shot, device, args,
     uniform_reference_model=None,
+    lagrange_multiplier: float | None = None,
 ) -> dict[str, float]:
     totals = defaultdict(float)
     total_queries = 0
@@ -130,7 +155,7 @@ def _validation_objective(
             logits = model(positive, negative, query, method)
             components = _objective(
                 model, method, positive, negative, query, targets, args,
-                uniform_reference_model, logits,
+                uniform_reference_model, logits, lagrange_multiplier,
             )
             queries = targets.numel()
             for name, value in components.items():
@@ -186,32 +211,25 @@ def _configure_optimizer(model: IERA, method: str, args) -> torch.optim.Optimize
             model.parameters(), lr=args.learning_rate, weight_decay=1e-4
         )
     head_names = {"projection.weight", "raw_tau_query", "raw_gamma"}
-    evidence_and_anchor, frozen_head = [], []
+    evidence_anchor_and_adapter = []
     for name, parameter in model.named_parameters():
         if name in head_names:
             parameter.requires_grad_(False)
-            frozen_head.append(parameter)
         else:
             parameter.requires_grad_(True)
-            evidence_and_anchor.append(parameter)
+            evidence_anchor_and_adapter.append(parameter)
     return torch.optim.AdamW(
-        [
-            {"params": evidence_and_anchor, "lr": args.learning_rate},
-            {"params": frozen_head, "lr": args.learning_rate / 10},
-        ],
+        evidence_anchor_and_adapter,
+        lr=args.learning_rate,
         weight_decay=1e-4,
     )
 
 
-def _maybe_unfreeze_anchored_head(
-    model: IERA, method: str, completed_steps: int, unfreeze_step: int
-) -> bool:
-    if method != "anchored_iera" or unfreeze_step <= 0 or completed_steps != unfreeze_step:
-        return False
-    for name, parameter in model.named_parameters():
-        if name in {"projection.weight", "raw_tau_query", "raw_gamma"}:
-            parameter.requires_grad_(True)
-    return True
+def _update_lagrange(
+    value: float, constraint_violation: float, learning_rate: float, maximum: float
+) -> float:
+    """Projected dual ascent: increase lambda whenever the SMS budget is violated."""
+    return min(maximum, max(0.0, value + learning_rate * constraint_violation))
 
 
 def _train(
@@ -263,15 +281,17 @@ def _train(
     optimizer = _configure_optimizer(model, method, args)
     generator = torch.Generator().manual_seed(run_seed)
     component_history = defaultdict(list)
+    lagrange_multiplier = args.lagrange_initial if method == "anchored_iera" else 0.0
     initial_validation = _validation_objective(
         model, method, patches, validation_bank, args.train_shot, device, args,
-        uniform_reference_model,
+        uniform_reference_model, lagrange_multiplier,
     )
     best_validation = initial_validation["total"]
     best_validation_worst_nuisance_auroc = initial_validation["worst_nuisance_auroc"]
     best_sms_budget_satisfied = bool(initial_validation["sms_budget_satisfied"])
     best_key = _checkpoint_key(method, initial_validation)
     best_step = 0
+    best_lagrange_multiplier = lagrange_multiplier
     best_state = copy.deepcopy(model.state_dict())
     curve = [
         {
@@ -279,7 +299,9 @@ def _train(
             "train_loss": None,
             "train_classification": None,
             "train_invariance": None,
+            "train_constraint_violation": None,
             "train_budget_excess": None,
+            "lagrange_multiplier": lagrange_multiplier,
             **{f"validation_{name}": value for name, value in initial_validation.items()},
         }
     ]
@@ -287,15 +309,12 @@ def _train(
     stopped_early = False
     model.train()
     for step in range(args.max_train_steps):
-        _maybe_unfreeze_anchored_head(
-            model, method, step + 1, args.anchored_unfreeze_step
-        )
         generated, episode_index = bank[int(torch.randint(len(bank), (1,), generator=generator))]
         positive, negative, query = _episode_batch(patches, generated, episode_index, episode_index + 1, args.train_shot, device)
         targets = generated["targets"][episode_index : episode_index + 1].to(device)
         components = _objective(
             model, method, positive, negative, query, targets, args,
-            uniform_reference_model,
+            uniform_reference_model, lagrange_multiplier=lagrange_multiplier,
         )
         loss = components["total"]
         optimizer.zero_grad(set_to_none=True)
@@ -304,11 +323,18 @@ def _train(
         optimizer.step()
         for name, value in components.items():
             component_history[name].append(float(value.detach()))
+        if method == "anchored_iera":
+            lagrange_multiplier = _update_lagrange(
+                lagrange_multiplier,
+                float(components["constraint_violation"].detach()),
+                args.lagrange_learning_rate,
+                args.lagrange_max,
+            )
         completed = step + 1
         if completed % args.validation_interval == 0 or completed == args.max_train_steps:
             validation = _validation_objective(
                 model, method, patches, validation_bank, args.train_shot, device, args,
-                uniform_reference_model,
+                uniform_reference_model, lagrange_multiplier,
             )
             recent = slice(-args.validation_interval, None)
             curve.append(
@@ -317,7 +343,11 @@ def _train(
                     "train_loss": statistics.mean(component_history["total"][recent]),
                     "train_classification": statistics.mean(component_history["classification"][recent]),
                     "train_invariance": statistics.mean(component_history["invariance"][recent]),
+                    "train_constraint_violation": statistics.mean(
+                        component_history["constraint_violation"][recent]
+                    ),
                     "train_budget_excess": statistics.mean(component_history["budget_excess"][recent]),
+                    "lagrange_multiplier": lagrange_multiplier,
                     **{f"validation_{name}": value for name, value in validation.items()},
                 }
             )
@@ -342,6 +372,7 @@ def _train(
                 best_sms_budget_satisfied = bool(validation["sms_budget_satisfied"])
                 best_key = candidate_key
                 best_step = completed
+                best_lagrange_multiplier = lagrange_multiplier
                 best_state = copy.deepcopy(model.state_dict())
                 checks_without_improvement = 0
             else:
@@ -359,6 +390,8 @@ def _train(
         "best_validation_loss": best_validation,
         "best_validation_worst_nuisance_auroc": best_validation_worst_nuisance_auroc,
         "best_sms_budget_satisfied": best_sms_budget_satisfied,
+        "best_lagrange_multiplier": best_lagrange_multiplier,
+        "final_lagrange_multiplier": lagrange_multiplier,
         "checkpoint_selection": (
             "highest worst-nuisance AUROC satisfying the per-pair SMS budget"
             if method == "anchored_iera"
@@ -369,9 +402,7 @@ def _train(
             if method == "anchored_iera"
             else "independent initialization"
         ),
-        "anchored_head_unfreeze_step": (
-            args.anchored_unfreeze_step if method == "anchored_iera" else None
-        ),
+        "query_projection_frozen": method == "anchored_iera",
         "stopped_early": stopped_early,
         "curve": curve,
         "meta_training_pairs": [
@@ -402,7 +433,6 @@ def _metrics(logits, panel_zero, panel_one, targets, nuisance, temperature, thre
     tp, fp = (target & prediction).sum(), (~target & prediction).sum()
     fn = (target & ~prediction).sum()
     raw_shift = (panel_one - panel_zero).abs()
-    shift_scale = torch.cat((panel_zero, panel_one)).std().clamp_min(1e-6)
     panel_zero_probability = torch.sigmoid(panel_zero / temperature)
     panel_one_probability = torch.sigmoid(panel_one / temperature)
     panel_zero_prediction = panel_zero_probability.ge(threshold)
@@ -417,7 +447,7 @@ def _metrics(logits, panel_zero, panel_one, targets, nuisance, temperature, thre
         "ece": _ece(probability, target),
         "false_positive_c0d1": float(probability[(~target) & nuisance.eq(1)].mean()),
         "sms_raw_logit": float(raw_shift.mean()),
-        "sms_normalized_logit": float(raw_shift.mean() / shift_scale),
+        "sms_normalized_logit": float(_normalized_sms(panel_zero, panel_one)),
         "support_swap_flip_rate": float(panel_zero_prediction.ne(panel_one_prediction).float().mean()),
         "support_swap_error_gap": float((panel_zero_error.float().mean() - panel_one_error.float().mean()).abs()),
         "worst_support_panel_error": float(torch.maximum(panel_zero_error.float().mean(), panel_one_error.float().mean())),
@@ -460,6 +490,8 @@ def _decision(
     summary: list[dict],
     auroc_tolerance: float = 0.01,
     patch_grid: int | None = None,
+    base_validation_feasible: bool = True,
+    sms_budget: float = 0.7,
 ) -> dict:
     lookup = {(row["pair"], row["method"], int(row["shot"]), row["metric"]): row["mean"] for row in summary}
     pairs = sorted({row["pair"] for row in summary})
@@ -482,6 +514,14 @@ def _decision(
                 "pair": pair,
                 "methods": method_values,
                 "anchored_reduces_sms": anchored["sms"] < baseline["sms"],
+                "anchored_meets_30pct_sms_budget": (
+                    anchored["sms"] <= sms_budget * baseline["sms"]
+                ),
+                "anchored_to_uniform_sms_ratio": (
+                    anchored["sms"] / baseline["sms"]
+                    if baseline["sms"] > 0
+                    else float("inf")
+                ),
                 "anchored_retains_auroc": (
                     anchored["auroc"] >= baseline["auroc"] - auroc_tolerance
                 ),
@@ -492,7 +532,7 @@ def _decision(
             }
         )
     anchored_consistent = bool(evidence) and all(
-        row["anchored_reduces_sms"]
+        row["anchored_meets_30pct_sms_budget"]
         and row["anchored_retains_auroc"]
         and row["anchored_retains_worst_nuisance_auroc"]
         for row in evidence
@@ -500,10 +540,22 @@ def _decision(
     pneumothorax = next(
         (row for row in evidence if row["pair"].startswith("Pneumothorax__")), None
     )
-    if anchored_consistent:
+    if not base_validation_feasible:
+        status = "constraint_infeasible_on_base_validation"
+        recommendation = (
+            "The real 30% SMS constraint was not feasible on every same-seed "
+            "base-validation run. Do not build or test high-resolution tokens yet."
+        )
+    elif anchored_consistent:
         status = "continue_anchored_iera"
-        recommendation = "Anchored IERA beats learned-uniform SMS while retaining AUROC on both pairs."
-    elif pneumothorax is not None and not pneumothorax["anchored_reduces_sms"]:
+        recommendation = (
+            "Anchored IERA meets the 30% SMS reduction budget while retaining "
+            "AUROC on both pairs."
+        )
+    elif (
+        pneumothorax is not None
+        and not pneumothorax["anchored_meets_30pct_sms_budget"]
+    ):
         if patch_grid is None or patch_grid < 14:
             status = "increase_resolution_14x14"
             recommendation = (
@@ -523,10 +575,14 @@ def _decision(
     return {
         "status": status,
         "rule": (
-            "Anchored IERA must beat learned-uniform SMS on both eligible pairs; "
+            "Anchored IERA must achieve at least a 30% normalized-SMS reduction "
+            "relative to learned uniform on both eligible pairs; "
             f"ordinary and worst-nuisance AUROC may each decrease by at most {auroc_tolerance:.2f}."
         ),
         "auroc_tolerance": auroc_tolerance,
+        "required_sms_ratio": sms_budget,
+        "required_sms_reduction": round(1.0 - sms_budget, 10),
+        "base_validation_constraint_feasible": base_validation_feasible,
         "patch_grid": patch_grid,
         "required_pairs": len(pairs),
         "anchored_iera_consistent": anchored_consistent,
@@ -548,9 +604,16 @@ def main() -> None:
     parser.add_argument("--queries-per-stratum", type=int, default=1)
     parser.add_argument("--seeds", type=int, nargs="+", default=(0, 1, 2, 3, 4))
     parser.add_argument("--projection-dim", type=int, default=128)
+    parser.add_argument("--support-adapter-dim", type=int, default=16)
     parser.add_argument("--alpha-max", type=float, default=0.25)
-    parser.add_argument("--invariance-weight", type=float, default=1.0)
     parser.add_argument("--invariance-budget", type=float, default=0.7)
+    parser.add_argument(
+        "--lagrange-initial", "--invariance-weight",
+        dest="lagrange_initial", type=float, default=1.0,
+        help="Initial adaptive SMS multiplier; --invariance-weight is a deprecated alias",
+    )
+    parser.add_argument("--lagrange-learning-rate", type=float, default=0.05)
+    parser.add_argument("--lagrange-max", type=float, default=100.0)
     parser.add_argument(
         "--max-train-steps", "--train-steps", dest="max_train_steps",
         type=int, default=1000,
@@ -558,15 +621,6 @@ def main() -> None:
     )
     parser.add_argument("--train-shot", type=int, default=3)
     parser.add_argument("--learning-rate", type=float, default=1e-3)
-    parser.add_argument(
-        "--anchored-unfreeze-step",
-        type=int,
-        default=0,
-        help=(
-            "Optional step at which Anchored IERA unfreezes its learned-uniform "
-            "projection/query head at 10x lower LR; 0 keeps it frozen"
-        ),
-    )
     parser.add_argument("--validation-interval", type=int, default=25)
     parser.add_argument("--early-stopping-patience", type=int, default=5)
     parser.add_argument("--early-stopping-min-delta", type=float, default=1e-4)
@@ -583,12 +637,22 @@ def main() -> None:
         parser.error("early-stopping patience must be positive")
     if args.early_stopping_episodes_per_pair < 25:
         parser.error("early-stopping-episodes-per-pair must be at least 25")
-    if args.anchored_unfreeze_step < 0:
-        parser.error("anchored-unfreeze-step must be non-negative")
-    if not 0 < args.alpha_max <= 1 or args.invariance_weight < 0:
-        parser.error("alpha-max must be in (0,1] and invariance-weight must be non-negative")
+    if not 0 < args.alpha_max <= 1 or args.support_adapter_dim <= 0:
+        parser.error("alpha-max must be in (0,1] and support-adapter-dim must be positive")
     if not 0 < args.invariance_budget <= 1:
         parser.error("invariance-budget must be in (0,1]")
+    if not math.isclose(args.invariance_budget, 0.7, rel_tol=0.0, abs_tol=1e-12):
+        parser.error("this controlled protocol requires --invariance-budget 0.7")
+    if (
+        args.lagrange_initial < 0
+        or args.lagrange_learning_rate <= 0
+        or args.lagrange_max <= 0
+        or args.lagrange_initial > args.lagrange_max
+    ):
+        parser.error(
+            "Lagrange initial/max must be valid non-negative bounds and "
+            "lagrange-learning-rate must be positive"
+        )
     started = time.perf_counter()
     device = torch.device("cuda" if args.device == "auto" and torch.cuda.is_available() else args.device if args.device != "auto" else "cpu")
     data = load_dataset(args.embeddings, args.manifest)
@@ -666,7 +730,10 @@ def main() -> None:
         for method in METHODS:
             _set_seed(run_seed)
             model = IERA(
-                patches.shape[-1], args.projection_dim, alpha_max=args.alpha_max
+                patches.shape[-1],
+                args.projection_dim,
+                alpha_max=args.alpha_max,
+                support_adapter_dim=args.support_adapter_dim,
             ).to(device)
             if method == "anchored_iera":
                 if uniform_reference_model is None:
@@ -724,7 +791,31 @@ def main() -> None:
     _write(args.output_dir / "summary_metrics.csv", summary)
     if training_curve_rows:
         _write(args.output_dir / "training_curves.csv", training_curve_rows)
-    decision = _decision(summary, patch_grid=int(patch_metadata["pool_grid"]))
+    anchored_training_runs = [
+        run for run in training_runs if run["method"] == "anchored_iera"
+    ]
+    base_validation_feasible = bool(anchored_training_runs) and all(
+        run["best_sms_budget_satisfied"] for run in anchored_training_runs
+    )
+    decision = _decision(
+        summary,
+        patch_grid=int(patch_metadata["pool_grid"]),
+        base_validation_feasible=base_validation_feasible,
+        sms_budget=args.invariance_budget,
+    )
+    decision["base_validation_runs"] = [
+        {
+            "seed": run["seed"],
+            "budget_feasible": run["best_sms_budget_satisfied"],
+            "selected_step": run["best_step"],
+            "selected_worst_nuisance_auroc": (
+                run["best_validation_worst_nuisance_auroc"]
+            ),
+            "selected_lagrange_multiplier": run["best_lagrange_multiplier"],
+            "final_lagrange_multiplier": run["final_lagrange_multiplier"],
+        }
+        for run in anchored_training_runs
+    ]
     (args.output_dir / "decision.json").write_text(json.dumps(decision, indent=2) + "\n", encoding="utf-8")
     (args.output_dir / "experiment.json").write_text(
         json.dumps(
@@ -746,18 +837,31 @@ def main() -> None:
                 "max_train_steps": args.max_train_steps,
                 "anchored_iera": {
                     "alpha_max": args.alpha_max,
-                    "invariance_weight": args.invariance_weight,
                     "uniform_sensitivity_budget": args.invariance_budget,
+                    "required_sms_reduction": round(
+                        1.0 - args.invariance_budget, 10
+                    ),
                     "objective": (
                         "classification + lambda * max(0, normalized_SMS "
                         "- budget * learned_uniform_normalized_SMS)"
                     ),
+                    "normalized_sms_definition": (
+                        "mean(abs(panel_1_logit - panel_0_logit)) / "
+                        "std(concat(panel_0_logit, panel_1_logit))"
+                    ),
+                    "adaptive_lagrange": {
+                        "initial": args.lagrange_initial,
+                        "learning_rate": args.lagrange_learning_rate,
+                        "maximum": args.lagrange_max,
+                        "update": "projected dual ascent on signed SMS constraint violation",
+                    },
                     "initialization": "same-seed learned_uniform best checkpoint",
                     "initially_trainable": (
-                        "evidence attention and anchor parameters only"
+                        "evidence attention, anchor parameters, and support-only "
+                        "residual adapter"
                     ),
-                    "projection_query_head_unfreeze_step": args.anchored_unfreeze_step,
-                    "unfrozen_head_learning_rate_multiplier": 0.1,
+                    "support_adapter_dim": args.support_adapter_dim,
+                    "query_projection": "frozen for all Anchored-IERA steps",
                 },
                 "early_stopping": {
                     "validation_interval": args.validation_interval,
@@ -772,6 +876,7 @@ def main() -> None:
                 },
                 "meta_training_labels": "target and confounder both restricted to non-evaluation base classes",
                 "training_runs": training_runs,
+                "base_validation_constraint_feasible": base_validation_feasible,
                 "eligible_pairs": [item["pair"] for item in eligibility if item["eligible"]],
                 "elapsed_seconds": time.perf_counter() - started,
                 "readout_note": "Evidence weights only positive support patches; queries use support-independent prototype-to-patch local matching.",

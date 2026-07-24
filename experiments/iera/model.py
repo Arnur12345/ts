@@ -13,13 +13,30 @@ METHODS = ("frozen_protonet", "learned_uniform", "iera", "anchored_iera")
 
 
 class IERA(nn.Module):
-    def __init__(self, input_dim: int, projection_dim: int = 128, alpha_max: float = 0.25) -> None:
+    def __init__(
+        self,
+        input_dim: int,
+        projection_dim: int = 128,
+        alpha_max: float = 0.25,
+        support_adapter_dim: int = 16,
+    ) -> None:
         super().__init__()
         if not 0 < alpha_max <= 1:
             raise ValueError("alpha_max must be in (0, 1]")
+        if support_adapter_dim <= 0:
+            raise ValueError("support_adapter_dim must be positive")
         self.alpha_max = float(alpha_max)
+        self.support_adapter_dim = int(support_adapter_dim)
         self.projection = nn.Linear(input_dim, projection_dim, bias=False)
         nn.init.orthogonal_(self.projection.weight)
+        self.support_adapter_down = nn.Linear(
+            projection_dim, support_adapter_dim, bias=False
+        )
+        self.support_adapter_up = nn.Linear(
+            support_adapter_dim, projection_dim, bias=False
+        )
+        nn.init.xavier_uniform_(self.support_adapter_down.weight)
+        nn.init.zeros_(self.support_adapter_up.weight)
         self.raw_tau = nn.Parameter(torch.tensor(-2.3))
         self.raw_tau_attention = nn.Parameter(torch.tensor(-2.3))
         self.raw_tau_query = nn.Parameter(torch.tensor(-2.3))
@@ -32,7 +49,7 @@ class IERA(nn.Module):
     def _positive(value: torch.Tensor, floor: float = 1e-3) -> torch.Tensor:
         return F.softplus(value) + floor
 
-    def parameters_dict(self) -> dict[str, float]:
+    def parameters_dict(self) -> dict[str, float | int]:
         return {
             "tau": float(self._positive(self.raw_tau).detach()),
             "tau_attention": float(self._positive(self.raw_tau_attention).detach()),
@@ -40,12 +57,22 @@ class IERA(nn.Module):
             "beta": float(self._positive(self.raw_beta).detach()),
             "gamma": float(self._positive(self.raw_gamma).detach()),
             "alpha_max": self.alpha_max,
+            "support_adapter_dim": self.support_adapter_dim,
+            "support_adapter_norm": float(
+                self.support_adapter_up.weight.detach().norm()
+            ),
             "anchor_bias": float(self.raw_anchor_bias.detach()),
             "anchor_slope": float(self.raw_anchor_slope.detach()),
         }
 
     def _project(self, tokens: torch.Tensor) -> torch.Tensor:
         return F.normalize(self.projection(tokens.float()), dim=-1)
+
+    def _adapt_support(self, projected: torch.Tensor) -> torch.Tensor:
+        residual = self.support_adapter_up(
+            F.gelu(self.support_adapter_down(projected))
+        )
+        return F.normalize(projected + residual, dim=-1)
 
     def _lme(self, tokens: torch.Tensor, bank: torch.Tensor, self_image_offset: int | None = None) -> torch.Tensor:
         # tokens [B,N,P,D], bank [B,A,D] -> [B,N,P]
@@ -128,8 +155,8 @@ class IERA(nn.Module):
         return prototype, alpha.squeeze(-1)
 
     def anchor_weight(self, positive_tokens: torch.Tensor, negative_tokens: torch.Tensor) -> torch.Tensor:
-        positive = self._project(positive_tokens)
-        negative = self._project(negative_tokens)
+        positive = self._adapt_support(self._project(positive_tokens))
+        negative = self._adapt_support(self._project(negative_tokens))
         return self._anchored_prototype(positive, negative)[1]
 
     def _local_logits(self, query: torch.Tensor, prototype: torch.Tensor) -> torch.Tensor:
@@ -161,6 +188,10 @@ class IERA(nn.Module):
         elif method == "iera":
             prototype = self._evidence_prototype(positive, negative)
         else:
+            # Only Anchored IERA may adapt support representations. Query tokens
+            # always remain in the frozen learned-uniform projection space.
+            positive = self._adapt_support(positive)
+            negative = self._adapt_support(negative)
             prototype, _ = self._anchored_prototype(positive, negative)
         return self._local_logits(query, prototype)
 

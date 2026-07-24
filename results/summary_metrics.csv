@@ -1,0 +1,545 @@
+pair,target,confounder,method,shot,metric,mean,std
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,frozen_protonet,1,auroc,0.44712000489234927,0.03115360171164313
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,frozen_protonet,1,auprc,0.4680447578430176,0.02659715981959036
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,frozen_protonet,1,f1,0.6666666865348816,0.0
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,frozen_protonet,1,brier,0.2505283236503601,8.54220333188293e-05
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,frozen_protonet,1,ece,0.02153857946395874,0.00014675965128434326
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,frozen_protonet,1,false_positive_c0d1,0.5215842247009277,0.0001942069814446631
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,frozen_protonet,1,sms_raw_logit,0.07780704945325852,0.0037695791664030067
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,frozen_protonet,1,sms_normalized_logit,1.0211015105247498,0.05126942045803523
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,frozen_protonet,1,support_swap_flip_rate,0.0,0.0
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,frozen_protonet,1,support_swap_error_gap,0.0,0.0
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,frozen_protonet,1,worst_support_panel_error,0.5,0.0
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,frozen_protonet,1,d0_auroc,0.4413599967956543,0.015130365420125802
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,frozen_protonet,1,d0_auprc,0.47017204761505127,0.01864061873622486
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,frozen_protonet,1,d1_auroc,0.45151999592781067,0.05201568274381046
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,frozen_protonet,1,d1_auprc,0.48031814098358155,0.046124857718898606
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,frozen_protonet,1,worst_nuisance_auroc,0.4297599971294403,0.02829642690053473
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,frozen_protonet,1,worst_nuisance_auprc,0.4607242941856384,0.011718015281482565
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,frozen_protonet,3,auroc,0.45681999921798705,0.0361053592532478
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,frozen_protonet,3,auprc,0.47543424367904663,0.027501583369525483
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,frozen_protonet,3,f1,0.6666666865348816,0.0
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,frozen_protonet,3,brier,0.25055031180381776,6.858454171650644e-05
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,frozen_protonet,3,ece,0.022291159629821776,5.37661913291872e-05
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,frozen_protonet,3,false_positive_c0d1,0.5223487496376038,0.00019437802295874584
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,frozen_protonet,3,sms_raw_logit,0.047037440538406375,0.005080465304662473
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,frozen_protonet,3,sms_normalized_logit,0.8724811673164368,0.09162247557819816
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,frozen_protonet,3,support_swap_flip_rate,0.0,0.0
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,frozen_protonet,3,support_swap_error_gap,0.0,0.0
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,frozen_protonet,3,worst_support_panel_error,0.5,0.0
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,frozen_protonet,3,d0_auroc,0.43712000250816346,0.03676781099133747
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,frozen_protonet,3,d0_auprc,0.47872479557991027,0.031128865785167152
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,frozen_protonet,3,d1_auroc,0.4690399944782257,0.06952674128751324
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,frozen_protonet,3,d1_auprc,0.48951135873794555,0.045261246226258184
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,frozen_protonet,3,worst_nuisance_auroc,0.4179199993610382,0.04984005959525729
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,frozen_protonet,3,worst_nuisance_auprc,0.46184166669845583,0.017129818666203733
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,frozen_protonet,5,auroc,0.4395799994468689,0.03796059688383818
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,frozen_protonet,5,auprc,0.47236490845680235,0.03306020978192997
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,frozen_protonet,5,f1,0.6666666865348816,0.0
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,frozen_protonet,5,brier,0.25057770013809205,6.399194539113063e-05
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,frozen_protonet,5,ece,0.022457575798034667,4.237610654152328e-05
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,frozen_protonet,5,false_positive_c0d1,0.5225449800491333,0.00019455972265427056
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,frozen_protonet,5,sms_raw_logit,0.038430729508399965,0.002971667889110422
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,frozen_protonet,5,sms_normalized_logit,0.7883974313735962,0.09612913930589839
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,frozen_protonet,5,support_swap_flip_rate,0.0,0.0
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,frozen_protonet,5,support_swap_error_gap,0.0,0.0
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,frozen_protonet,5,worst_support_panel_error,0.5,0.0
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,frozen_protonet,5,d0_auroc,0.4209600031375885,0.04856549460499487
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,frozen_protonet,5,d0_auprc,0.46537806987762453,0.027374158279772593
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,frozen_protonet,5,d1_auroc,0.4562399983406067,0.06297719267497096
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,frozen_protonet,5,d1_auprc,0.49093759059906006,0.05859629866799107
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,frozen_protonet,5,worst_nuisance_auroc,0.40112000703811646,0.038490929709242436
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,frozen_protonet,5,worst_nuisance_auprc,0.4549786686897278,0.020743877138487386
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,frozen_protonet,10,auroc,0.43781999349594114,0.040404123818415745
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,frozen_protonet,10,auprc,0.47277035713195803,0.04758414565096493
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,frozen_protonet,10,f1,0.6666666865348816,0.0
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,frozen_protonet,10,brier,0.2505847692489624,5.98972321648768e-05
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,frozen_protonet,10,ece,0.022572028636932372,2.5837338200504047e-05
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,frozen_protonet,10,false_positive_c0d1,0.5226643681526184,0.00021234779808814984
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,frozen_protonet,10,sms_raw_logit,0.03342507742345333,0.003502219266767053
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,frozen_protonet,10,sms_normalized_logit,0.7255267024040222,0.107912210439663
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,frozen_protonet,10,support_swap_flip_rate,0.0,0.0
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,frozen_protonet,10,support_swap_error_gap,0.0,0.0
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,frozen_protonet,10,worst_support_panel_error,0.5,0.0
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,frozen_protonet,10,d0_auroc,0.41003999710083006,0.0314694790335721
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,frozen_protonet,10,d0_auprc,0.4511509358882904,0.023912962639371777
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,frozen_protonet,10,d1_auroc,0.45911999940872195,0.07801916862343143
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,frozen_protonet,10,d1_auprc,0.5051200032234192,0.08109652280621683
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,frozen_protonet,10,worst_nuisance_auroc,0.3910799980163574,0.03672426529134645
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,frozen_protonet,10,worst_nuisance_auprc,0.44576709866523745,0.024258044669718842
+Edema__Cardiomegaly,Edema,Cardiomegaly,frozen_protonet,1,auroc,0.6355800032615662,0.06347564021128438
+Edema__Cardiomegaly,Edema,Cardiomegaly,frozen_protonet,1,auprc,0.6052324175834656,0.06755471112501969
+Edema__Cardiomegaly,Edema,Cardiomegaly,frozen_protonet,1,f1,0.6666666865348816,0.0
+Edema__Cardiomegaly,Edema,Cardiomegaly,frozen_protonet,1,brier,0.2500898987054825,0.00014429969362664827
+Edema__Cardiomegaly,Edema,Cardiomegaly,frozen_protonet,1,ece,0.02164177894592285,0.00010273637675118616
+Edema__Cardiomegaly,Edema,Cardiomegaly,frozen_protonet,1,false_positive_c0d1,0.5214909791946412,0.00027895500193930625
+Edema__Cardiomegaly,Edema,Cardiomegaly,frozen_protonet,1,sms_raw_logit,0.06487799435853958,0.0029932465442968352
+Edema__Cardiomegaly,Edema,Cardiomegaly,frozen_protonet,1,sms_normalized_logit,0.8938065052032471,0.005606334654410283
+Edema__Cardiomegaly,Edema,Cardiomegaly,frozen_protonet,1,support_swap_flip_rate,0.0,0.0
+Edema__Cardiomegaly,Edema,Cardiomegaly,frozen_protonet,1,support_swap_error_gap,0.0,0.0
+Edema__Cardiomegaly,Edema,Cardiomegaly,frozen_protonet,1,worst_support_panel_error,0.5,0.0
+Edema__Cardiomegaly,Edema,Cardiomegaly,frozen_protonet,1,d0_auroc,0.6628799915313721,0.06277414075253587
+Edema__Cardiomegaly,Edema,Cardiomegaly,frozen_protonet,1,d0_auprc,0.6296190738677978,0.06865648997407948
+Edema__Cardiomegaly,Edema,Cardiomegaly,frozen_protonet,1,d1_auroc,0.6064799964427948,0.0818297773553892
+Edema__Cardiomegaly,Edema,Cardiomegaly,frozen_protonet,1,d1_auprc,0.591464614868164,0.07915073618838044
+Edema__Cardiomegaly,Edema,Cardiomegaly,frozen_protonet,1,worst_nuisance_auroc,0.6035199940204621,0.07667562638552208
+Edema__Cardiomegaly,Edema,Cardiomegaly,frozen_protonet,1,worst_nuisance_auprc,0.5790542244911194,0.05666630205217751
+Edema__Cardiomegaly,Edema,Cardiomegaly,frozen_protonet,3,auroc,0.6553200006484985,0.050057827108166204
+Edema__Cardiomegaly,Edema,Cardiomegaly,frozen_protonet,3,auprc,0.6128031849861145,0.0581110553199685
+Edema__Cardiomegaly,Edema,Cardiomegaly,frozen_protonet,3,f1,0.6666666865348816,0.0
+Edema__Cardiomegaly,Edema,Cardiomegaly,frozen_protonet,3,brier,0.25016730427742007,0.00010052448231144348
+Edema__Cardiomegaly,Edema,Cardiomegaly,frozen_protonet,3,ece,0.02229146957397461,4.074853568835035e-05
+Edema__Cardiomegaly,Edema,Cardiomegaly,frozen_protonet,3,false_positive_c0d1,0.5222069621086121,0.0001680693773347658
+Edema__Cardiomegaly,Edema,Cardiomegaly,frozen_protonet,3,sms_raw_logit,0.036930781602859494,0.0030497547664224
+Edema__Cardiomegaly,Edema,Cardiomegaly,frozen_protonet,3,sms_normalized_logit,0.6859653234481812,0.048147559605354946
+Edema__Cardiomegaly,Edema,Cardiomegaly,frozen_protonet,3,support_swap_flip_rate,0.0,0.0
+Edema__Cardiomegaly,Edema,Cardiomegaly,frozen_protonet,3,support_swap_error_gap,0.0,0.0
+Edema__Cardiomegaly,Edema,Cardiomegaly,frozen_protonet,3,worst_support_panel_error,0.5,0.0
+Edema__Cardiomegaly,Edema,Cardiomegaly,frozen_protonet,3,d0_auroc,0.6967999935150146,0.06888773365649153
+Edema__Cardiomegaly,Edema,Cardiomegaly,frozen_protonet,3,d0_auprc,0.6677569270133972,0.07977136509585213
+Edema__Cardiomegaly,Edema,Cardiomegaly,frozen_protonet,3,d1_auroc,0.6157599925994873,0.054455548015459446
+Edema__Cardiomegaly,Edema,Cardiomegaly,frozen_protonet,3,d1_auprc,0.5801821947097778,0.06180995902920775
+Edema__Cardiomegaly,Edema,Cardiomegaly,frozen_protonet,3,worst_nuisance_auroc,0.6157599925994873,0.054455548015459446
+Edema__Cardiomegaly,Edema,Cardiomegaly,frozen_protonet,3,worst_nuisance_auprc,0.5801821947097778,0.06180995902920775
+Edema__Cardiomegaly,Edema,Cardiomegaly,frozen_protonet,5,auroc,0.6633599996566772,0.03827705161001192
+Edema__Cardiomegaly,Edema,Cardiomegaly,frozen_protonet,5,auprc,0.6251126527786255,0.05188179944465579
+Edema__Cardiomegaly,Edema,Cardiomegaly,frozen_protonet,5,f1,0.6666666865348816,0.0
+Edema__Cardiomegaly,Edema,Cardiomegaly,frozen_protonet,5,brier,0.2501660645008087,7.406602467546788e-05
+Edema__Cardiomegaly,Edema,Cardiomegaly,frozen_protonet,5,ece,0.022414469718933107,4.536055623432285e-05
+Edema__Cardiomegaly,Edema,Cardiomegaly,frozen_protonet,5,false_positive_c0d1,0.522331964969635,0.00015940690536235107
+Edema__Cardiomegaly,Edema,Cardiomegaly,frozen_protonet,5,sms_raw_logit,0.02873370386660099,0.0022248211950933847
+Edema__Cardiomegaly,Edema,Cardiomegaly,frozen_protonet,5,sms_normalized_logit,0.563302743434906,0.042121541881153385
+Edema__Cardiomegaly,Edema,Cardiomegaly,frozen_protonet,5,support_swap_flip_rate,0.0,0.0
+Edema__Cardiomegaly,Edema,Cardiomegaly,frozen_protonet,5,support_swap_error_gap,0.0,0.0
+Edema__Cardiomegaly,Edema,Cardiomegaly,frozen_protonet,5,worst_support_panel_error,0.5,0.0
+Edema__Cardiomegaly,Edema,Cardiomegaly,frozen_protonet,5,d0_auroc,0.7011199951171875,0.04075528744297972
+Edema__Cardiomegaly,Edema,Cardiomegaly,frozen_protonet,5,d0_auprc,0.6707461476325989,0.04587968389423583
+Edema__Cardiomegaly,Edema,Cardiomegaly,frozen_protonet,5,d1_auroc,0.6244799971580506,0.06296054660998769
+Edema__Cardiomegaly,Edema,Cardiomegaly,frozen_protonet,5,d1_auprc,0.5968994617462158,0.08022366328134338
+Edema__Cardiomegaly,Edema,Cardiomegaly,frozen_protonet,5,worst_nuisance_auroc,0.6189599990844726,0.050985166149329325
+Edema__Cardiomegaly,Edema,Cardiomegaly,frozen_protonet,5,worst_nuisance_auprc,0.5904924273490906,0.06796580128647366
+Edema__Cardiomegaly,Edema,Cardiomegaly,frozen_protonet,10,auroc,0.671720004081726,0.04356659710233301
+Edema__Cardiomegaly,Edema,Cardiomegaly,frozen_protonet,10,auprc,0.6334052324295044,0.045796910507526066
+Edema__Cardiomegaly,Edema,Cardiomegaly,frozen_protonet,10,f1,0.6666666865348816,0.0
+Edema__Cardiomegaly,Edema,Cardiomegaly,frozen_protonet,10,brier,0.25016080141067504,8.746426071610321e-05
+Edema__Cardiomegaly,Edema,Cardiomegaly,frozen_protonet,10,ece,0.02250610589981079,4.373580724142853e-05
+Edema__Cardiomegaly,Edema,Cardiomegaly,frozen_protonet,10,false_positive_c0d1,0.5223976731300354,0.00015753367002475227
+Edema__Cardiomegaly,Edema,Cardiomegaly,frozen_protonet,10,sms_raw_logit,0.021254198998212813,0.0019890445598857174
+Edema__Cardiomegaly,Edema,Cardiomegaly,frozen_protonet,10,sms_normalized_logit,0.4413894295692444,0.04031363130826757
+Edema__Cardiomegaly,Edema,Cardiomegaly,frozen_protonet,10,support_swap_flip_rate,0.0,0.0
+Edema__Cardiomegaly,Edema,Cardiomegaly,frozen_protonet,10,support_swap_error_gap,0.0,0.0
+Edema__Cardiomegaly,Edema,Cardiomegaly,frozen_protonet,10,worst_support_panel_error,0.5,0.0
+Edema__Cardiomegaly,Edema,Cardiomegaly,frozen_protonet,10,d0_auroc,0.7074399948120117,0.038129894242778996
+Edema__Cardiomegaly,Edema,Cardiomegaly,frozen_protonet,10,d0_auprc,0.6717601656913758,0.0470356371941899
+Edema__Cardiomegaly,Edema,Cardiomegaly,frozen_protonet,10,d1_auroc,0.6371999979019165,0.07019472859763584
+Edema__Cardiomegaly,Edema,Cardiomegaly,frozen_protonet,10,d1_auprc,0.6121926665306091,0.06875747500956543
+Edema__Cardiomegaly,Edema,Cardiomegaly,frozen_protonet,10,worst_nuisance_auroc,0.6312800049781799,0.05823790602892235
+Edema__Cardiomegaly,Edema,Cardiomegaly,frozen_protonet,10,worst_nuisance_auprc,0.6049129366874695,0.05490095572543082
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,learned_uniform,1,auroc,0.4693000018596649,0.032977424043537984
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,learned_uniform,1,auprc,0.49330506920814515,0.04002549793008997
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,learned_uniform,1,f1,0.6666666865348816,0.0
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,learned_uniform,1,brier,0.2514519512653351,0.0007949006505767272
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,learned_uniform,1,ece,0.02890504486858845,0.009449188222909955
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,learned_uniform,1,false_positive_c0d1,0.5119966387748718,0.0031207987384722284
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,learned_uniform,1,sms_raw_logit,0.9040992736816407,0.06596084792462191
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,learned_uniform,1,sms_normalized_logit,1.082895314693451,0.0913418075589934
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,learned_uniform,1,support_swap_flip_rate,0.0,0.0
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,learned_uniform,1,support_swap_error_gap,0.0,0.0
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,learned_uniform,1,worst_support_panel_error,0.5,0.0
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,learned_uniform,1,d0_auroc,0.4588799953460693,0.042247262623588064
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,learned_uniform,1,d0_auprc,0.490168434381485,0.044197820991250934
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,learned_uniform,1,d1_auroc,0.4767199993133545,0.0393104599274849
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,learned_uniform,1,d1_auprc,0.5070946335792541,0.0425457201958056
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,learned_uniform,1,worst_nuisance_auroc,0.4481599986553192,0.03445181364262985
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,learned_uniform,1,worst_nuisance_auprc,0.4811724305152893,0.04099277835103203
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,learned_uniform,3,auroc,0.4834600031375885,0.019336703560612185
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,learned_uniform,3,auprc,0.5037298917770385,0.03523812803752807
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,learned_uniform,3,f1,0.6693877696990966,0.00608452692761516
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,learned_uniform,3,brier,0.2516915500164032,0.0004738612669619967
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,learned_uniform,3,ece,0.035849519073963165,0.013029564062208373
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,learned_uniform,3,false_positive_c0d1,0.5211161375045776,0.008247247361401252
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,learned_uniform,3,sms_raw_logit,0.7734086036682128,0.055324831868674006
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,learned_uniform,3,sms_normalized_logit,1.0088415026664734,0.12220840345772992
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,learned_uniform,3,support_swap_flip_rate,0.014000000059604644,0.03130495181827709
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,learned_uniform,3,support_swap_error_gap,0.0019999980926513673,0.00447213169003838
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,learned_uniform,3,worst_support_panel_error,0.4990000009536743,0.00223606584501919
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,learned_uniform,3,d0_auroc,0.4671999990940094,0.031769176045920215
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,learned_uniform,3,d0_auprc,0.5037728607654571,0.049976717243612474
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,learned_uniform,3,d1_auroc,0.4984000027179718,0.04611203944503293
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,learned_uniform,3,d1_auprc,0.516380923986435,0.03331351763466451
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,learned_uniform,3,worst_nuisance_auroc,0.4556799948215485,0.020140313612184272
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,learned_uniform,3,worst_nuisance_auprc,0.49206307530403137,0.0451476379596397
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,learned_uniform,5,auroc,0.46423999667167665,0.0287920689442079
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,learned_uniform,5,auprc,0.4962091624736786,0.026676749407145813
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,learned_uniform,5,f1,0.6671171307563781,0.0010072238993383295
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,learned_uniform,5,brier,0.2531320333480835,0.0022392583665506627
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,learned_uniform,5,ece,0.06198972649872303,0.032484727639645855
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,learned_uniform,5,false_positive_c0d1,0.5260450005531311,0.010463836232720366
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,learned_uniform,5,sms_raw_logit,0.7197434663772583,0.08936782987180984
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,learned_uniform,5,sms_normalized_logit,0.9591982364654541,0.10788340074177055
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,learned_uniform,5,support_swap_flip_rate,0.011999999731779098,0.026832815130237306
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,learned_uniform,5,support_swap_error_gap,0.0039999961853027345,0.00894426338007676
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,learned_uniform,5,worst_support_panel_error,0.5019999980926514,0.00447213169003838
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,learned_uniform,5,d0_auroc,0.4402400016784668,0.039591515396419426
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,learned_uniform,5,d0_auprc,0.48579692244529726,0.045743939062800616
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,learned_uniform,5,d1_auroc,0.48679999709129335,0.07001314462243635
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,learned_uniform,5,d1_auprc,0.5234673500061036,0.03940252218656289
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,learned_uniform,5,worst_nuisance_auroc,0.4202399969100952,0.02954806390787369
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,learned_uniform,5,worst_nuisance_auprc,0.47042976021766664,0.032922702788265056
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,learned_uniform,10,auroc,0.45997999906539916,0.03226124126960909
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,learned_uniform,10,auprc,0.48781412839889526,0.024802156951630395
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,learned_uniform,10,f1,0.6666666865348816,0.0
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,learned_uniform,10,brier,0.25264413356781007,0.0020522632769282368
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,learned_uniform,10,ece,0.04824283719062805,0.0294793902943831
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,learned_uniform,10,false_positive_c0d1,0.5237861394882202,0.008422713696041754
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,learned_uniform,10,sms_raw_logit,0.666043758392334,0.07092748369598316
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,learned_uniform,10,sms_normalized_logit,0.8927311420440673,0.10296290798962597
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,learned_uniform,10,support_swap_flip_rate,0.0,0.0
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,learned_uniform,10,support_swap_error_gap,0.0,0.0
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,learned_uniform,10,worst_support_panel_error,0.5,0.0
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,learned_uniform,10,d0_auroc,0.4230400025844574,0.0451660017227814
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,learned_uniform,10,d0_auprc,0.47618589997291566,0.05141851114748811
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,learned_uniform,10,d1_auroc,0.4963200032711029,0.05700343319908716
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,learned_uniform,10,d1_auprc,0.5159049034118652,0.02311431768969785
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,learned_uniform,10,worst_nuisance_auroc,0.4156000018119812,0.04163459741146102
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,learned_uniform,10,worst_nuisance_auprc,0.46517152190208433,0.04039519124834162
+Edema__Cardiomegaly,Edema,Cardiomegaly,learned_uniform,1,auroc,0.7548799991607666,0.04901170333752158
+Edema__Cardiomegaly,Edema,Cardiomegaly,learned_uniform,1,auprc,0.7484558820724487,0.046310723659939934
+Edema__Cardiomegaly,Edema,Cardiomegaly,learned_uniform,1,f1,0.7178749322891236,0.047680238016293425
+Edema__Cardiomegaly,Edema,Cardiomegaly,learned_uniform,1,brier,0.21226142942905427,0.019795905255854295
+Edema__Cardiomegaly,Edema,Cardiomegaly,learned_uniform,1,ece,0.12248328924179078,0.016557967961246086
+Edema__Cardiomegaly,Edema,Cardiomegaly,learned_uniform,1,false_positive_c0d1,0.570155680179596,0.04505316073953621
+Edema__Cardiomegaly,Edema,Cardiomegaly,learned_uniform,1,sms_raw_logit,0.6175177931785584,0.044218863321261626
+Edema__Cardiomegaly,Edema,Cardiomegaly,learned_uniform,1,sms_normalized_logit,0.6865030527114868,0.09015052982361968
+Edema__Cardiomegaly,Edema,Cardiomegaly,learned_uniform,1,support_swap_flip_rate,0.25799999833106996,0.0636985130193772
+Edema__Cardiomegaly,Edema,Cardiomegaly,learned_uniform,1,support_swap_error_gap,0.031999999284744264,0.02514954498924569
+Edema__Cardiomegaly,Edema,Cardiomegaly,learned_uniform,1,worst_support_panel_error,0.36299999952316286,0.048166381260358514
+Edema__Cardiomegaly,Edema,Cardiomegaly,learned_uniform,1,d0_auroc,0.8173599958419799,0.044687904776412525
+Edema__Cardiomegaly,Edema,Cardiomegaly,learned_uniform,1,d0_auprc,0.81653391122818,0.033566406059595696
+Edema__Cardiomegaly,Edema,Cardiomegaly,learned_uniform,1,d1_auroc,0.7042400002479553,0.06230543646714108
+Edema__Cardiomegaly,Edema,Cardiomegaly,learned_uniform,1,d1_auprc,0.7025506854057312,0.06792416905970954
+Edema__Cardiomegaly,Edema,Cardiomegaly,learned_uniform,1,worst_nuisance_auroc,0.7042400002479553,0.06230543646714108
+Edema__Cardiomegaly,Edema,Cardiomegaly,learned_uniform,1,worst_nuisance_auprc,0.7025506854057312,0.06792416905970954
+Edema__Cardiomegaly,Edema,Cardiomegaly,learned_uniform,3,auroc,0.7874600052833557,0.03194570317145987
+Edema__Cardiomegaly,Edema,Cardiomegaly,learned_uniform,3,auprc,0.7716954350471497,0.037414698486814925
+Edema__Cardiomegaly,Edema,Cardiomegaly,learned_uniform,3,f1,0.7156604886054992,0.04481790688657433
+Edema__Cardiomegaly,Edema,Cardiomegaly,learned_uniform,3,brier,0.2021305412054062,0.015695387150850313
+Edema__Cardiomegaly,Edema,Cardiomegaly,learned_uniform,3,ece,0.12266335487365723,0.01598166888214998
+Edema__Cardiomegaly,Edema,Cardiomegaly,learned_uniform,3,false_positive_c0d1,0.5871252536773681,0.04801866037576506
+Edema__Cardiomegaly,Edema,Cardiomegaly,learned_uniform,3,sms_raw_logit,0.4469545543193817,0.04846154446981301
+Edema__Cardiomegaly,Edema,Cardiomegaly,learned_uniform,3,sms_normalized_logit,0.48534674644470216,0.0930633362147287
+Edema__Cardiomegaly,Edema,Cardiomegaly,learned_uniform,3,support_swap_flip_rate,0.1689999967813492,0.06035312183057013
+Edema__Cardiomegaly,Edema,Cardiomegaly,learned_uniform,3,support_swap_error_gap,0.02900000810623169,0.030290265797113507
+Edema__Cardiomegaly,Edema,Cardiomegaly,learned_uniform,3,worst_support_panel_error,0.3510000050067902,0.027477262341067548
+Edema__Cardiomegaly,Edema,Cardiomegaly,learned_uniform,3,d0_auroc,0.8618399977684021,0.038877863553578945
+Edema__Cardiomegaly,Edema,Cardiomegaly,learned_uniform,3,d0_auprc,0.8598003387451172,0.04775608146682601
+Edema__Cardiomegaly,Edema,Cardiomegaly,learned_uniform,3,d1_auroc,0.7229599952697754,0.03655198485432405
+Edema__Cardiomegaly,Edema,Cardiomegaly,learned_uniform,3,d1_auprc,0.7146256804466248,0.04784673602939124
+Edema__Cardiomegaly,Edema,Cardiomegaly,learned_uniform,3,worst_nuisance_auroc,0.7229599952697754,0.03655198485432405
+Edema__Cardiomegaly,Edema,Cardiomegaly,learned_uniform,3,worst_nuisance_auprc,0.7146256804466248,0.04784673602939124
+Edema__Cardiomegaly,Edema,Cardiomegaly,learned_uniform,5,auroc,0.7961999893188476,0.021375572541810342
+Edema__Cardiomegaly,Edema,Cardiomegaly,learned_uniform,5,auprc,0.789676558971405,0.021236950645892146
+Edema__Cardiomegaly,Edema,Cardiomegaly,learned_uniform,5,f1,0.739170229434967,0.027624992286943036
+Edema__Cardiomegaly,Edema,Cardiomegaly,learned_uniform,5,brier,0.1997976154088974,0.014940059553881044
+Edema__Cardiomegaly,Edema,Cardiomegaly,learned_uniform,5,ece,0.13985936492681503,0.01806454890956417
+Edema__Cardiomegaly,Edema,Cardiomegaly,learned_uniform,5,false_positive_c0d1,0.5874320507049561,0.04672145598484238
+Edema__Cardiomegaly,Edema,Cardiomegaly,learned_uniform,5,sms_raw_logit,0.33585016131401063,0.06774342443736057
+Edema__Cardiomegaly,Edema,Cardiomegaly,learned_uniform,5,sms_normalized_logit,0.3475740671157837,0.08120252126534631
+Edema__Cardiomegaly,Edema,Cardiomegaly,learned_uniform,5,support_swap_flip_rate,0.11400000005960464,0.016733199934036738
+Edema__Cardiomegaly,Edema,Cardiomegaly,learned_uniform,5,support_swap_error_gap,0.015999996662139894,0.008944278374083304
+Edema__Cardiomegaly,Edema,Cardiomegaly,learned_uniform,5,worst_support_panel_error,0.3100000023841858,0.03391165382638692
+Edema__Cardiomegaly,Edema,Cardiomegaly,learned_uniform,5,d0_auroc,0.8643200039863587,0.02576727559182149
+Edema__Cardiomegaly,Edema,Cardiomegaly,learned_uniform,5,d0_auprc,0.8659851431846619,0.03204606412677258
+Edema__Cardiomegaly,Edema,Cardiomegaly,learned_uniform,5,d1_auroc,0.7410399913787842,0.03863323674905798
+Edema__Cardiomegaly,Edema,Cardiomegaly,learned_uniform,5,d1_auprc,0.7479358315467834,0.042406509132850795
+Edema__Cardiomegaly,Edema,Cardiomegaly,learned_uniform,5,worst_nuisance_auroc,0.7410399913787842,0.03863323674905798
+Edema__Cardiomegaly,Edema,Cardiomegaly,learned_uniform,5,worst_nuisance_auprc,0.7479358315467834,0.042406509132850795
+Edema__Cardiomegaly,Edema,Cardiomegaly,learned_uniform,10,auroc,0.8018599867820739,0.02017220551631154
+Edema__Cardiomegaly,Edema,Cardiomegaly,learned_uniform,10,auprc,0.791236138343811,0.021925104180325932
+Edema__Cardiomegaly,Edema,Cardiomegaly,learned_uniform,10,f1,0.7428865790367126,0.024587183728262855
+Edema__Cardiomegaly,Edema,Cardiomegaly,learned_uniform,10,brier,0.19716797173023223,0.0169203831212666
+Edema__Cardiomegaly,Edema,Cardiomegaly,learned_uniform,10,ece,0.1267728865146637,0.021643362176027067
+Edema__Cardiomegaly,Edema,Cardiomegaly,learned_uniform,10,false_positive_c0d1,0.5822421669960022,0.05288272847217016
+Edema__Cardiomegaly,Edema,Cardiomegaly,learned_uniform,10,sms_raw_logit,0.2555730402469635,0.08688101455347441
+Edema__Cardiomegaly,Edema,Cardiomegaly,learned_uniform,10,sms_normalized_logit,0.2516708880662918,0.09243081691906267
+Edema__Cardiomegaly,Edema,Cardiomegaly,learned_uniform,10,support_swap_flip_rate,0.08399999886751175,0.03209361194814926
+Edema__Cardiomegaly,Edema,Cardiomegaly,learned_uniform,10,support_swap_error_gap,0.010000002384185792,0.014142137941808207
+Edema__Cardiomegaly,Edema,Cardiomegaly,learned_uniform,10,worst_support_panel_error,0.28799999952316285,0.021679475429289937
+Edema__Cardiomegaly,Edema,Cardiomegaly,learned_uniform,10,d0_auroc,0.8656000018119812,0.022664504139444507
+Edema__Cardiomegaly,Edema,Cardiomegaly,learned_uniform,10,d0_auprc,0.8656382203102112,0.029455841262184125
+Edema__Cardiomegaly,Edema,Cardiomegaly,learned_uniform,10,d1_auroc,0.7475200057029724,0.04191744663513198
+Edema__Cardiomegaly,Edema,Cardiomegaly,learned_uniform,10,d1_auprc,0.7424560427665711,0.04855391505128178
+Edema__Cardiomegaly,Edema,Cardiomegaly,learned_uniform,10,worst_nuisance_auroc,0.7475200057029724,0.04191744663513198
+Edema__Cardiomegaly,Edema,Cardiomegaly,learned_uniform,10,worst_nuisance_auprc,0.7424560427665711,0.04855391505128178
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,iera,1,auroc,0.4885600030422211,0.02118167806182503
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,iera,1,auprc,0.5076848864555359,0.020713396803427396
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,iera,1,f1,0.6666666865348816,0.0
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,iera,1,brier,0.25090934336185455,0.0006291240856003927
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,iera,1,ece,0.018610189855098724,0.003418463047907418
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,iera,1,false_positive_c0d1,0.5150524258613587,0.002615539044683849
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,iera,1,sms_raw_logit,0.7365189313888549,0.08974978748475505
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,iera,1,sms_normalized_logit,1.094344472885132,0.05099016041327515
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,iera,1,support_swap_flip_rate,0.0,0.0
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,iera,1,support_swap_error_gap,0.0,0.0
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,iera,1,worst_support_panel_error,0.5,0.0
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,iera,1,d0_auroc,0.49240000247955323,0.023571165012399437
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,iera,1,d0_auprc,0.5243916749954224,0.02705335639175538
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,iera,1,d1_auroc,0.48199999928474424,0.04215401058925926
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,iera,1,d1_auprc,0.5076932966709137,0.026504822203428004
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,iera,1,worst_nuisance_auroc,0.4629599988460541,0.025426911507492864
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,iera,1,worst_nuisance_auprc,0.5041691720485687,0.02438204732690974
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,iera,3,auroc,0.5115199983119965,0.019044473597655733
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,iera,3,auprc,0.5224766612052918,0.018383171992117753
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,iera,3,f1,0.6666666865348816,0.0
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,iera,3,brier,0.25041499435901643,0.0007506068418836598
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,iera,3,ece,0.018237629905343056,0.004988739259617482
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,iera,3,false_positive_c0d1,0.5171501398086548,0.007443153840080334
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,iera,3,sms_raw_logit,0.6938060641288757,0.0966724879829901
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,iera,3,sms_normalized_logit,1.0756604313850402,0.07041517454470592
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,iera,3,support_swap_flip_rate,0.0,0.0
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,iera,3,support_swap_error_gap,0.0,0.0
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,iera,3,worst_support_panel_error,0.5,0.0
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,iera,3,d0_auroc,0.5307999908924103,0.03935479217720345
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,iera,3,d0_auprc,0.5410562574863433,0.03029685013892981
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,iera,3,d1_auroc,0.49160000681877136,0.03149985233166537
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,iera,3,d1_auprc,0.5212025701999664,0.034219104115329725
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,iera,3,worst_nuisance_auroc,0.4840000033378601,0.030017338049409023
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,iera,3,worst_nuisance_auprc,0.5040569186210633,0.019606807472987462
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,iera,5,auroc,0.5116199970245361,0.04272349179401255
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,iera,5,auprc,0.5148829281330108,0.03935117927025662
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,iera,5,f1,0.6666666865348816,0.0
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,iera,5,brier,0.2500996857881546,0.0010394451547050838
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,iera,5,ece,0.02444160021841526,0.007484706172533159
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,iera,5,false_positive_c0d1,0.5159761071205139,0.008916933021180521
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,iera,5,sms_raw_logit,0.6922039866447449,0.13683925837830435
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,iera,5,sms_normalized_logit,1.0740657925605774,0.09522502814260791
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,iera,5,support_swap_flip_rate,0.0,0.0
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,iera,5,support_swap_error_gap,0.0,0.0
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,iera,5,worst_support_panel_error,0.5,0.0
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,iera,5,d0_auroc,0.5196799993515014,0.06329764008942672
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,iera,5,d0_auprc,0.5211259245872497,0.056217068816032854
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,iera,5,d1_auroc,0.5032000005245209,0.05335091584142709
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,iera,5,d1_auprc,0.5263388574123382,0.052513237699663144
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,iera,5,worst_nuisance_auroc,0.48399999737739563,0.04069299456950314
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,iera,5,worst_nuisance_auprc,0.4956703245639801,0.03913017723608754
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,iera,10,auroc,0.5308599889278411,0.024525556042444285
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,iera,10,auprc,0.5443387985229492,0.037492286484918376
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,iera,10,f1,0.6666666865348816,0.0
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,iera,10,brier,0.2493869960308075,0.0006084562438485123
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,iera,10,ece,0.03092678226530552,0.01416719426564357
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,iera,10,false_positive_c0d1,0.5124019026756287,0.0059149910278909435
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,iera,10,sms_raw_logit,0.737016475200653,0.14122185986139202
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,iera,10,sms_normalized_logit,1.1453563928604127,0.06492882275218002
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,iera,10,support_swap_flip_rate,0.010999999940395355,0.024596747619217648
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,iera,10,support_swap_error_gap,0.0009999990463256836,0.00223606584501919
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,iera,10,worst_support_panel_error,0.5,0.0
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,iera,10,d0_auroc,0.51632000207901,0.05048834157468876
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,iera,10,d0_auprc,0.5361174762248992,0.06649045988955522
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,iera,10,d1_auroc,0.5444000005722046,0.029614863105360257
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,iera,10,d1_auprc,0.5733683347702027,0.018248336285549133
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,iera,10,worst_nuisance_auroc,0.5027199983596802,0.03797199338368753
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,iera,10,worst_nuisance_auprc,0.5208684742450714,0.04794732454161515
+Edema__Cardiomegaly,Edema,Cardiomegaly,iera,1,auroc,0.6932200074195862,0.048913985779726665
+Edema__Cardiomegaly,Edema,Cardiomegaly,iera,1,auprc,0.6586987137794494,0.04629863505183677
+Edema__Cardiomegaly,Edema,Cardiomegaly,iera,1,f1,0.684633469581604,0.015081664832114344
+Edema__Cardiomegaly,Edema,Cardiomegaly,iera,1,brier,0.2269558399915695,0.012217665628874374
+Edema__Cardiomegaly,Edema,Cardiomegaly,iera,1,ece,0.10428067594766617,0.03328336946039966
+Edema__Cardiomegaly,Edema,Cardiomegaly,iera,1,false_positive_c0d1,0.5538162589073181,0.04802675023305461
+Edema__Cardiomegaly,Edema,Cardiomegaly,iera,1,sms_raw_logit,0.6754590511322022,0.12774529532819517
+Edema__Cardiomegaly,Edema,Cardiomegaly,iera,1,sms_normalized_logit,0.8647371053695678,0.06452088547469541
+Edema__Cardiomegaly,Edema,Cardiomegaly,iera,1,support_swap_flip_rate,0.2679999977350235,0.10335617577466592
+Edema__Cardiomegaly,Edema,Cardiomegaly,iera,1,support_swap_error_gap,0.026000005006790162,0.0204328154873507
+Edema__Cardiomegaly,Edema,Cardiomegaly,iera,1,worst_support_panel_error,0.40900000333786013,0.022192343693564764
+Edema__Cardiomegaly,Edema,Cardiomegaly,iera,1,d0_auroc,0.7400799989700317,0.06510508383171791
+Edema__Cardiomegaly,Edema,Cardiomegaly,iera,1,d0_auprc,0.693119490146637,0.06644573818847183
+Edema__Cardiomegaly,Edema,Cardiomegaly,iera,1,d1_auroc,0.6503199934959412,0.056562458125047704
+Edema__Cardiomegaly,Edema,Cardiomegaly,iera,1,d1_auprc,0.6459860682487488,0.035391408082800876
+Edema__Cardiomegaly,Edema,Cardiomegaly,iera,1,worst_nuisance_auroc,0.6501599907875061,0.05661844018705207
+Edema__Cardiomegaly,Edema,Cardiomegaly,iera,1,worst_nuisance_auprc,0.6436363339424134,0.038763724556035536
+Edema__Cardiomegaly,Edema,Cardiomegaly,iera,3,auroc,0.7376999974250793,0.057400643514972226
+Edema__Cardiomegaly,Edema,Cardiomegaly,iera,3,auprc,0.7201790094375611,0.06679798763729453
+Edema__Cardiomegaly,Edema,Cardiomegaly,iera,3,f1,0.7107535123825073,0.045909417810262754
+Edema__Cardiomegaly,Edema,Cardiomegaly,iera,3,brier,0.2108783781528473,0.0198847961236002
+Edema__Cardiomegaly,Edema,Cardiomegaly,iera,3,ece,0.09987478852272033,0.023178753563015898
+Edema__Cardiomegaly,Edema,Cardiomegaly,iera,3,false_positive_c0d1,0.5399471938610076,0.054502818641031216
+Edema__Cardiomegaly,Edema,Cardiomegaly,iera,3,sms_raw_logit,0.5945759773254394,0.09020232885109554
+Edema__Cardiomegaly,Edema,Cardiomegaly,iera,3,sms_normalized_logit,0.7268465161323547,0.0745189762853177
+Edema__Cardiomegaly,Edema,Cardiomegaly,iera,3,support_swap_flip_rate,0.21299999952316284,0.029495760927279367
+Edema__Cardiomegaly,Edema,Cardiomegaly,iera,3,support_swap_error_gap,0.022999995946884157,0.021095015706839873
+Edema__Cardiomegaly,Edema,Cardiomegaly,iera,3,worst_support_panel_error,0.3759999990463257,0.03911521236643753
+Edema__Cardiomegaly,Edema,Cardiomegaly,iera,3,d0_auroc,0.802400004863739,0.07012845808400416
+Edema__Cardiomegaly,Edema,Cardiomegaly,iera,3,d0_auprc,0.7813463687896729,0.08985620407794809
+Edema__Cardiomegaly,Edema,Cardiomegaly,iera,3,d1_auroc,0.6763200044631958,0.05538043624171749
+Edema__Cardiomegaly,Edema,Cardiomegaly,iera,3,d1_auprc,0.6867289304733276,0.06475768985123073
+Edema__Cardiomegaly,Edema,Cardiomegaly,iera,3,worst_nuisance_auroc,0.6763200044631958,0.05538043624171749
+Edema__Cardiomegaly,Edema,Cardiomegaly,iera,3,worst_nuisance_auprc,0.6795923233032226,0.06755660213956463
+Edema__Cardiomegaly,Edema,Cardiomegaly,iera,5,auroc,0.7503600001335144,0.04203940223098582
+Edema__Cardiomegaly,Edema,Cardiomegaly,iera,5,auprc,0.7378751039505005,0.03858356823066808
+Edema__Cardiomegaly,Edema,Cardiomegaly,iera,5,f1,0.7200317502021789,0.022286042281542563
+Edema__Cardiomegaly,Edema,Cardiomegaly,iera,5,brier,0.20752544105052947,0.016228515953921142
+Edema__Cardiomegaly,Edema,Cardiomegaly,iera,5,ece,0.09936027526855469,0.02987084837987343
+Edema__Cardiomegaly,Edema,Cardiomegaly,iera,5,false_positive_c0d1,0.524097329378128,0.061415706568390814
+Edema__Cardiomegaly,Edema,Cardiomegaly,iera,5,sms_raw_logit,0.5464031875133515,0.08239778434161413
+Edema__Cardiomegaly,Edema,Cardiomegaly,iera,5,sms_normalized_logit,0.6476754426956177,0.08926446957275783
+Edema__Cardiomegaly,Edema,Cardiomegaly,iera,5,support_swap_flip_rate,0.18899999856948851,0.058245172530293085
+Edema__Cardiomegaly,Edema,Cardiomegaly,iera,5,support_swap_error_gap,0.04100000262260437,0.018506753172214098
+Edema__Cardiomegaly,Edema,Cardiomegaly,iera,5,worst_support_panel_error,0.3610000014305115,0.049924941122491386
+Edema__Cardiomegaly,Edema,Cardiomegaly,iera,5,d0_auroc,0.8176000118255615,0.057975170138869964
+Edema__Cardiomegaly,Edema,Cardiomegaly,iera,5,d0_auprc,0.8183184862136841,0.05753896188016754
+Edema__Cardiomegaly,Edema,Cardiomegaly,iera,5,d1_auroc,0.6927200078964233,0.045067417575143986
+Edema__Cardiomegaly,Edema,Cardiomegaly,iera,5,d1_auprc,0.6975403785705566,0.05066949079639223
+Edema__Cardiomegaly,Edema,Cardiomegaly,iera,5,worst_nuisance_auroc,0.6927200078964233,0.045067417575143986
+Edema__Cardiomegaly,Edema,Cardiomegaly,iera,5,worst_nuisance_auprc,0.6975403785705566,0.05066949079639223
+Edema__Cardiomegaly,Edema,Cardiomegaly,iera,10,auroc,0.7820999979972839,0.0451826172062884
+Edema__Cardiomegaly,Edema,Cardiomegaly,iera,10,auprc,0.779927921295166,0.04959303488409884
+Edema__Cardiomegaly,Edema,Cardiomegaly,iera,10,f1,0.7271047234535217,0.033757574756932036
+Edema__Cardiomegaly,Edema,Cardiomegaly,iera,10,brier,0.19678555130958558,0.018995595291969376
+Edema__Cardiomegaly,Edema,Cardiomegaly,iera,10,ece,0.09894202202558518,0.02156323440710995
+Edema__Cardiomegaly,Edema,Cardiomegaly,iera,10,false_positive_c0d1,0.4946753740310669,0.08678216798116134
+Edema__Cardiomegaly,Edema,Cardiomegaly,iera,10,sms_raw_logit,0.44416584372520446,0.0740062927711157
+Edema__Cardiomegaly,Edema,Cardiomegaly,iera,10,sms_normalized_logit,0.5201448440551758,0.1043223105879769
+Edema__Cardiomegaly,Edema,Cardiomegaly,iera,10,support_swap_flip_rate,0.15599999874830245,0.07012488867777235
+Edema__Cardiomegaly,Edema,Cardiomegaly,iera,10,support_swap_error_gap,0.012000000476837159,0.010368218693343761
+Edema__Cardiomegaly,Edema,Cardiomegaly,iera,10,worst_support_panel_error,0.32600000500679016,0.04174326809843325
+Edema__Cardiomegaly,Edema,Cardiomegaly,iera,10,d0_auroc,0.841920006275177,0.04304174598013817
+Edema__Cardiomegaly,Edema,Cardiomegaly,iera,10,d0_auprc,0.841087806224823,0.05181137381492171
+Edema__Cardiomegaly,Edema,Cardiomegaly,iera,10,d1_auroc,0.7311999917030334,0.06790934644413159
+Edema__Cardiomegaly,Edema,Cardiomegaly,iera,10,d1_auprc,0.7424461483955384,0.06378303225884398
+Edema__Cardiomegaly,Edema,Cardiomegaly,iera,10,worst_nuisance_auroc,0.7311999917030334,0.06790934644413159
+Edema__Cardiomegaly,Edema,Cardiomegaly,iera,10,worst_nuisance_auprc,0.7424461483955384,0.06378303225884398
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,anchored_iera,1,auroc,0.4726199984550476,0.03128036148323511
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,anchored_iera,1,auprc,0.49244808554649355,0.03437227075299979
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,anchored_iera,1,f1,0.6666666865348816,0.0
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,anchored_iera,1,brier,0.2513016939163208,0.0007893683917521132
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,anchored_iera,1,ece,0.022605537623167037,0.006054397210863445
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,anchored_iera,1,false_positive_c0d1,0.5114694476127625,0.003089615528005574
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,anchored_iera,1,sms_raw_logit,0.9114036560058594,0.0696560334148954
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,anchored_iera,1,sms_normalized_logit,1.0919740915298461,0.09362232436415198
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,anchored_iera,1,support_swap_flip_rate,0.0,0.0
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,anchored_iera,1,support_swap_error_gap,0.0,0.0
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,anchored_iera,1,worst_support_panel_error,0.5,0.0
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,anchored_iera,1,d0_auroc,0.4617599964141846,0.04218397823369622
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,anchored_iera,1,d0_auprc,0.4876171350479126,0.03897665332423563
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,anchored_iera,1,d1_auroc,0.47871999740600585,0.03596709821430464
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,anchored_iera,1,d1_auprc,0.5065733015537262,0.037679241201582385
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,anchored_iera,1,worst_nuisance_auroc,0.45167999267578124,0.03320168474369496
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,anchored_iera,1,worst_nuisance_auprc,0.4812577962875366,0.036669512010120295
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,anchored_iera,3,auroc,0.48925999999046327,0.01453058643916548
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,anchored_iera,3,auprc,0.5067144572734833,0.03775370700714895
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,anchored_iera,3,f1,0.6693877696990966,0.00608452692761516
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,anchored_iera,3,brier,0.2513602614402771,0.00042301937336130797
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,anchored_iera,3,ece,0.030726393684744835,0.015893330961453185
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,anchored_iera,3,false_positive_c0d1,0.5200073838233947,0.008270189017571036
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,anchored_iera,3,sms_raw_logit,0.780810010433197,0.0624136382421028
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,anchored_iera,3,sms_normalized_logit,1.0183116436004638,0.12401661571833601
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,anchored_iera,3,support_swap_flip_rate,0.020000000298023225,0.04472136021639598
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,anchored_iera,3,support_swap_error_gap,0.006000000238418579,0.013416408398118888
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,anchored_iera,3,worst_support_panel_error,0.5,0.0
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,anchored_iera,3,d0_auroc,0.47504000663757323,0.0329212501020052
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,anchored_iera,3,d0_auprc,0.5095863401889801,0.044187775802406355
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,anchored_iera,3,d1_auroc,0.4994399964809418,0.04174742404680055
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,anchored_iera,3,d1_auprc,0.5139401674270629,0.037313378326520326
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,anchored_iera,3,worst_nuisance_auroc,0.46128000020980836,0.01946566654820201
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,anchored_iera,3,worst_nuisance_auprc,0.4974673092365265,0.040347945347910905
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,anchored_iera,5,auroc,0.4696399986743927,0.023292436844491272
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,anchored_iera,5,auprc,0.5026804983615876,0.027630869307792634
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,anchored_iera,5,f1,0.6671171307563781,0.0010072238993383295
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,anchored_iera,5,brier,0.25269211530685426,0.0019497179419667747
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,anchored_iera,5,ece,0.05788811966776848,0.02652624597674266
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,anchored_iera,5,false_positive_c0d1,0.5246656775474549,0.010085383652598822
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,anchored_iera,5,sms_raw_logit,0.7400607705116272,0.0787746431392605
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,anchored_iera,5,sms_normalized_logit,0.9958026289939881,0.09190742108698037
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,anchored_iera,5,support_swap_flip_rate,0.014000000059604644,0.03130495181827709
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,anchored_iera,5,support_swap_error_gap,0.004000002145767212,0.008944276708080508
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,anchored_iera,5,worst_support_panel_error,0.5,0.0
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,anchored_iera,5,d0_auroc,0.45511999130249026,0.03664793371290655
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,anchored_iera,5,d0_auprc,0.4956884741783142,0.04176704788506881
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,anchored_iera,5,d1_auroc,0.48327999711036684,0.07173807540518025
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,anchored_iera,5,d1_auprc,0.526699161529541,0.05014793240976631
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,anchored_iera,5,worst_nuisance_auroc,0.42919999957084654,0.025922952902046964
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,anchored_iera,5,worst_nuisance_auprc,0.4748035788536072,0.02496615301395831
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,anchored_iera,10,auroc,0.4694999992847443,0.02405504110792241
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,anchored_iera,10,auprc,0.4975948452949524,0.022129703658739088
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,anchored_iera,10,f1,0.6666666865348816,0.0
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,anchored_iera,10,brier,0.2528103828430176,0.0021303356041653065
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,anchored_iera,10,ece,0.05773452520370483,0.037186717640351
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,anchored_iera,10,false_positive_c0d1,0.5266530752182007,0.011278635132560997
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,anchored_iera,10,sms_raw_logit,0.6942995309829711,0.06722941533347836
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,anchored_iera,10,sms_normalized_logit,0.9519549965858459,0.08634609398628176
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,anchored_iera,10,support_swap_flip_rate,0.0,0.0
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,anchored_iera,10,support_swap_error_gap,0.0,0.0
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,anchored_iera,10,worst_support_panel_error,0.5,0.0
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,anchored_iera,10,d0_auroc,0.43847999572753904,0.04274052228601375
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,anchored_iera,10,d0_auprc,0.4912364363670349,0.05090040054155346
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,anchored_iera,10,d1_auroc,0.49743998646736143,0.05416241109954048
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,anchored_iera,10,d1_auprc,0.5208561241626739,0.025771769036113404
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,anchored_iera,10,worst_nuisance_auroc,0.42751999497413634,0.03636746030197364
+Pneumothorax__Support Devices,Pneumothorax,Support Devices,anchored_iera,10,worst_nuisance_auprc,0.4740409553050995,0.030966529329744502
+Edema__Cardiomegaly,Edema,Cardiomegaly,anchored_iera,1,auroc,0.7581799864768982,0.047321215206623315
+Edema__Cardiomegaly,Edema,Cardiomegaly,anchored_iera,1,auprc,0.7514473795890808,0.04801945651151866
+Edema__Cardiomegaly,Edema,Cardiomegaly,anchored_iera,1,f1,0.7153164386749268,0.04375488852060187
+Edema__Cardiomegaly,Edema,Cardiomegaly,anchored_iera,1,brier,0.21151942014694214,0.01965940738998227
+Edema__Cardiomegaly,Edema,Cardiomegaly,anchored_iera,1,ece,0.12777612507343292,0.015790157791956853
+Edema__Cardiomegaly,Edema,Cardiomegaly,anchored_iera,1,false_positive_c0d1,0.5704821109771728,0.04586635442478087
+Edema__Cardiomegaly,Edema,Cardiomegaly,anchored_iera,1,sms_raw_logit,0.6131141781806946,0.04408721851511699
+Edema__Cardiomegaly,Edema,Cardiomegaly,anchored_iera,1,sms_normalized_logit,0.680462121963501,0.09068835095634141
+Edema__Cardiomegaly,Edema,Cardiomegaly,anchored_iera,1,support_swap_flip_rate,0.24800000190734864,0.07587819510461773
+Edema__Cardiomegaly,Edema,Cardiomegaly,anchored_iera,1,support_swap_error_gap,0.021999996900558472,0.021965869828725598
+Edema__Cardiomegaly,Edema,Cardiomegaly,anchored_iera,1,worst_support_panel_error,0.3669999957084656,0.03546123868751872
+Edema__Cardiomegaly,Edema,Cardiomegaly,anchored_iera,1,d0_auroc,0.8223999977111817,0.04230460738009565
+Edema__Cardiomegaly,Edema,Cardiomegaly,anchored_iera,1,d0_auprc,0.8205162763595581,0.032546029952615164
+Edema__Cardiomegaly,Edema,Cardiomegaly,anchored_iera,1,d1_auroc,0.7057599902153016,0.062453556393926704
+Edema__Cardiomegaly,Edema,Cardiomegaly,anchored_iera,1,d1_auprc,0.7060682296752929,0.07684928353462872
+Edema__Cardiomegaly,Edema,Cardiomegaly,anchored_iera,1,worst_nuisance_auroc,0.7057599902153016,0.062453556393926704
+Edema__Cardiomegaly,Edema,Cardiomegaly,anchored_iera,1,worst_nuisance_auprc,0.7060682296752929,0.07684928353462872
+Edema__Cardiomegaly,Edema,Cardiomegaly,anchored_iera,3,auroc,0.7891200184822083,0.03135437132983547
+Edema__Cardiomegaly,Edema,Cardiomegaly,anchored_iera,3,auprc,0.7739878296852112,0.036429935654468316
+Edema__Cardiomegaly,Edema,Cardiomegaly,anchored_iera,3,f1,0.7361041188240052,0.04714787765524091
+Edema__Cardiomegaly,Edema,Cardiomegaly,anchored_iera,3,brier,0.2013522654771805,0.01570705044002687
+Edema__Cardiomegaly,Edema,Cardiomegaly,anchored_iera,3,ece,0.1204307958483696,0.014393478082825673
+Edema__Cardiomegaly,Edema,Cardiomegaly,anchored_iera,3,false_positive_c0d1,0.5850803017616272,0.048462617064120514
+Edema__Cardiomegaly,Edema,Cardiomegaly,anchored_iera,3,sms_raw_logit,0.43237122893333435,0.05096699269540219
+Edema__Cardiomegaly,Edema,Cardiomegaly,anchored_iera,3,sms_normalized_logit,0.4659189760684967,0.09096327068884917
+Edema__Cardiomegaly,Edema,Cardiomegaly,anchored_iera,3,support_swap_flip_rate,0.14899999946355819,0.05308013012399916
+Edema__Cardiomegaly,Edema,Cardiomegaly,anchored_iera,3,support_swap_error_gap,0.026999998092651366,0.02564176218229836
+Edema__Cardiomegaly,Edema,Cardiomegaly,anchored_iera,3,worst_support_panel_error,0.33899999856948854,0.0473550454252717
+Edema__Cardiomegaly,Edema,Cardiomegaly,anchored_iera,3,d0_auroc,0.8600000023841858,0.039462373814642925
+Edema__Cardiomegaly,Edema,Cardiomegaly,anchored_iera,3,d0_auprc,0.8569136023521423,0.050332058094692475
+Edema__Cardiomegaly,Edema,Cardiomegaly,anchored_iera,3,d1_auroc,0.7265599966049194,0.035740836916455895
+Edema__Cardiomegaly,Edema,Cardiomegaly,anchored_iera,3,d1_auprc,0.7173072576522828,0.04677919650267686
+Edema__Cardiomegaly,Edema,Cardiomegaly,anchored_iera,3,worst_nuisance_auroc,0.7265599966049194,0.035740836916455895
+Edema__Cardiomegaly,Edema,Cardiomegaly,anchored_iera,3,worst_nuisance_auprc,0.7173072576522828,0.04677919650267686
+Edema__Cardiomegaly,Edema,Cardiomegaly,anchored_iera,5,auroc,0.7968400001525879,0.02074276980025865
+Edema__Cardiomegaly,Edema,Cardiomegaly,anchored_iera,5,auprc,0.7909549236297607,0.020677825892668436
+Edema__Cardiomegaly,Edema,Cardiomegaly,anchored_iera,5,f1,0.7493499636650085,0.02587616519001032
+Edema__Cardiomegaly,Edema,Cardiomegaly,anchored_iera,5,brier,0.19922209084033965,0.014499616257229564
+Edema__Cardiomegaly,Edema,Cardiomegaly,anchored_iera,5,ece,0.1340714529156685,0.020507516642567728
+Edema__Cardiomegaly,Edema,Cardiomegaly,anchored_iera,5,false_positive_c0d1,0.5851541876792907,0.04618159244882667
+Edema__Cardiomegaly,Edema,Cardiomegaly,anchored_iera,5,sms_raw_logit,0.3264927685260773,0.05533296402316793
+Edema__Cardiomegaly,Edema,Cardiomegaly,anchored_iera,5,sms_normalized_logit,0.3353127777576447,0.06735488933447288
+Edema__Cardiomegaly,Edema,Cardiomegaly,anchored_iera,5,support_swap_flip_rate,0.10900000184774399,0.028151376536398372
+Edema__Cardiomegaly,Edema,Cardiomegaly,anchored_iera,5,support_swap_error_gap,0.017000004649162292,0.007582878529274148
+Edema__Cardiomegaly,Edema,Cardiomegaly,anchored_iera,5,worst_support_panel_error,0.3000000059604645,0.03221024848225143
+Edema__Cardiomegaly,Edema,Cardiomegaly,anchored_iera,5,d0_auroc,0.8625599861145019,0.026440281287677263
+Edema__Cardiomegaly,Edema,Cardiomegaly,anchored_iera,5,d0_auprc,0.8639453887939453,0.033638665517675595
+Edema__Cardiomegaly,Edema,Cardiomegaly,anchored_iera,5,d1_auroc,0.7438400030136109,0.03743965788049426
+Edema__Cardiomegaly,Edema,Cardiomegaly,anchored_iera,5,d1_auprc,0.749693238735199,0.040619616563426116
+Edema__Cardiomegaly,Edema,Cardiomegaly,anchored_iera,5,worst_nuisance_auroc,0.7438400030136109,0.03743965788049426
+Edema__Cardiomegaly,Edema,Cardiomegaly,anchored_iera,5,worst_nuisance_auprc,0.749693238735199,0.040619616563426116
+Edema__Cardiomegaly,Edema,Cardiomegaly,anchored_iera,10,auroc,0.803600013256073,0.018959685490563993
+Edema__Cardiomegaly,Edema,Cardiomegaly,anchored_iera,10,auprc,0.7942278146743774,0.01924369850324707
+Edema__Cardiomegaly,Edema,Cardiomegaly,anchored_iera,10,f1,0.7467547416687011,0.028276385716350192
+Edema__Cardiomegaly,Edema,Cardiomegaly,anchored_iera,10,brier,0.1960647463798523,0.016327187610028895
+Edema__Cardiomegaly,Edema,Cardiomegaly,anchored_iera,10,ece,0.125721837580204,0.022792807062626676
+Edema__Cardiomegaly,Edema,Cardiomegaly,anchored_iera,10,false_positive_c0d1,0.5795812606811523,0.051367625430619485
+Edema__Cardiomegaly,Edema,Cardiomegaly,anchored_iera,10,sms_raw_logit,0.25686543583869936,0.08612143050424315
+Edema__Cardiomegaly,Edema,Cardiomegaly,anchored_iera,10,sms_normalized_logit,0.25140324532985686,0.09036269170857086
+Edema__Cardiomegaly,Edema,Cardiomegaly,anchored_iera,10,support_swap_flip_rate,0.08100000135600567,0.0397492143343222
+Edema__Cardiomegaly,Edema,Cardiomegaly,anchored_iera,10,support_swap_error_gap,0.01099998950958252,0.007416191414457641
+Edema__Cardiomegaly,Edema,Cardiomegaly,anchored_iera,10,worst_support_panel_error,0.28799999356269834,0.022803506358638072
+Edema__Cardiomegaly,Edema,Cardiomegaly,anchored_iera,10,d0_auroc,0.8663999915122986,0.02341623628888716
+Edema__Cardiomegaly,Edema,Cardiomegaly,anchored_iera,10,d0_auprc,0.8689698100090026,0.02753280243208004
+Edema__Cardiomegaly,Edema,Cardiomegaly,anchored_iera,10,d1_auroc,0.7492799997329712,0.038484700433073296
+Edema__Cardiomegaly,Edema,Cardiomegaly,anchored_iera,10,d1_auprc,0.7458977341651917,0.0447116593953731
+Edema__Cardiomegaly,Edema,Cardiomegaly,anchored_iera,10,worst_nuisance_auroc,0.7492799997329712,0.038484700433073296
+Edema__Cardiomegaly,Edema,Cardiomegaly,anchored_iera,10,worst_nuisance_auprc,0.7458977341651917,0.0447116593953731

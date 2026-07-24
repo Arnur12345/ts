@@ -21,6 +21,7 @@ from experiments.iera.run import (
     _metrics,
     _normalized_consistency,
     _objective,
+    _update_lagrange,
 )
 from experiments.residuals.data import ResidualDataset
 
@@ -134,6 +135,21 @@ class IERATest(unittest.TestCase):
         panel = torch.tensor([[0.1, 0.5, -0.2, 1.0]])
         self.assertEqual(float(_normalized_consistency(panel, panel)), 0.0)
 
+    def test_training_sms_exactly_matches_evaluated_normalized_sms(self) -> None:
+        panel_zero = torch.tensor([[-1.0, -0.2, 0.3, 0.8]])
+        panel_one = torch.tensor([[-0.5, 0.2, 0.7, 1.1]])
+        targets = torch.tensor([0.0, 0.0, 1.0, 1.0])
+        nuisance = torch.tensor([0, 1, 0, 1])
+        evaluated = _metrics(
+            torch.zeros(4), panel_zero.flatten(), panel_one.flatten(),
+            targets, nuisance, 1.0, 0.5,
+        )
+        self.assertAlmostEqual(
+            float(_normalized_consistency(panel_zero, panel_one)),
+            evaluated["sms_normalized_logit"],
+            places=7,
+        )
+
     def test_anchored_objective_uses_fixed_uniform_budget(self) -> None:
         generator = torch.Generator().manual_seed(31)
         positive = torch.randn(1, 2, 2, 4, 6, generator=generator)
@@ -142,14 +158,14 @@ class IERATest(unittest.TestCase):
         targets = torch.tensor([[0.0, 0.0, 1.0, 1.0]])
         model = IERA(6, 4, alpha_max=0.25)
         reference = IERA(6, 4, alpha_max=0.25).eval().requires_grad_(False)
-        args = SimpleNamespace(invariance_weight=1.0, invariance_budget=0.7)
+        args = SimpleNamespace(lagrange_initial=1.0, invariance_budget=0.7)
         components = _objective(
             model, "anchored_iera", positive, negative, query, targets, args,
             uniform_reference_model=reference,
         )
         expected = (
             components["classification"]
-            + args.invariance_weight * components["budget_excess"]
+            + args.lagrange_initial * components["budget_excess"]
         )
         torch.testing.assert_close(components["total"], expected)
         self.assertGreaterEqual(float(components["budget_excess"]), 0.0)
@@ -167,7 +183,29 @@ class IERATest(unittest.TestCase):
         self.assertFalse(parameters["raw_gamma"].requires_grad)
         self.assertTrue(parameters["raw_tau_attention"].requires_grad)
         self.assertTrue(parameters["raw_anchor_bias"].requires_grad)
-        self.assertEqual(optimizer.param_groups[1]["lr"], args.learning_rate / 10)
+        self.assertTrue(parameters["support_adapter_up.weight"].requires_grad)
+        self.assertEqual(len(optimizer.param_groups), 1)
+
+    def test_support_adapter_is_anchored_only(self) -> None:
+        generator = torch.Generator().manual_seed(44)
+        positive = torch.randn(1, 2, 2, 4, 6, generator=generator)
+        negative = torch.randn(1, 2, 2, 4, 6, generator=generator)
+        query = torch.randn(1, 4, 4, 6, generator=generator)
+        model = IERA(6, 4, support_adapter_dim=2)
+        uniform_before = model(positive, negative, query, "learned_uniform")
+        anchored_before = model(positive, negative, query, "anchored_iera")
+        with torch.no_grad():
+            model.support_adapter_up.weight.normal_()
+        uniform_after = model(positive, negative, query, "learned_uniform")
+        anchored_after = model(positive, negative, query, "anchored_iera")
+        torch.testing.assert_close(uniform_before, uniform_after)
+        self.assertFalse(torch.allclose(anchored_before, anchored_after))
+
+    def test_lagrange_multiplier_adapts_to_constraint(self) -> None:
+        increased = _update_lagrange(1.0, 0.5, learning_rate=0.1, maximum=10.0)
+        decreased = _update_lagrange(increased, -0.25, learning_rate=0.1, maximum=10.0)
+        self.assertGreater(increased, 1.0)
+        self.assertLess(decreased, increased)
 
     def test_anchored_checkpoint_prefers_feasible_worst_auc(self) -> None:
         infeasible = {
@@ -237,7 +275,7 @@ class IERATest(unittest.TestCase):
             "frozen_protonet": (1.1, 0.58, 0.68),
             "learned_uniform": (1.0, 0.60, 0.70),
             "iera": (0.9, 0.64, 0.71),
-            "anchored_iera": (0.8, 0.65, 0.71),
+            "anchored_iera": (0.7, 0.65, 0.71),
         }
         for pair in ("pair_a", "pair_b"):
             for method, (sms, worst, auroc) in values.items():
@@ -258,7 +296,7 @@ class IERATest(unittest.TestCase):
                 "frozen_protonet": (1.1, 0.58, 0.68),
                 "learned_uniform": (1.0, 0.70, 0.75),
                 "iera": (0.9, 0.69, 0.74),
-                "anchored_iera": (0.8, 0.69, 0.74),
+                "anchored_iera": (0.69, 0.69, 0.74),
             }.items():
                 for metric, mean in zip(
                     ("sms_normalized_logit", "worst_nuisance_auroc", "auroc"),
@@ -273,6 +311,33 @@ class IERATest(unittest.TestCase):
         decision = _decision(rows)
         self.assertEqual(decision["status"], "continue_anchored_iera")
         self.assertEqual(decision["auroc_tolerance"], 0.01)
+        self.assertEqual(decision["required_sms_ratio"], 0.7)
+
+    def test_infeasible_base_validation_blocks_high_resolution(self) -> None:
+        rows = []
+        pair = "Pneumothorax__Support Devices"
+        for method, values in {
+            "frozen_protonet": (1.1, 0.58, 0.68),
+            "learned_uniform": (1.0, 0.70, 0.75),
+            "iera": (0.9, 0.69, 0.74),
+            "anchored_iera": (0.8, 0.70, 0.75),
+        }.items():
+            for metric, mean in zip(
+                ("sms_normalized_logit", "worst_nuisance_auroc", "auroc"),
+                values,
+            ):
+                rows.append(
+                    {
+                        "pair": pair, "method": method, "shot": 3,
+                        "metric": metric, "mean": mean,
+                    }
+                )
+        decision = _decision(
+            rows, patch_grid=4, base_validation_feasible=False
+        )
+        self.assertEqual(
+            decision["status"], "constraint_infeasible_on_base_validation"
+        )
 
 
 if __name__ == "__main__":
