@@ -18,7 +18,15 @@ import torch.nn.functional as F
 from experiments.residuals.data import load_config, load_dataset
 from experiments.residuals.metrics import _average_precision, _auc, _ece, select_temperature, select_threshold
 
-from .episodes import PILOT_PAIRS, eligible_directed_pairs, generate_pair_episodes, split_indices, validate_pair_episodes
+from .episodes import (
+    PILOT_PAIRS,
+    eligible_directed_pairs,
+    generate_pair_episodes,
+    patient_counts,
+    split_indices,
+    stratum_pools,
+    validate_pair_episodes,
+)
 from .labels import restore_raw_target_status
 from .model import IERA, METHODS
 from .patch_cache import load_patch_cache
@@ -43,35 +51,46 @@ def _episode_batch(patches, episode, start, end, shot, device):
     )
 
 
-def _train(model, patches, data, config, args, device) -> list[float]:
-    if args.train_steps == 0:
+def _set_seed(seed: int) -> None:
+    random.seed(seed)
+    torch.manual_seed(seed)
+    if torch.cuda.is_available():
+        torch.cuda.manual_seed_all(seed)
+
+
+def _train(model, method, patches, data, config, args, device, run_seed) -> list[float]:
+    if args.train_steps == 0 or method == "positive_prototype":
         return []
     train_indices = split_indices(data, "train", args.split_seed)
     evaluation_targets = {_ids(data, pair)[0] for pair in PILOT_PAIRS}
     base_ids = [data.class_names.index(name) for name in config["class_partitions"]["base"] if data.class_names.index(name) not in evaluation_targets]
-    pairs = eligible_directed_pairs(data, train_indices, base_ids, args.min_stratum_patients)
+    pairs = eligible_directed_pairs(
+        data, train_indices, base_ids, args.min_stratum_patients,
+        confounder_ids=base_ids,
+    )
     if not pairs:
-        raise ValueError("no eligible meta-training target/confounder pairs")
-    random.Random(args.seed).shuffle(pairs)
+        raise ValueError("no eligible base-only meta-training target/confounder pairs")
+    random.Random(run_seed).shuffle(pairs)
     pairs = pairs[: min(12, len(pairs))]
     bank = []
     episodes_per_pair = max(2, math.ceil(min(args.train_steps, 120) / len(pairs)))
     for pair_index, (target, confounder) in enumerate(pairs):
         generated = generate_pair_episodes(
             data, train_indices, target, confounder, episodes_per_pair,
-            args.train_shot, 1, args.seed + 10_000 + pair_index,
+            args.train_shot, 1, run_seed + 10_000 + pair_index,
+            min_stratum_patients=args.min_stratum_patients,
         )
         for episode_index in range(episodes_per_pair):
             bank.append((generated, episode_index))
     optimizer = torch.optim.AdamW(model.parameters(), lr=args.learning_rate, weight_decay=1e-4)
-    generator = torch.Generator().manual_seed(args.seed)
+    generator = torch.Generator().manual_seed(run_seed)
     losses = []
     model.train()
     for step in range(args.train_steps):
         generated, episode_index = bank[int(torch.randint(len(bank), (1,), generator=generator))]
         positive, negative, query = _episode_batch(patches, generated, episode_index, episode_index + 1, args.train_shot, device)
         targets = generated["targets"][episode_index : episode_index + 1].to(device)
-        logits = model(positive, negative, query, "iera")
+        logits = model(positive, negative, query, method)
         loss = F.binary_cross_entropy_with_logits(logits, targets)
         optimizer.zero_grad(set_to_none=True)
         loss.backward()
@@ -79,7 +98,7 @@ def _train(model, patches, data, config, args, device) -> list[float]:
         optimizer.step()
         losses.append(float(loss.detach()))
         if (step + 1) % 25 == 0:
-            print(f"meta-training {step + 1}/{args.train_steps}: loss={statistics.mean(losses[-25:]):.4f}", flush=True)
+            print(f"training {method} seed {run_seed}: {step + 1}/{args.train_steps}, loss={statistics.mean(losses[-25:]):.4f}", flush=True)
     model.eval()
     return losses
 
@@ -104,6 +123,12 @@ def _metrics(logits, panel_zero, panel_one, targets, nuisance, temperature, thre
     target = targets.bool()
     tp, fp = (target & prediction).sum(), (~target & prediction).sum()
     fn = (target & ~prediction).sum()
+    raw_shift = (panel_one - panel_zero).abs()
+    shift_scale = torch.cat((panel_zero, panel_one)).std().clamp_min(1e-6)
+    panel_zero_prediction = panel_zero.ge(0)
+    panel_one_prediction = panel_one.ge(0)
+    panel_zero_error = panel_zero_prediction.ne(target)
+    panel_one_error = panel_one_prediction.ne(target)
     result = {
         "auroc": _auc(target, probability),
         "auprc": _average_precision(target, probability),
@@ -111,7 +136,11 @@ def _metrics(logits, panel_zero, panel_one, targets, nuisance, temperature, thre
         "brier": float((probability - targets).square().mean()),
         "ece": _ece(probability, target),
         "false_positive_c0d1": float(probability[(~target) & nuisance.eq(1)].mean()),
-        "sms": float((torch.sigmoid(panel_one / temperature) - torch.sigmoid(panel_zero / temperature)).abs().mean()),
+        "sms_raw_logit": float(raw_shift.mean()),
+        "sms_normalized_logit": float(raw_shift.mean() / shift_scale),
+        "support_swap_flip_rate": float(panel_zero_prediction.ne(panel_one_prediction).float().mean()),
+        "support_swap_error_gap": float((panel_zero_error.float().mean() - panel_one_error.float().mean()).abs()),
+        "worst_support_panel_error": float(torch.maximum(panel_zero_error.float().mean(), panel_one_error.float().mean())),
     }
     nuisance_auc, nuisance_auprc = [], []
     for value in (0, 1):
@@ -150,11 +179,12 @@ def _summaries(rows: list[dict]) -> list[dict]:
 def _decision(summary: list[dict]) -> dict:
     lookup = {(row["pair"], row["method"], int(row["shot"]), row["metric"]): row["mean"] for row in summary}
     pairs = sorted({row["pair"] for row in summary})
-    shot = 3
+    available_shots = sorted({int(row["shot"]) for row in summary})
+    shot = 3 if 3 in available_shots else available_shots[0]
     evidence = []
     for pair in pairs:
-        baseline_sms = lookup.get((pair, "positive_prototype", shot, "sms"), float("nan"))
-        iera_sms = lookup.get((pair, "iera", shot, "sms"), float("nan"))
+        baseline_sms = lookup.get((pair, "positive_prototype", shot, "sms_normalized_logit"), float("nan"))
+        iera_sms = lookup.get((pair, "iera", shot, "sms_normalized_logit"), float("nan"))
         reduction = 1 - iera_sms / baseline_sms if baseline_sms > 0 else float("nan")
         worst_gain = lookup.get((pair, "iera", shot, "worst_nuisance_auroc"), float("nan")) - lookup.get((pair, "positive_prototype", shot, "worst_nuisance_auroc"), float("nan"))
         ordinary_loss = lookup.get((pair, "positive_prototype", shot, "auroc"), float("nan")) - lookup.get((pair, "iera", shot, "auroc"), float("nan"))
@@ -162,7 +192,7 @@ def _decision(summary: list[dict]) -> dict:
     passing = [row for row in evidence if row["sms_reduction"] >= 0.30 and row["worst_auroc_gain"] >= 0.02 and row["ordinary_auroc_loss"] < 0.01]
     return {
         "status": "continue" if len(passing) >= 3 else "stop_or_revise",
-        "rule": "at least three pairs: SMS reduction >=30%, worst-nuisance AUROC gain >=0.02, ordinary AUROC loss <0.01",
+        "rule": "at least three pairs: uncalibrated normalized-logit SMS reduction >=30%, worst-nuisance AUROC gain >=0.02, ordinary AUROC loss <0.01",
         "passing_pairs": len(passing),
         "evidence": evidence,
     }
@@ -197,50 +227,112 @@ def main() -> None:
     restore_raw_target_status(data, args.raw_labels)
     config = load_config(args.config)
     patches, patch_metadata = load_patch_cache(args.patch_cache, data.manifest_sha256)
-    model = IERA(patches.shape[-1], args.projection_dim).to(device)
-    losses = _train(model, patches, data, config, args, device)
-
     validation_indices = split_indices(data, "validate", args.split_seed)
     test_indices = split_indices(data, "test", args.split_seed)
     args.output_dir.mkdir(parents=True, exist_ok=True)
-    torch.save({"state_dict": model.state_dict(), "parameters": model.parameters_dict()}, args.output_dir / "iera_model.pt")
-    rows = []
-    max_shot = max(args.shots)
+
+    eligibility = []
+    eligible_pairs = []
     for pair_index, names in enumerate(PILOT_PAIRS):
         target_id, confounder_id = _ids(data, names)
-        pair_name = f"{names[0]}__{names[1]}"
-        validation = generate_pair_episodes(
-            data, validation_indices, target_id, confounder_id, args.episodes,
-            max_shot, args.queries_per_stratum, args.seed + pair_index * 10_000,
+        partition_counts = {
+            "validation": patient_counts(data, stratum_pools(data, validation_indices, target_id, confounder_id)),
+            "test": patient_counts(data, stratum_pools(data, test_indices, target_id, confounder_id)),
+        }
+        eligible = all(
+            min(counts.values()) >= args.min_stratum_patients
+            for counts in partition_counts.values()
         )
-        test_by_seed = {
-            seed: generate_pair_episodes(
+        eligibility.append(
+            {
+                "pair": f"{names[0]}__{names[1]}",
+                "target": names[0],
+                "confounder": names[1],
+                "minimum_required_per_stratum": args.min_stratum_patients,
+                "counts": {
+                    partition: {f"c{key[0]}d{key[1]}": value for key, value in counts.items()}
+                    for partition, counts in partition_counts.items()
+                },
+                "eligible": eligible,
+            }
+        )
+        if eligible:
+            eligible_pairs.append((pair_index, names, target_id, confounder_id))
+    (args.output_dir / "eligibility.json").write_text(json.dumps(eligibility, indent=2) + "\n", encoding="utf-8")
+    if not eligible_pairs:
+        raise ValueError(
+            "none of the four evaluation pairs satisfies --min-stratum-patients "
+            "in both validation and test; inspect eligibility.json"
+        )
+
+    max_shot = max(args.shots)
+    episode_sets = {}
+    for pair_index, names, target_id, confounder_id in eligible_pairs:
+        for seed in args.seeds:
+            validation = generate_pair_episodes(
+                data, validation_indices, target_id, confounder_id, args.episodes,
+                max_shot, args.queries_per_stratum,
+                args.seed + pair_index * 10_000 + seed,
+                min_stratum_patients=args.min_stratum_patients,
+            )
+            test = generate_pair_episodes(
                 data, test_indices, target_id, confounder_id, args.episodes,
                 max_shot, args.queries_per_stratum,
                 args.seed + 100_000 + pair_index * 10_000 + seed,
+                min_stratum_patients=args.min_stratum_patients,
             )
-            for seed in args.seeds
-        }
-        validate_pair_episodes(validation, data)
-        for test in test_by_seed.values():
+            validate_pair_episodes(validation, data)
             validate_pair_episodes(test, data)
-        torch.save(
-            {"validation": validation, "test_by_seed": test_by_seed},
-            args.output_dir / f"episodes_{pair_index:02d}.pt",
-        )
-        for shot in args.shots:
-            for method in args.methods:
-                val_logits, _, _ = _score(model, patches, validation, shot, method, args.episode_batch_size, device)
-                val_targets = validation["targets"].flatten()
-                temperature = select_temperature(val_logits[:, None], val_targets[:, None], "multi_label")
-                threshold = select_threshold(val_logits[:, None], val_targets[:, None], temperature)
-                for seed in args.seeds:
-                    test = test_by_seed[seed]
+            episode_sets[(pair_index, seed)] = (validation, test)
+            torch.save(
+                {"validation": validation, "test": test},
+                args.output_dir / f"episodes_{pair_index:02d}_seed_{seed:03d}.pt",
+            )
+
+    rows = []
+    training_runs = []
+    for seed in args.seeds:
+        run_seed = args.seed + seed
+        for method in args.methods:
+            _set_seed(run_seed)
+            model = IERA(patches.shape[-1], args.projection_dim).to(device)
+            losses = _train(model, method, patches, data, config, args, device, run_seed)
+            if method != "positive_prototype":
+                torch.save(
+                    {
+                        "method": method,
+                        "seed": seed,
+                        "training_seed": run_seed,
+                        "state_dict": model.state_dict(),
+                        "parameters": model.parameters_dict(),
+                    },
+                    args.output_dir / f"model_{method}_seed_{seed:03d}.pt",
+                )
+            training_runs.append(
+                {
+                    "method": method,
+                    "seed": seed,
+                    "training_seed": run_seed,
+                    "final_loss": losses[-1] if losses else None,
+                    "learned_parameters": model.parameters_dict() if method != "positive_prototype" else None,
+                }
+            )
+            for pair_index, names, _target_id, _confounder_id in eligible_pairs:
+                pair_name = f"{names[0]}__{names[1]}"
+                validation, test = episode_sets[(pair_index, seed)]
+                for shot in args.shots:
+                    val_logits, _, _ = _score(model, patches, validation, shot, method, args.episode_batch_size, device)
+                    val_targets = validation["targets"].flatten()
+                    temperature = select_temperature(val_logits[:, None], val_targets[:, None], "multi_label")
+                    threshold = select_threshold(val_logits[:, None], val_targets[:, None], temperature)
                     logits, panel_zero, panel_one = _score(model, patches, test, shot, method, args.episode_batch_size, device)
                     metrics = _metrics(logits, panel_zero, panel_one, test["targets"].flatten(), test["nuisance"].flatten(), temperature, threshold)
                     for metric, value in metrics.items():
                         rows.append({"pair": pair_name, "target": names[0], "confounder": names[1], "method": method, "shot": shot, "seed": seed, "temperature": temperature, "threshold": threshold, "metric": metric, "value": value})
-                print(f"finished {pair_name}, {method}, {shot}-shot", flush=True)
+                    print(f"finished {pair_name}, {method}, {shot}-shot", flush=True)
+            del model
+            if device.type == "cuda":
+                torch.cuda.empty_cache()
     summary = _summaries(rows)
     _write(args.output_dir / "per_seed_metrics.csv", rows)
     _write(args.output_dir / "summary_metrics.csv", summary)
@@ -256,12 +348,15 @@ def main() -> None:
                 "shots": args.shots,
                 "episodes": args.episodes,
                 "seeds": args.seeds,
+                "seed_semantics": "independent initialization, meta-training, validation, and test episode run",
                 "patient_split": {"seed": args.split_seed, "fractions": [0.70, 0.15, 0.15]},
                 "train_steps": args.train_steps,
-                "final_train_loss": losses[-1] if losses else None,
-                "learned_parameters": model.parameters_dict(),
+                "meta_training_labels": "target and confounder both restricted to non-evaluation base classes",
+                "training_runs": training_runs,
+                "eligible_pairs": [item["pair"] for item in eligibility if item["eligible"]],
                 "elapsed_seconds": time.perf_counter() - started,
-                "readout_note": "The proposal omits p_c/readout equations; implementation uses evidence-weighted positive and query tokens with cosine scoring.",
+                "readout_note": "Evidence weights only positive support patches; queries use support-independent prototype-to-patch local matching.",
+                "sms_policy": "uncalibrated raw and within-method normalized logit shift; calibration is not used for SMS",
             },
             indent=2,
         )

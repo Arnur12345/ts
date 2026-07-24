@@ -56,10 +56,12 @@ def eligible_directed_pairs(
     indices: torch.Tensor,
     target_ids: list[int],
     min_patients: int,
+    confounder_ids: list[int] | None = None,
 ) -> list[tuple[int, int]]:
+    confounder_ids = target_ids if confounder_ids is None else confounder_ids
     pairs = []
     for target in target_ids:
-        for confounder in range(len(data.class_names)):
+        for confounder in confounder_ids:
             if target == confounder:
                 continue
             counts = patient_counts(data, stratum_pools(data, indices, target, confounder))
@@ -77,11 +79,13 @@ def generate_pair_episodes(
     max_shot: int,
     queries_per_stratum: int,
     seed: int,
+    min_stratum_patients: int = 0,
     max_attempts: int = 200,
 ) -> dict:
     pools = stratum_pools(data, indices, target_id, confounder_id)
     counts = patient_counts(data, pools)
-    required = max_shot + queries_per_stratum
+    sample_count = max_shot + queries_per_stratum
+    required = max(sample_count, min_stratum_patients)
     if min(counts.values()) < required:
         raise ValueError(
             f"{data.class_names[target_id]} / {data.class_names[confounder_id]} needs {required} "
@@ -96,7 +100,7 @@ def generate_pair_episodes(
             selected: dict[tuple[int, int], list[int]] = {}
             try:
                 for key in order:
-                    selected[key] = _draw(pools[key], required, used, data.subject_ids, generator)
+                    selected[key] = _draw(pools[key], sample_count, used, data.subject_ids, generator)
                 positive_runs.append(torch.tensor([selected[(1, env)][:max_shot] for env in (0, 1)]))
                 negative_runs.append(torch.tensor([selected[(0, env)][:max_shot] for env in (0, 1)]))
                 queries, targets, nuisance = [], [], []

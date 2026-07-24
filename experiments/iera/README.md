@@ -9,13 +9,17 @@ query readout. The minimal readout implemented here is documented explicitly:
 
 1. evidence-ratio attention weights target-positive support patches;
 2. their weighted mean is the target prototype;
-3. the same evidence ratio weights query patches;
-4. a learned-scale cosine similarity gives the binary logit.
+3. the prototype is compared directly with query patches using a smooth local
+   maximum, without support-conditioned query attention;
+4. a learned scale converts the local match to a binary logit.
 
-Exact positive patch self-matches are masked. The frozen encoder is never
-updated. A small linear projection and the five positive scalar parameters
+Every patch from the source radiograph is excluded when estimating that
+support image's evidence; with one shot, the other environment supplies the
+independent positive bank. The frozen encoder is never updated. A small linear projection and the five positive scalar parameters
 `tau`, `tau_attention`, `tau_query`, `beta`, and `gamma` are meta-trained on
-base target/confounder pairs that exclude all four pilot targets.
+base-only target/confounder pairs that exclude the pilot target labels.
+Each IERA ablation is initialized and trained independently. The positive
+prototype baseline runs directly in frozen BioMedCLIP patch space.
 
 The pilot evaluates:
 
@@ -30,7 +34,9 @@ edema/cardiomegaly, pleural effusion/atelectasis, and
 pneumonia/consolidation. Every episode contains all four `(c,d)` strata,
 verified target-positive and target-negative supports in both environments,
 fixed queries, and no repeated patient. Blank/uncertain targets are never
-converted to negatives.
+converted to negatives. A pair is skipped unless every stratum has at least
+`--min-stratum-patients` patients in both validation and test; exact counts are
+written to `eligibility.json`.
 
 Because MIMIC's official validation/test partitions are too small for the
 required four-way co-label strata, the pilot creates a deterministic 70/15/15
@@ -38,8 +44,11 @@ patient split over the full cache using `--split-seed 2026`. A subject and all
 of their studies occur in exactly one partition.
 
 Reported metrics include AUROC, AUPRC, nuisance-specific and worst-nuisance
-performance, support-mixture sensitivity (SMS), false-positive activation on
-`c- d+`, Brier score, ECE, and a preregistered decision file.
+performance, false-positive activation on `c- d+`, Brier score, ECE, and a
+preregistered decision file. SMS is computed from uncalibrated logits and also
+normalized by the method's pooled panel-logit standard deviation; support-swap
+flip rate and panel error metrics are reported separately. Calibration can no
+longer suppress SMS.
 
 ## 1. Build the patch cache
 
@@ -70,7 +79,7 @@ PYTHONPATH=. python3 -m experiments.iera.run \
   --manifest outputs/residuals/multilabel_manifest.csv \
   --patch-cache outputs/iera/patch_cache \
   --raw-labels ~/data/mimic-cxr-jpg-2.1.0/mimic-cxr-2.0.0-chexpert.csv.gz \
-  --output-dir outputs/iera/pilot_v1 \
+  --output-dir outputs/iera/pilot_v2 \
   --shots 1 3 5 10 \
   --episodes 100 \
   --queries-per-stratum 1 \
@@ -78,6 +87,11 @@ PYTHONPATH=. python3 -m experiments.iera.run \
   --train-steps 100 \
   --device cuda
 ```
+
+Each value in `--seeds` now controls an independent model initialization,
+meta-training run, validation episode set, and test episode set. Models are
+saved separately by method and seed. The existing patch cache remains valid
+after these fixes and does not need to be rebuilt.
 
 For a fast server smoke test, use `--shots 1 3 --episodes 2 --seeds 0
 --train-steps 2`. Results are saved as `per_seed_metrics.csv`,

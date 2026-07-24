@@ -150,14 +150,34 @@ def build(args: argparse.Namespace) -> None:
     print(f"saved patch cache metadata to {metadata_path}")
 
 
-def load_patch_cache(cache_dir: Path, manifest_hash: str):
+def load_patch_cache(
+    cache_dir: Path,
+    manifest_hash: str,
+    expected_model: str = MODEL,
+    expected_pool_grid: int | None = None,
+):
     import torch
 
     metadata = json.loads((cache_dir / "patch_cache.json").read_text(encoding="utf-8"))
     if metadata["manifest_sha256"] != manifest_hash:
         raise ValueError("patch cache and manifest hashes differ")
+    if metadata.get("complete") is not True:
+        raise ValueError("patch cache is incomplete; rerun the cache command to resume it")
+    if metadata.get("dtype") != "float16":
+        raise ValueError(f"unsupported patch cache dtype {metadata.get('dtype')!r}")
+    if metadata.get("model") != expected_model:
+        raise ValueError("patch cache was produced by a different visual encoder")
+    pool_grid = int(metadata.get("pool_grid", 0))
+    if pool_grid <= 0 or (expected_pool_grid is not None and pool_grid != expected_pool_grid):
+        raise ValueError("patch cache pooling configuration does not match this run")
     shape = tuple(metadata["shape"])
-    tokens = torch.from_file(str(cache_dir / metadata["tokens"]), shared=False, size=math.prod(shape), dtype=torch.float16)
+    if len(shape) != 3 or shape[1] != pool_grid * pool_grid or int(metadata.get("completed", -1)) != shape[0]:
+        raise ValueError("patch cache shape/progress metadata is inconsistent")
+    token_path = cache_dir / metadata["tokens"]
+    expected_bytes = math.prod(shape) * torch.tensor([], dtype=torch.float16).element_size()
+    if not token_path.is_file() or token_path.stat().st_size != expected_bytes:
+        raise ValueError("patch cache file size does not match its metadata")
+    tokens = torch.from_file(str(token_path), shared=False, size=math.prod(shape), dtype=torch.float16)
     return tokens.reshape(shape), metadata
 
 

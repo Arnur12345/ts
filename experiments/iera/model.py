@@ -39,14 +39,17 @@ class IERA(nn.Module):
     def _project(self, tokens: torch.Tensor) -> torch.Tensor:
         return F.normalize(self.projection(tokens.float()), dim=-1)
 
-    def _lme(self, tokens: torch.Tensor, bank: torch.Tensor, self_patch_offset: int | None = None) -> torch.Tensor:
+    def _lme(self, tokens: torch.Tensor, bank: torch.Tensor, self_image_offset: int | None = None) -> torch.Tensor:
         # tokens [B,N,P,D], bank [B,A,D] -> [B,N,P]
         similarity = torch.einsum("bnpd,bad->bnpa", tokens, bank) / self._positive(self.raw_tau)
-        if self_patch_offset is not None:
+        bank_size = bank.shape[1]
+        if self_image_offset is not None:
             patch_count = tokens.shape[2]
-            diagonal = torch.arange(patch_count, device=tokens.device)
-            similarity[:, 0, diagonal, self_patch_offset + diagonal] = -torch.inf
-        return torch.logsumexp(similarity, dim=-1) - math.log(bank.shape[1])
+            similarity[:, :, :, self_image_offset : self_image_offset + patch_count] = -torch.inf
+            bank_size -= patch_count
+        if bank_size <= 0:
+            raise ValueError("evidence bank is empty after excluding the source radiograph")
+        return torch.logsumexp(similarity, dim=-1) - math.log(bank_size)
 
     def _robust_evidence(
         self,
@@ -61,14 +64,21 @@ class IERA(nn.Module):
         ratios = []
         for environment in range(environments):
             positive_bank = positive[:, environment].flatten(1, 2)
-            self_offset = None
+            self_offset: int | None = None
             if environment == self_environment and self_shot is not None:
+                # With one shot there is no independent positive evidence in this
+                # environment. Use the other environment instead of leaking the
+                # source radiograph into its own evidence estimate.
+                if positive.shape[2] == 1:
+                    continue
                 self_offset = self_shot * tokens.shape[2]
             ratio = self._lme(tokens, positive_bank, self_offset)
             if method != "iera_no_negatives":
                 negative_bank = negative[:, environment].flatten(1, 2)
                 ratio = ratio - self._lme(tokens, negative_bank)
             ratios.append(ratio)
+        if not ratios:
+            return torch.zeros(tokens.shape[:-1], dtype=tokens.dtype, device=tokens.device)
         evidence = torch.stack(ratios, dim=-1)
         if method == "iera_mean_env" or evidence.shape[-1] == 1:
             return evidence.mean(-1)
@@ -98,19 +108,29 @@ class IERA(nn.Module):
     def forward(self, positive_tokens: torch.Tensor, negative_tokens: torch.Tensor, query_tokens: torch.Tensor, method: str = "iera") -> torch.Tensor:
         if method not in METHODS:
             raise ValueError(f"unknown IERA method {method!r}")
+        if method == "positive_prototype":
+            # A fair frozen-space ProtoNet baseline: it does not inherit the
+            # projection or scale learned with an IERA objective.
+            positive = F.normalize(positive_tokens.float(), dim=-1)
+            query = F.normalize(query_tokens.float(), dim=-1)
+            prototype = F.normalize(positive.mean(dim=(1, 2, 3)), dim=-1)
+            query_representation = F.normalize(query.mean(2), dim=-1)
+            return torch.einsum("bnd,bd->bn", query_representation, prototype)
+
         positive = self._project(positive_tokens)
         negative = self._project(negative_tokens)
         query = self._project(query_tokens)
-        if method == "positive_prototype":
-            prototype = F.normalize(positive.mean(dim=(1, 2, 3)), dim=-1)
-            query_representation = F.normalize(query.mean(2), dim=-1)
-        else:
-            prototype = self._prototype(positive, negative, method)
-            evidence = self._robust_evidence(query, positive, negative, method)
-            attention = (evidence / self._positive(self.raw_tau_query)).softmax(-1)
-            query_representation = F.normalize(torch.einsum("bnp,bnpd->bnd", attention, query), dim=-1)
-        gamma = self._positive(self.raw_gamma)
-        return gamma * torch.einsum("bnd,bd->bn", query_representation, prototype)
+        prototype = self._prototype(positive, negative, method)
+        # Support determines only the prototype. Query aggregation is local
+        # prototype-to-patch matching, so a support swap cannot also rewrite
+        # the query representation through a second evidence-ratio attention.
+        patch_similarity = torch.einsum("bnpd,bd->bnp", query, prototype)
+        tau_query = self._positive(self.raw_tau_query)
+        local_score = tau_query * (
+            torch.logsumexp(patch_similarity / tau_query, dim=-1)
+            - math.log(patch_similarity.shape[-1])
+        )
+        return self._positive(self.raw_gamma) * local_score
 
     def swapped_logits(self, positive: torch.Tensor, negative: torch.Tensor, query: torch.Tensor, method: str) -> tuple[torch.Tensor, torch.Tensor]:
         """Score identical queries using d=0-only versus d=1-only support panels."""

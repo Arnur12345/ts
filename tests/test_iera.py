@@ -1,13 +1,18 @@
 from __future__ import annotations
 
 import unittest
+import json
+import math
+import tempfile
+from pathlib import Path
 
 import torch
 import torch.nn as nn
 
 from experiments.iera.episodes import generate_pair_episodes, validate_pair_episodes
 from experiments.iera.model import IERA, METHODS
-from experiments.iera.patch_cache import extract_patch_tokens
+from experiments.iera.patch_cache import MODEL, extract_patch_tokens, load_patch_cache
+from experiments.iera.run import _metrics
 from experiments.residuals.data import ResidualDataset
 
 
@@ -60,6 +65,11 @@ class IERATest(unittest.TestCase):
         validate_pair_episodes(episodes, data)
         self.assertEqual(tuple(episodes["positive"].shape), (3, 2, 5))
         self.assertEqual(tuple(episodes["query"].shape), (3, 8))
+        with self.assertRaisesRegex(ValueError, "needs 21 patients"):
+            generate_pair_episodes(
+                data, torch.arange(len(data.labels)), 0, 1, 1, 5, 2,
+                seed=9, min_stratum_patients=21,
+            )
 
     def test_all_ablation_scores_are_finite_and_trainable(self) -> None:
         generator = torch.Generator().manual_seed(4)
@@ -73,6 +83,61 @@ class IERATest(unittest.TestCase):
             self.assertTrue(torch.isfinite(logits).all())
         model(positive, negative, query, "iera").sum().backward()
         self.assertIsNotNone(model.projection.weight.grad)
+
+    def test_self_exclusion_masks_the_complete_source_image(self) -> None:
+        model = IERA(3, 3)
+        tokens = torch.nn.functional.normalize(torch.tensor([[[[1.0, 0.0, 0.0], [0.0, 1.0, 0.0]]]]), dim=-1)
+        bank = torch.nn.functional.normalize(
+            torch.tensor([[[1.0, 0.0, 0.0], [0.0, 1.0, 0.0], [0.0, 0.0, 1.0], [1.0, 1.0, 0.0]]]),
+            dim=-1,
+        )
+        observed = model._lme(tokens, bank, self_image_offset=0)
+        similarity = torch.einsum("bnpd,bad->bnpa", tokens, bank[:, 2:]) / model._positive(model.raw_tau)
+        expected = torch.logsumexp(similarity, -1) - math.log(2)
+        torch.testing.assert_close(observed, expected)
+
+    def test_frozen_prototype_does_not_use_iera_projection(self) -> None:
+        generator = torch.Generator().manual_seed(12)
+        positive = torch.randn(1, 2, 2, 4, 6, generator=generator)
+        negative = torch.randn(1, 2, 2, 4, 6, generator=generator)
+        query = torch.randn(1, 3, 4, 6, generator=generator)
+        model = IERA(6, 3)
+        before = model(positive, negative, query, "positive_prototype")
+        with torch.no_grad():
+            model.projection.weight.zero_()
+            model.raw_gamma.fill_(20)
+        after = model(positive, negative, query, "positive_prototype")
+        torch.testing.assert_close(before, after)
+
+    def test_patch_cache_requires_complete_consistent_file(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            shape = (2, 4, 3)
+            token_path = root / "tokens.bin"
+            torch.zeros(math.prod(shape), dtype=torch.float16).numpy().tofile(token_path)
+            metadata = {
+                "tokens": token_path.name, "shape": list(shape), "dtype": "float16",
+                "pool_grid": 2, "manifest_sha256": "manifest", "model": MODEL,
+                "completed": 2, "complete": False,
+            }
+            (root / "patch_cache.json").write_text(json.dumps(metadata), encoding="utf-8")
+            with self.assertRaisesRegex(ValueError, "incomplete"):
+                load_patch_cache(root, "manifest")
+            metadata["complete"] = True
+            (root / "patch_cache.json").write_text(json.dumps(metadata), encoding="utf-8")
+            tokens, _ = load_patch_cache(root, "manifest", expected_pool_grid=2)
+            self.assertEqual(tuple(tokens.shape), shape)
+
+    def test_sms_is_independent_of_calibration_temperature(self) -> None:
+        logits = torch.tensor([-1.0, -0.5, 0.5, 1.0])
+        panel_zero = torch.tensor([-1.0, -0.2, 0.3, 0.8])
+        panel_one = torch.tensor([-0.5, 0.2, 0.7, 1.1])
+        targets = torch.tensor([0.0, 0.0, 1.0, 1.0])
+        nuisance = torch.tensor([0, 1, 0, 1])
+        cold = _metrics(logits, panel_zero, panel_one, targets, nuisance, 0.1, 0.5)
+        warm = _metrics(logits, panel_zero, panel_one, targets, nuisance, 10.0, 0.5)
+        self.assertEqual(cold["sms_raw_logit"], warm["sms_raw_logit"])
+        self.assertEqual(cold["sms_normalized_logit"], warm["sms_normalized_logit"])
 
 
 if __name__ == "__main__":

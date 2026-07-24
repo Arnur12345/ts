@@ -48,7 +48,12 @@ def select_pairs(
         if not image.is_file() or report is None:
             continue
         item = dict(row)
-        item["report_path"] = report.relative_to(data_root).as_posix()
+        try:
+            item["report_path"] = report.relative_to(data_root).as_posix()
+        except ValueError:
+            # Path joins preserve an absolute right-hand operand, so the same
+            # manifest works when reports live outside the image data root.
+            item["report_path"] = report.resolve().as_posix()
         grouped[row["class_name"]].append(item)
 
     if not grouped:

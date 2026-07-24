@@ -49,6 +49,26 @@ class PairSelectionTest(unittest.TestCase):
             self.assertEqual(len({row["subject_id"] for row in first}), 9)
             self.assertEqual(sum(row["class_name"] == "A" for row in first), 2)
 
+    def test_external_report_root_uses_absolute_paths(self) -> None:
+        with tempfile.TemporaryDirectory() as image_temporary, tempfile.TemporaryDirectory() as report_temporary:
+            root = Path(image_temporary)
+            reports = Path(report_temporary)
+            subject, study = "10000000", "50000000"
+            image = root / "files" / "d0.jpg"
+            image.parent.mkdir(parents=True)
+            image.touch()
+            report = reports / "files" / "p10" / "p10000000" / "s50000000.txt"
+            report.parent.mkdir(parents=True)
+            report.write_text("external report", encoding="utf-8")
+            manifest = root / "manifest.csv"
+            with manifest.open("w", newline="", encoding="utf-8") as handle:
+                writer = csv.DictWriter(handle, fieldnames=["dicom_id", "study_id", "subject_id", "relative_path", "class_name"])
+                writer.writeheader()
+                writer.writerow({"dicom_id": "d0", "study_id": study, "subject_id": subject, "relative_path": "files/d0.jpg", "class_name": "A"})
+            selected = select_pairs(manifest, root, reports, target=1, seed=1)
+            self.assertTrue(Path(selected[0]["report_path"]).is_absolute())
+            self.assertEqual((root / selected[0]["report_path"]).read_text(encoding="utf-8"), "external report")
+
 
 if __name__ == "__main__":
     unittest.main()
