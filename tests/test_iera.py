@@ -5,6 +5,7 @@ import json
 import math
 import tempfile
 from pathlib import Path
+from types import SimpleNamespace
 
 import torch
 import torch.nn as nn
@@ -12,7 +13,7 @@ import torch.nn as nn
 from experiments.iera.episodes import generate_pair_episodes, validate_pair_episodes
 from experiments.iera.model import IERA, METHODS
 from experiments.iera.patch_cache import MODEL, extract_patch_tokens, load_patch_cache
-from experiments.iera.run import _decision, _meta_split, _metrics
+from experiments.iera.run import _decision, _meta_split, _metrics, _normalized_consistency, _objective
 from experiments.residuals.data import ResidualDataset
 
 
@@ -102,12 +103,47 @@ class IERATest(unittest.TestCase):
         negative = torch.randn(1, 2, 2, 4, 6, generator=generator)
         query = torch.randn(1, 3, 4, 6, generator=generator)
         model = IERA(6, 3)
-        before = model(positive, negative, query, "positive_prototype")
+        before = model(positive, negative, query, "frozen_protonet")
         with torch.no_grad():
             model.projection.weight.zero_()
             model.raw_gamma.fill_(20)
-        after = model(positive, negative, query, "positive_prototype")
+        after = model(positive, negative, query, "frozen_protonet")
         torch.testing.assert_close(before, after)
+
+    def test_anchor_weight_is_support_dependent_and_bounded(self) -> None:
+        generator = torch.Generator().manual_seed(21)
+        positive = torch.randn(3, 2, 2, 4, 6, generator=generator)
+        negative = torch.randn(3, 2, 2, 4, 6, generator=generator)
+        model = IERA(6, 4, alpha_max=0.25)
+        with torch.no_grad():
+            model.raw_anchor_slope.fill_(2.0)
+        alpha = model.anchor_weight(positive, negative)
+        self.assertEqual(tuple(alpha.shape), (3,))
+        self.assertTrue(alpha.ge(0).all())
+        self.assertTrue(alpha.le(0.25).all())
+
+    def test_normalized_consistency_is_zero_for_identical_panels(self) -> None:
+        panel = torch.tensor([[0.1, 0.5, -0.2, 1.0]])
+        self.assertEqual(float(_normalized_consistency(panel, panel)), 0.0)
+
+    def test_anchored_objective_uses_fixed_uniform_budget(self) -> None:
+        generator = torch.Generator().manual_seed(31)
+        positive = torch.randn(1, 2, 2, 4, 6, generator=generator)
+        negative = torch.randn(1, 2, 2, 4, 6, generator=generator)
+        query = torch.randn(1, 4, 4, 6, generator=generator)
+        targets = torch.tensor([[0.0, 0.0, 1.0, 1.0]])
+        model = IERA(6, 4, alpha_max=0.25)
+        reference = IERA(6, 4, alpha_max=0.25).eval().requires_grad_(False)
+        args = SimpleNamespace(invariance_weight=1.0, invariance_budget=0.7)
+        components = _objective(
+            model, "anchored_iera", positive, negative, query, targets, args,
+            uniform_reference_model=reference,
+        )
+        self.assertGreaterEqual(float(components["total"]), float(components["classification"]))
+        self.assertGreaterEqual(float(components["budget_excess"]), 0.0)
+        components["total"].backward()
+        self.assertIsNotNone(model.raw_anchor_bias.grad)
+        self.assertTrue(all(parameter.grad is None for parameter in reference.parameters()))
 
     def test_patch_cache_requires_complete_consistent_file(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
@@ -152,10 +188,10 @@ class IERATest(unittest.TestCase):
     def test_decision_requires_consistency_across_both_pairs(self) -> None:
         rows = []
         values = {
-            "positive_prototype": (1.0, 0.60, 0.70),
-            "iera": (0.8, 0.65, 0.71),
-            "iera_no_negatives": (0.9, 0.63, 0.70),
-            "iera_mean_env": (0.95, 0.61, 0.70),
+            "frozen_protonet": (1.1, 0.58, 0.68),
+            "learned_uniform": (1.0, 0.60, 0.70),
+            "iera": (0.9, 0.64, 0.71),
+            "anchored_iera": (0.8, 0.65, 0.71),
         }
         for pair in ("pair_a", "pair_b"):
             for method, (sms, worst, auroc) in values.items():
@@ -167,7 +203,7 @@ class IERATest(unittest.TestCase):
                     rows.append({"pair": pair, "method": method, "shot": 3, "metric": metric, "mean": mean})
         decision = _decision(rows)
         self.assertEqual(decision["required_pairs"], 2)
-        self.assertEqual(decision["status"], "continue_full_iera")
+        self.assertEqual(decision["status"], "continue_anchored_iera")
 
 
 if __name__ == "__main__":

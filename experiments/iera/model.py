@@ -9,12 +9,15 @@ import torch.nn as nn
 import torch.nn.functional as F
 
 
-METHODS = ("positive_prototype", "iera", "iera_no_negatives", "iera_mean_env")
+METHODS = ("frozen_protonet", "learned_uniform", "iera", "anchored_iera")
 
 
 class IERA(nn.Module):
-    def __init__(self, input_dim: int, projection_dim: int = 128) -> None:
+    def __init__(self, input_dim: int, projection_dim: int = 128, alpha_max: float = 0.25) -> None:
         super().__init__()
+        if not 0 < alpha_max <= 1:
+            raise ValueError("alpha_max must be in (0, 1]")
+        self.alpha_max = float(alpha_max)
         self.projection = nn.Linear(input_dim, projection_dim, bias=False)
         nn.init.orthogonal_(self.projection.weight)
         self.raw_tau = nn.Parameter(torch.tensor(-2.3))
@@ -22,6 +25,8 @@ class IERA(nn.Module):
         self.raw_tau_query = nn.Parameter(torch.tensor(-2.3))
         self.raw_beta = nn.Parameter(torch.tensor(-1.5))
         self.raw_gamma = nn.Parameter(torch.tensor(2.0))
+        self.raw_anchor_bias = nn.Parameter(torch.tensor(0.0))
+        self.raw_anchor_slope = nn.Parameter(torch.tensor(0.0))
 
     @staticmethod
     def _positive(value: torch.Tensor, floor: float = 1e-3) -> torch.Tensor:
@@ -34,6 +39,9 @@ class IERA(nn.Module):
             "tau_query": float(self._positive(self.raw_tau_query).detach()),
             "beta": float(self._positive(self.raw_beta).detach()),
             "gamma": float(self._positive(self.raw_gamma).detach()),
+            "alpha_max": self.alpha_max,
+            "anchor_bias": float(self.raw_anchor_bias.detach()),
+            "anchor_slope": float(self.raw_anchor_slope.detach()),
         }
 
     def _project(self, tokens: torch.Tensor) -> torch.Tensor:
@@ -80,12 +88,16 @@ class IERA(nn.Module):
         if not ratios:
             return torch.zeros(tokens.shape[:-1], dtype=tokens.dtype, device=tokens.device)
         evidence = torch.stack(ratios, dim=-1)
-        if method == "iera_mean_env" or evidence.shape[-1] == 1:
+        if evidence.shape[-1] == 1:
             return evidence.mean(-1)
         beta = self._positive(self.raw_beta)
         return -beta * (torch.logsumexp(-evidence / beta, dim=-1) - math.log(evidence.shape[-1]))
 
-    def _prototype(self, positive: torch.Tensor, negative: torch.Tensor, method: str) -> torch.Tensor:
+    @staticmethod
+    def _uniform_prototype(positive: torch.Tensor) -> torch.Tensor:
+        return F.normalize(positive.mean(dim=(1, 2, 3)), dim=-1)
+
+    def _evidence_prototype(self, positive: torch.Tensor, negative: torch.Tensor) -> torch.Tensor:
         batch, environments, shots, patches, width = positive.shape
         token_groups, evidence_groups = [], []
         for environment in range(environments):
@@ -94,7 +106,7 @@ class IERA(nn.Module):
                 token_groups.append(tokens[:, 0])
                 evidence_groups.append(
                     self._robust_evidence(
-                        tokens, positive, negative, method,
+                        tokens, positive, negative, "iera",
                         self_environment=environment, self_shot=shot,
                     )[:, 0]
                 )
@@ -103,10 +115,36 @@ class IERA(nn.Module):
         attention = (evidence / self._positive(self.raw_tau_attention)).softmax(-1)
         return F.normalize(torch.einsum("bn,bnd->bd", attention, tokens), dim=-1)
 
+    def _anchored_prototype(
+        self, positive: torch.Tensor, negative: torch.Tensor
+    ) -> tuple[torch.Tensor, torch.Tensor]:
+        uniform = self._uniform_prototype(positive)
+        evidence = self._evidence_prototype(positive, negative)
+        disagreement = 1 - (uniform * evidence).sum(-1, keepdim=True)
+        alpha = self.alpha_max * torch.sigmoid(
+            self.raw_anchor_bias + self.raw_anchor_slope * disagreement
+        )
+        prototype = F.normalize(uniform + alpha * (evidence - uniform), dim=-1)
+        return prototype, alpha.squeeze(-1)
+
+    def anchor_weight(self, positive_tokens: torch.Tensor, negative_tokens: torch.Tensor) -> torch.Tensor:
+        positive = self._project(positive_tokens)
+        negative = self._project(negative_tokens)
+        return self._anchored_prototype(positive, negative)[1]
+
+    def _local_logits(self, query: torch.Tensor, prototype: torch.Tensor) -> torch.Tensor:
+        patch_similarity = torch.einsum("bnpd,bd->bnp", query, prototype)
+        tau_query = self._positive(self.raw_tau_query)
+        local_score = tau_query * (
+            torch.logsumexp(patch_similarity / tau_query, dim=-1)
+            - math.log(patch_similarity.shape[-1])
+        )
+        return self._positive(self.raw_gamma) * local_score
+
     def forward(self, positive_tokens: torch.Tensor, negative_tokens: torch.Tensor, query_tokens: torch.Tensor, method: str = "iera") -> torch.Tensor:
         if method not in METHODS:
             raise ValueError(f"unknown IERA method {method!r}")
-        if method == "positive_prototype":
+        if method == "frozen_protonet":
             # A fair frozen-space ProtoNet baseline: it does not inherit the
             # projection or scale learned with an IERA objective.
             positive = F.normalize(positive_tokens.float(), dim=-1)
@@ -118,17 +156,13 @@ class IERA(nn.Module):
         positive = self._project(positive_tokens)
         negative = self._project(negative_tokens)
         query = self._project(query_tokens)
-        prototype = self._prototype(positive, negative, method)
-        # Support determines only the prototype. Query aggregation is local
-        # prototype-to-patch matching, so a support swap cannot also rewrite
-        # the query representation through a second evidence-ratio attention.
-        patch_similarity = torch.einsum("bnpd,bd->bnp", query, prototype)
-        tau_query = self._positive(self.raw_tau_query)
-        local_score = tau_query * (
-            torch.logsumexp(patch_similarity / tau_query, dim=-1)
-            - math.log(patch_similarity.shape[-1])
-        )
-        return self._positive(self.raw_gamma) * local_score
+        if method == "learned_uniform":
+            prototype = self._uniform_prototype(positive)
+        elif method == "iera":
+            prototype = self._evidence_prototype(positive, negative)
+        else:
+            prototype, _ = self._anchored_prototype(positive, negative)
+        return self._local_logits(query, prototype)
 
     def swapped_logits(self, positive: torch.Tensor, negative: torch.Tensor, query: torch.Tensor, method: str) -> tuple[torch.Tensor, torch.Tensor]:
         """Score identical queries using d=0-only versus d=1-only support panels."""

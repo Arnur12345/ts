@@ -15,20 +15,26 @@ query readout. The minimal readout implemented here is documented explicitly:
 
 Every patch from the source radiograph is excluded when estimating that
 support image's evidence; with one shot, the other environment supplies the
-independent positive bank. The frozen encoder is never updated. A small linear projection and the five positive scalar parameters
-`tau`, `tau_attention`, `tau_query`, `beta`, and `gamma` are meta-trained on
+independent positive bank. The frozen encoder is never updated. A small linear projection, evidence temperatures,
+scale, and bounded anchor gate are meta-trained on
 base-only target/confounder pairs that exclude the pilot target labels.
 Each IERA ablation is initialized and trained independently. The positive
 prototype baseline runs directly in frozen BioMedCLIP patch space.
 
 The pilot evaluates:
 
-- standard positive prototype;
-- full two-environment IERA;
-- no negative bank;
-- mean across environments instead of the robust soft minimum.
+- frozen BioMedCLIP ProtoNet;
+- learned-uniform ProtoNet with the same projection and local readout;
+- unanchored two-environment IERA;
+- Anchored IERA with explicit support-consistency training.
 
-No other architectural ablations run during this controlled repair cycle.
+Anchored IERA interpolates from the learned-uniform prototype toward IERA's
+evidence-weighted proposal. A support-dependent gate is bounded by
+`--alpha-max 0.25`, preventing attention from replacing the stable prototype.
+Its objective adds normalized support-panel consistency and penalizes
+sensitivity above `--invariance-budget 0.7` times the fixed, independently
+trained learned-uniform reference. No other architectural controls run during
+this rescue cycle.
 
 The four fixed stress pairs are pneumothorax/support devices,
 edema/cardiomegaly, pleural effusion/atelectasis, and
@@ -80,7 +86,7 @@ PYTHONPATH=. python3 -m experiments.iera.run \
   --manifest outputs/residuals/multilabel_manifest.csv \
   --patch-cache outputs/iera/patch_cache \
   --raw-labels ~/data/mimic-cxr-jpg-2.1.0/mimic-cxr-2.0.0-chexpert.csv.gz \
-  --output-dir outputs/iera/pilot_v2 \
+  --output-dir outputs/iera/anchored_v1 \
   --shots 1 3 5 10 \
   --episodes 100 \
   --queries-per-stratum 1 \
@@ -88,6 +94,9 @@ PYTHONPATH=. python3 -m experiments.iera.run \
   --max-train-steps 1000 \
   --validation-interval 25 \
   --early-stopping-patience 5 \
+  --alpha-max 0.25 \
+  --invariance-weight 1.0 \
+  --invariance-budget 0.7 \
   --device cuda
 ```
 
@@ -96,7 +105,8 @@ meta-training run, validation episode set, and test episode set. Models are
 saved separately by method and seed. The existing patch cache remains valid
 after these fixes and does not need to be rebuilt.
 
-Every learned method is trained independently. Checkpoint selection uses a
+Every learned method is trained independently. Anchored IERA's budget uses the
+fixed best learned-uniform checkpoint from the same seed. Checkpoint selection uses a
 separate patient-disjoint set of base-class episodes, never either evaluated
 pair. `training_curves.csv` records train/validation loss, and every saved model
 contains the restored best checkpoint and its best step rather than the final
@@ -111,8 +121,7 @@ and exact episode indices.
 blank labels to zero. IERA reloads the original table and treats only explicit
 0/1 values as verified target status; blank and -1 values are excluded.
 
-`decision.json` requires consistent behavior across both eligible pairs. It
-continues full IERA only when SMS falls and worst-nuisance AUROC rises on both;
-otherwise it recommends the no-negative reformulation, mean aggregation,
-another limited revision, or abandonment according to the controlled repair
-rules in `comments.md`.
+`decision.json` requires Anchored IERA to beat the learned-uniform baseline on
+normalized SMS while retaining ordinary and worst-nuisance AUROC on both
+eligible pairs. Failure to reduce Pneumothorax SMS after this direct constraint
+is reported as evidence of pathology-versus-device non-identifiability.

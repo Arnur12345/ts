@@ -71,8 +71,50 @@ def _meta_split(data, indices, split_seed):
     return torch.tensor(train, dtype=torch.long), torch.tensor(validation, dtype=torch.long)
 
 
-def _validation_loss(model, method, patches, bank, shot, device) -> float:
-    total_loss, total_queries = 0.0, 0
+def _normalized_consistency(panel_zero: torch.Tensor, panel_one: torch.Tensor) -> torch.Tensor:
+    variance = torch.cat((panel_zero, panel_one), dim=-1).var(unbiased=False)
+    return (panel_zero - panel_one).square().mean() / (variance + 1e-6)
+
+
+def _objective(
+    model, method, positive, negative, query, targets, args,
+    uniform_reference_model=None,
+) -> dict[str, torch.Tensor]:
+    logits = model(positive, negative, query, method)
+    classification = F.binary_cross_entropy_with_logits(logits, targets)
+    zero = classification.new_zeros(())
+    invariance = zero
+    budget_excess = zero
+    uniform_reference = zero
+    if method == "anchored_iera":
+        panel_zero, panel_one = model.swapped_logits(positive, negative, query, method)
+        invariance = _normalized_consistency(panel_zero, panel_one)
+        if uniform_reference_model is None:
+            raise ValueError("anchored_iera requires a fixed learned-uniform reference model")
+        with torch.no_grad():
+            uniform_zero, uniform_one = uniform_reference_model.swapped_logits(
+                positive, negative, query, "learned_uniform"
+            )
+            uniform_reference = _normalized_consistency(uniform_zero, uniform_one)
+        budget_excess = F.relu(
+            invariance - args.invariance_budget * uniform_reference.detach()
+        )
+    total = classification + args.invariance_weight * (invariance + budget_excess)
+    return {
+        "total": total,
+        "classification": classification,
+        "invariance": invariance,
+        "budget_excess": budget_excess,
+        "uniform_reference": uniform_reference,
+    }
+
+
+def _validation_objective(
+    model, method, patches, bank, shot, device, args,
+    uniform_reference_model=None,
+) -> dict[str, float]:
+    totals = defaultdict(float)
+    total_queries = 0
     model.eval()
     with torch.inference_mode():
         for generated in bank:
@@ -80,14 +122,22 @@ def _validation_loss(model, method, patches, bank, shot, device) -> float:
                 patches, generated, 0, len(generated["positive"]), shot, device
             )
             targets = generated["targets"].to(device)
-            logits = model(positive, negative, query, method)
-            total_loss += float(F.binary_cross_entropy_with_logits(logits, targets, reduction="sum"))
-            total_queries += targets.numel()
-    return total_loss / total_queries
+            components = _objective(
+                model, method, positive, negative, query, targets, args,
+                uniform_reference_model,
+            )
+            queries = targets.numel()
+            for name, value in components.items():
+                totals[name] += float(value) * queries
+            total_queries += queries
+    return {name: value / total_queries for name, value in totals.items()}
 
 
-def _train(model, method, patches, data, config, args, device, run_seed) -> dict:
-    if method == "positive_prototype":
+def _train(
+    model, method, patches, data, config, args, device, run_seed,
+    uniform_reference_model=None,
+) -> dict:
+    if method == "frozen_protonet":
         return {
             "method": method, "steps_run": 0, "best_step": 0,
             "best_validation_loss": None, "stopped_early": False, "curve": [],
@@ -131,11 +181,24 @@ def _train(model, method, patches, data, config, args, device, run_seed) -> dict
         )
     optimizer = torch.optim.AdamW(model.parameters(), lr=args.learning_rate, weight_decay=1e-4)
     generator = torch.Generator().manual_seed(run_seed)
-    losses = []
-    best_validation = _validation_loss(model, method, patches, validation_bank, args.train_shot, device)
+    component_history = defaultdict(list)
+    initial_validation = _validation_objective(
+        model, method, patches, validation_bank, args.train_shot, device, args,
+        uniform_reference_model,
+    )
+    best_validation = initial_validation["total"]
     best_step = 0
     best_state = copy.deepcopy(model.state_dict())
-    curve = [{"step": 0, "train_loss": None, "validation_loss": best_validation}]
+    curve = [
+        {
+            "step": 0,
+            "train_loss": None,
+            "train_classification": None,
+            "train_invariance": None,
+            "train_budget_excess": None,
+            **{f"validation_{name}": value for name, value in initial_validation.items()},
+        }
+    ]
     checks_without_improvement = 0
     stopped_early = False
     model.train()
@@ -143,33 +206,41 @@ def _train(model, method, patches, data, config, args, device, run_seed) -> dict
         generated, episode_index = bank[int(torch.randint(len(bank), (1,), generator=generator))]
         positive, negative, query = _episode_batch(patches, generated, episode_index, episode_index + 1, args.train_shot, device)
         targets = generated["targets"][episode_index : episode_index + 1].to(device)
-        logits = model(positive, negative, query, method)
-        loss = F.binary_cross_entropy_with_logits(logits, targets)
+        components = _objective(
+            model, method, positive, negative, query, targets, args,
+            uniform_reference_model,
+        )
+        loss = components["total"]
         optimizer.zero_grad(set_to_none=True)
         loss.backward()
         torch.nn.utils.clip_grad_norm_(model.parameters(), 5.0)
         optimizer.step()
-        losses.append(float(loss.detach()))
+        for name, value in components.items():
+            component_history[name].append(float(value.detach()))
         completed = step + 1
         if completed % args.validation_interval == 0 or completed == args.max_train_steps:
-            validation_loss = _validation_loss(
-                model, method, patches, validation_bank, args.train_shot, device
+            validation = _validation_objective(
+                model, method, patches, validation_bank, args.train_shot, device, args,
+                uniform_reference_model,
             )
-            recent = losses[-args.validation_interval :]
+            recent = slice(-args.validation_interval, None)
             curve.append(
                 {
                     "step": completed,
-                    "train_loss": statistics.mean(recent),
-                    "validation_loss": validation_loss,
+                    "train_loss": statistics.mean(component_history["total"][recent]),
+                    "train_classification": statistics.mean(component_history["classification"][recent]),
+                    "train_invariance": statistics.mean(component_history["invariance"][recent]),
+                    "train_budget_excess": statistics.mean(component_history["budget_excess"][recent]),
+                    **{f"validation_{name}": value for name, value in validation.items()},
                 }
             )
             print(
                 f"training {method} seed {run_seed}: {completed}/{args.max_train_steps}, "
-                f"train={curve[-1]['train_loss']:.4f}, val={validation_loss:.4f}",
+                f"train={curve[-1]['train_loss']:.4f}, val={validation['total']:.4f}",
                 flush=True,
             )
-            if validation_loss < best_validation - args.early_stopping_min_delta:
-                best_validation = validation_loss
+            if validation["total"] < best_validation - args.early_stopping_min_delta:
+                best_validation = validation["total"]
                 best_step = completed
                 best_state = copy.deepcopy(model.state_dict())
                 checks_without_improvement = 0
@@ -183,7 +254,7 @@ def _train(model, method, patches, data, config, args, device, run_seed) -> dict
     model.eval()
     return {
         "method": method,
-        "steps_run": len(losses),
+        "steps_run": len(component_history["total"]),
         "best_step": best_step,
         "best_validation_loss": best_validation,
         "stopped_early": stopped_early,
@@ -275,7 +346,7 @@ def _decision(summary: list[dict]) -> dict:
     pairs = sorted({row["pair"] for row in summary})
     available_shots = sorted({int(row["shot"]) for row in summary})
     shot = 3 if 3 in available_shots else available_shots[0]
-    methods = ("positive_prototype", "iera", "iera_no_negatives", "iera_mean_env")
+    methods = ("frozen_protonet", "learned_uniform", "iera", "anchored_iera")
     evidence = []
     for pair in pairs:
         method_values = {
@@ -286,59 +357,44 @@ def _decision(summary: list[dict]) -> dict:
             }
             for method in methods
         }
-        baseline, full = method_values["positive_prototype"], method_values["iera"]
+        baseline, anchored = method_values["learned_uniform"], method_values["anchored_iera"]
         evidence.append(
             {
                 "pair": pair,
                 "methods": method_values,
-                "full_iera_reduces_sms": full["sms"] < baseline["sms"],
-                "full_iera_improves_worst_nuisance_auroc": (
-                    full["worst_nuisance_auroc"] > baseline["worst_nuisance_auroc"]
+                "anchored_reduces_sms": anchored["sms"] < baseline["sms"],
+                "anchored_retains_auroc": anchored["auroc"] >= baseline["auroc"],
+                "anchored_retains_worst_nuisance_auroc": (
+                    anchored["worst_nuisance_auroc"] >= baseline["worst_nuisance_auroc"]
                 ),
             }
         )
-    full_consistent = bool(evidence) and all(
-        row["full_iera_reduces_sms"] and row["full_iera_improves_worst_nuisance_auroc"]
+    anchored_consistent = bool(evidence) and all(
+        row["anchored_reduces_sms"]
+        and row["anchored_retains_auroc"]
+        and row["anchored_retains_worst_nuisance_auroc"]
         for row in evidence
     )
-    learned = ("iera", "iera_no_negatives", "iera_mean_env")
-    averages = {
-        method: {
-            "sms": statistics.mean(row["methods"][method]["sms"] for row in evidence),
-            "worst_nuisance_auroc": statistics.mean(
-                row["methods"][method]["worst_nuisance_auroc"] for row in evidence
-            ),
-        }
-        for method in learned
-    }
-    best_sms = min(learned, key=lambda method: averages[method]["sms"])
-    best_worst = max(learned, key=lambda method: averages[method]["worst_nuisance_auroc"])
-    every_learned_increases_sms = all(
-        row["methods"][method]["sms"] >= row["methods"]["positive_prototype"]["sms"]
-        for row in evidence
-        for method in learned
+    pneumothorax = next(
+        (row for row in evidence if row["pair"].startswith("Pneumothorax__")), None
     )
-    if full_consistent:
-        status = "continue_full_iera"
-        recommendation = "Full IERA consistently reduces SMS and improves worst-nuisance AUROC."
-    elif every_learned_increases_sms:
-        status = "abandon_present_mechanism"
-        recommendation = "Every learned method increases SMS; redesign the mechanism."
-    elif best_sms == best_worst == "iera_no_negatives":
-        status = "reformulate_without_negatives"
-        recommendation = "Remove explicit negative subtraction and frame the method as invariant support-evidence selection."
-    elif best_sms == best_worst == "iera_mean_env":
-        status = "simplify_to_mean_environment"
-        recommendation = "Replace the soft minimum with mean environment aggregation."
+    if anchored_consistent:
+        status = "continue_anchored_iera"
+        recommendation = "Anchored IERA beats learned-uniform SMS while retaining AUROC on both pairs."
+    elif pneumothorax is not None and not pneumothorax["anchored_reduces_sms"]:
+        status = "abandon_due_identifiability"
+        recommendation = (
+            "Directly constrained Anchored IERA cannot reduce Pneumothorax SMS; "
+            "treat pathology-versus-device evidence as observationally non-identifiable."
+        )
     else:
-        status = "revise_once_more"
-        recommendation = "No method dominates both sensitivity and worst-nuisance discrimination."
+        status = "stop_or_revise_anchor"
+        recommendation = "The anchor reduces sensitivity but does not retain both AUROC criteria."
     return {
         "status": status,
-        "rule": "Require consistent behavior across every eligible pair (currently two), using normalized SMS as primary sensitivity.",
+        "rule": "Anchored IERA must beat learned-uniform SMS and retain AUROC and worst-nuisance AUROC on both eligible pairs.",
         "required_pairs": len(pairs),
-        "full_iera_consistent": full_consistent,
-        "learned_method_averages": averages,
+        "anchored_iera_consistent": anchored_consistent,
         "recommendation": recommendation,
         "evidence": evidence,
     }
@@ -357,6 +413,9 @@ def main() -> None:
     parser.add_argument("--queries-per-stratum", type=int, default=1)
     parser.add_argument("--seeds", type=int, nargs="+", default=(0, 1, 2, 3, 4))
     parser.add_argument("--projection-dim", type=int, default=128)
+    parser.add_argument("--alpha-max", type=float, default=0.25)
+    parser.add_argument("--invariance-weight", type=float, default=1.0)
+    parser.add_argument("--invariance-budget", type=float, default=0.7)
     parser.add_argument(
         "--max-train-steps", "--train-steps", dest="max_train_steps",
         type=int, default=1000,
@@ -378,6 +437,10 @@ def main() -> None:
         parser.error("max-train-steps and validation-interval must be positive")
     if args.early_stopping_patience <= 0 or args.early_stopping_episodes_per_pair <= 0:
         parser.error("early-stopping patience and episodes-per-pair must be positive")
+    if not 0 < args.alpha_max <= 1 or args.invariance_weight < 0:
+        parser.error("alpha-max must be in (0,1] and invariance-weight must be non-negative")
+    if not 0 < args.invariance_budget <= 1:
+        parser.error("invariance-budget must be in (0,1]")
     started = time.perf_counter()
     device = torch.device("cuda" if args.device == "auto" and torch.cuda.is_available() else args.device if args.device != "auto" else "cpu")
     data = load_dataset(args.embeddings, args.manifest)
@@ -451,11 +514,19 @@ def main() -> None:
     training_curve_rows = []
     for seed in args.seeds:
         run_seed = args.seed + seed
+        uniform_reference_model = None
         for method in METHODS:
             _set_seed(run_seed)
-            model = IERA(patches.shape[-1], args.projection_dim).to(device)
-            training_info = _train(model, method, patches, data, config, args, device, run_seed)
-            if method != "positive_prototype":
+            model = IERA(
+                patches.shape[-1], args.projection_dim, alpha_max=args.alpha_max
+            ).to(device)
+            training_info = _train(
+                model, method, patches, data, config, args, device, run_seed,
+                uniform_reference_model,
+            )
+            if method == "learned_uniform":
+                uniform_reference_model = copy.deepcopy(model).eval().requires_grad_(False)
+            if method != "frozen_protonet":
                 torch.save(
                     {
                         "method": method,
@@ -471,7 +542,7 @@ def main() -> None:
                 **{key: value for key, value in training_info.items() if key != "curve"},
                 "seed": seed,
                 "training_seed": run_seed,
-                "learned_parameters": model.parameters_dict() if method != "positive_prototype" else None,
+                "learned_parameters": model.parameters_dict() if method != "frozen_protonet" else None,
             })
             for point in training_info["curve"]:
                 training_curve_rows.append(
@@ -493,6 +564,7 @@ def main() -> None:
             del model
             if device.type == "cuda":
                 torch.cuda.empty_cache()
+        del uniform_reference_model
     summary = _summaries(rows)
     _write(args.output_dir / "per_seed_metrics.csv", rows)
     _write(args.output_dir / "summary_metrics.csv", summary)
@@ -514,6 +586,12 @@ def main() -> None:
                 "seed_semantics": "independent initialization, meta-training, validation, and test episode run",
                 "patient_split": {"seed": args.split_seed, "fractions": [0.70, 0.15, 0.15]},
                 "max_train_steps": args.max_train_steps,
+                "anchored_iera": {
+                    "alpha_max": args.alpha_max,
+                    "invariance_weight": args.invariance_weight,
+                    "uniform_sensitivity_budget": args.invariance_budget,
+                    "objective": "classification + lambda * (normalized consistency + budget excess)",
+                },
                 "early_stopping": {
                     "validation_interval": args.validation_interval,
                     "patience": args.early_stopping_patience,
