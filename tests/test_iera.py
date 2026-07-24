@@ -12,7 +12,7 @@ import torch.nn as nn
 from experiments.iera.episodes import generate_pair_episodes, validate_pair_episodes
 from experiments.iera.model import IERA, METHODS
 from experiments.iera.patch_cache import MODEL, extract_patch_tokens, load_patch_cache
-from experiments.iera.run import _metrics
+from experiments.iera.run import _decision, _meta_split, _metrics
 from experiments.residuals.data import ResidualDataset
 
 
@@ -138,6 +138,36 @@ class IERATest(unittest.TestCase):
         warm = _metrics(logits, panel_zero, panel_one, targets, nuisance, 10.0, 0.5)
         self.assertEqual(cold["sms_raw_logit"], warm["sms_raw_logit"])
         self.assertEqual(cold["sms_normalized_logit"], warm["sms_normalized_logit"])
+
+    def test_meta_early_stop_split_is_patient_disjoint(self) -> None:
+        data = _data()
+        # Add a second study per patient and prove both studies stay together.
+        original = len(data.subject_ids)
+        data.subject_ids.extend(data.subject_ids.copy())
+        train, validation = _meta_split(data, torch.arange(original * 2), split_seed=17)
+        train_subjects = {data.subject_ids[index] for index in train.tolist()}
+        validation_subjects = {data.subject_ids[index] for index in validation.tolist()}
+        self.assertFalse(train_subjects & validation_subjects)
+
+    def test_decision_requires_consistency_across_both_pairs(self) -> None:
+        rows = []
+        values = {
+            "positive_prototype": (1.0, 0.60, 0.70),
+            "iera": (0.8, 0.65, 0.71),
+            "iera_no_negatives": (0.9, 0.63, 0.70),
+            "iera_mean_env": (0.95, 0.61, 0.70),
+        }
+        for pair in ("pair_a", "pair_b"):
+            for method, (sms, worst, auroc) in values.items():
+                for metric, mean in (
+                    ("sms_normalized_logit", sms),
+                    ("worst_nuisance_auroc", worst),
+                    ("auroc", auroc),
+                ):
+                    rows.append({"pair": pair, "method": method, "shot": 3, "metric": metric, "mean": mean})
+        decision = _decision(rows)
+        self.assertEqual(decision["required_pairs"], 2)
+        self.assertEqual(decision["status"], "continue_full_iera")
 
 
 if __name__ == "__main__":

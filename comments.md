@@ -1,23 +1,27 @@
-It will execute, and all 12 tests pass, but the current experiment is not yet scientifically trustworthy. The largest issues explain the strange pilot results.
+Do one controlled repair cycle before abandoning the idea:
 
-::code-comment{title="[P0] Novel-label leakage during meta-training" body="Pilot labels are removed only from `target_ids`. `eligible_directed_pairs` still iterates over every class as a confounder, so held-out pathologies can influence episode construction and the learned projection. Restrict both target and confounder IDs to base classes." file="/Users/arnurartykbay/projects/paper/wacv/experiments/iera/run.py" start=50 end=52 priority=0}
+1. **Fix evaluation first**
+   - Make the decision require both eligible pairs, not three impossible pairs.
+   - Compute support-swap predictions using the calibrated threshold, not raw logit `0`.
+   - Keep normalized SMS as the primary sensitivity metric.
 
-::code-comment{title="[P0] SMS is distorted by per-method calibration" body="SMS is computed after dividing by a temperature selected separately for every method. A large temperature flattens probabilities and produces artificially low SMS; this likely benefits the weak prototype baseline. Use a shared temperature, report uncalibrated normalized-logit shift, or add support-swap error/flip metrics." file="/Users/arnurartykbay/projects/paper/wacv/experiments/iera/run.py" start=101 end=115 priority=0}
+2. **Train properly**
+   - Replace 50 fixed steps with validation-based early stopping, likely allowing 500–2,000 steps.
+   - Use separate base-class episodes for early stopping—do not select checkpoints using the evaluated novel pairs.
+   - Save the best checkpoint and training curves, not merely the final batch loss.
 
-::code-comment{title="[P1] Evaluation bypasses minimum-stratum rule" body="`--min-stratum-patients` is enforced for meta-training pairs but not the four evaluation pairs. Episode generation only requires `max_shot + queries`, allowing the pilot to evaluate strata with 13 or 30 patients despite the intended 50-patient minimum." file="/Users/arnurartykbay/projects/paper/wacv/experiments/iera/run.py" start=209 end=223 priority=1}
+3. **Run only four methods**
+   - Positive ProtoNet.
+   - Full IERA.
+   - `iera_no_negatives`.
+   - `iera_mean_env`.
 
-::code-comment{title="[P1] Same-image information remains in the bank" body="The self-match mask removes only the identical patch. Every other patch from the same radiograph remains in the positive bank, allowing within-image similarity to dominate evidence estimation. Mask the complete patch block for that support image and normalize by the remaining bank size." file="/Users/arnurartykbay/projects/paper/wacv/experiments/iera/model.py" start=42 end=49 priority=1}
+   Do not add more architectural components yet.
 
-::code-comment{title="[P1] Support affects both sides of the comparison" body="Support evidence first builds the prototype and then independently selects query patches. A support swap therefore changes both prototype and query representation, mechanically amplifying SMS. The handbook's local matching formulation should instead compare prototype against query patches without evidence-ratio query reweighting." file="/Users/arnurartykbay/projects/paper/wacv/experiments/iera/model.py" start=108 end=113 priority=1}
+4. **Use this decision**
+   - If full IERA reduces SMS and improves worst-nuisance AUROC consistently: continue.
+   - If `no_negatives` wins: remove subtraction and reformulate the paper as **invariant support-evidence selection**, not “explain-away.”
+   - If `mean_env` wins: the soft-min robustness operator is hurting; simplify it.
+   - If every learned method still increases SMS: abandon the present mechanism and redesign it.
 
-::code-comment{title="[P1] Baselines share an IERA-trained projection" body="One model is trained with the full IERA objective and then reused for ProtoNet and every ablation. This is not a fair baseline, and post-hoc ablations may be artificially weak. Train each learnable method independently, or evaluate the positive prototype directly in frozen BioMedCLIP space." file="/Users/arnurartykbay/projects/paper/wacv/experiments/iera/run.py" start=231 end=243 priority=1}
-
-::code-comment{title="[P1] Reported seeds are not training seeds" body="The model is initialized and trained once; `--seeds` only resamples test episodes. Global Torch/CUDA seeds are also not set before model construction. Consequently, the reported standard deviation is episode-sampling variability, not independent-run variability. Reinitialize and train one model per seed." file="/Users/arnurartykbay/projects/paper/wacv/experiments/iera/run.py" start=195 end=201 priority=1}
-
-::code-comment{title="[P2] Incomplete patch caches can be loaded" body="The loader validates only the manifest hash. It does not require `complete=true`, verify the dtype/model/pooling configuration, or confirm file size. An interrupted cache may therefore silently supply zero or unwritten tokens." file="/Users/arnurartykbay/projects/paper/wacv/experiments/iera/patch_cache.py" start=153 end=161 priority=2}
-
-::code-comment{title="[P2] External report roots are unsupported in practice" body="Although `--report-root` may point elsewhere, `relative_to(data_root)` raises when reports are outside the image root, and loading later joins the saved path back to `data_root`. Store an absolute report path or resolve relative to `report_root`." file="/Users/arnurartykbay/projects/paper/wacv/src/mimic_cxr_protocol/embed_pairs.py" start=46 end=52 priority=2}
-
-The patient splitting and within-episode overlap validation look sound, and the complete test suite passes. The protocol builder in `src/mimic_cxr_protocol/protocol.py` is generally careful.
-
-My conclusion: **the code works computationally, but fix the first six issues before interpreting or rerunning the pilot**. The biggest immediate causes of the failed result are probably temperature-dependent SMS and support-conditioned query attention.
+My current expectation is that **`iera_no_negatives` is your best rescue path**. It nearly met the Edema criterion already, whereas explicit negative subtraction appears unstable. First establish the effect on MIMIC; only afterward expand to CheXpert/NIH for external validation.

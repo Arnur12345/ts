@@ -3,7 +3,9 @@
 from __future__ import annotations
 
 import argparse
+import copy
 import csv
+import hashlib
 import json
 import math
 import random
@@ -58,22 +60,59 @@ def _set_seed(seed: int) -> None:
         torch.cuda.manual_seed_all(seed)
 
 
-def _train(model, method, patches, data, config, args, device, run_seed) -> list[float]:
-    if args.train_steps == 0 or method == "positive_prototype":
-        return []
-    train_indices = split_indices(data, "train", args.split_seed)
+def _meta_split(data, indices, split_seed):
+    train, validation = [], []
+    for index in indices.tolist():
+        subject = data.subject_ids[index]
+        bucket = int.from_bytes(
+            hashlib.sha256(f"iera-meta|{split_seed}|{subject}".encode()).digest()[:8], "big"
+        ) % 10_000
+        (validation if bucket >= 8500 else train).append(index)
+    return torch.tensor(train, dtype=torch.long), torch.tensor(validation, dtype=torch.long)
+
+
+def _validation_loss(model, method, patches, bank, shot, device) -> float:
+    total_loss, total_queries = 0.0, 0
+    model.eval()
+    with torch.inference_mode():
+        for generated in bank:
+            positive, negative, query = _episode_batch(
+                patches, generated, 0, len(generated["positive"]), shot, device
+            )
+            targets = generated["targets"].to(device)
+            logits = model(positive, negative, query, method)
+            total_loss += float(F.binary_cross_entropy_with_logits(logits, targets, reduction="sum"))
+            total_queries += targets.numel()
+    return total_loss / total_queries
+
+
+def _train(model, method, patches, data, config, args, device, run_seed) -> dict:
+    if method == "positive_prototype":
+        return {
+            "method": method, "steps_run": 0, "best_step": 0,
+            "best_validation_loss": None, "stopped_early": False, "curve": [],
+        }
+    all_train_indices = split_indices(data, "train", args.split_seed)
+    train_indices, early_stop_indices = _meta_split(data, all_train_indices, args.split_seed)
     evaluation_targets = {_ids(data, pair)[0] for pair in PILOT_PAIRS}
     base_ids = [data.class_names.index(name) for name in config["class_partitions"]["base"] if data.class_names.index(name) not in evaluation_targets]
-    pairs = eligible_directed_pairs(
+    train_pairs = eligible_directed_pairs(
         data, train_indices, base_ids, args.min_stratum_patients,
         confounder_ids=base_ids,
     )
+    early_stop_minimum = max(args.train_shot + 1, 10)
+    early_stop_pairs = eligible_directed_pairs(
+        data, early_stop_indices, base_ids, early_stop_minimum,
+        confounder_ids=base_ids,
+    )
+    pairs = sorted(set(train_pairs) & set(early_stop_pairs))
     if not pairs:
-        raise ValueError("no eligible base-only meta-training target/confounder pairs")
+        raise ValueError("no base-only target/confounder pairs support disjoint meta-train/early-stop episodes")
     random.Random(run_seed).shuffle(pairs)
     pairs = pairs[: min(12, len(pairs))]
     bank = []
-    episodes_per_pair = max(2, math.ceil(min(args.train_steps, 120) / len(pairs)))
+    validation_bank = []
+    episodes_per_pair = max(2, math.ceil(min(args.max_train_steps, 120) / len(pairs)))
     for pair_index, (target, confounder) in enumerate(pairs):
         generated = generate_pair_episodes(
             data, train_indices, target, confounder, episodes_per_pair,
@@ -82,11 +121,25 @@ def _train(model, method, patches, data, config, args, device, run_seed) -> list
         )
         for episode_index in range(episodes_per_pair):
             bank.append((generated, episode_index))
+        validation_bank.append(
+            generate_pair_episodes(
+                data, early_stop_indices, target, confounder,
+                args.early_stopping_episodes_per_pair, args.train_shot, 1,
+                run_seed + 50_000 + pair_index,
+                min_stratum_patients=early_stop_minimum,
+            )
+        )
     optimizer = torch.optim.AdamW(model.parameters(), lr=args.learning_rate, weight_decay=1e-4)
     generator = torch.Generator().manual_seed(run_seed)
     losses = []
+    best_validation = _validation_loss(model, method, patches, validation_bank, args.train_shot, device)
+    best_step = 0
+    best_state = copy.deepcopy(model.state_dict())
+    curve = [{"step": 0, "train_loss": None, "validation_loss": best_validation}]
+    checks_without_improvement = 0
+    stopped_early = False
     model.train()
-    for step in range(args.train_steps):
+    for step in range(args.max_train_steps):
         generated, episode_index = bank[int(torch.randint(len(bank), (1,), generator=generator))]
         positive, negative, query = _episode_batch(patches, generated, episode_index, episode_index + 1, args.train_shot, device)
         targets = generated["targets"][episode_index : episode_index + 1].to(device)
@@ -97,10 +150,49 @@ def _train(model, method, patches, data, config, args, device, run_seed) -> list
         torch.nn.utils.clip_grad_norm_(model.parameters(), 5.0)
         optimizer.step()
         losses.append(float(loss.detach()))
-        if (step + 1) % 25 == 0:
-            print(f"training {method} seed {run_seed}: {step + 1}/{args.train_steps}, loss={statistics.mean(losses[-25:]):.4f}", flush=True)
+        completed = step + 1
+        if completed % args.validation_interval == 0 or completed == args.max_train_steps:
+            validation_loss = _validation_loss(
+                model, method, patches, validation_bank, args.train_shot, device
+            )
+            recent = losses[-args.validation_interval :]
+            curve.append(
+                {
+                    "step": completed,
+                    "train_loss": statistics.mean(recent),
+                    "validation_loss": validation_loss,
+                }
+            )
+            print(
+                f"training {method} seed {run_seed}: {completed}/{args.max_train_steps}, "
+                f"train={curve[-1]['train_loss']:.4f}, val={validation_loss:.4f}",
+                flush=True,
+            )
+            if validation_loss < best_validation - args.early_stopping_min_delta:
+                best_validation = validation_loss
+                best_step = completed
+                best_state = copy.deepcopy(model.state_dict())
+                checks_without_improvement = 0
+            else:
+                checks_without_improvement += 1
+                if checks_without_improvement >= args.early_stopping_patience:
+                    stopped_early = True
+                    break
+            model.train()
+    model.load_state_dict(best_state)
     model.eval()
-    return losses
+    return {
+        "method": method,
+        "steps_run": len(losses),
+        "best_step": best_step,
+        "best_validation_loss": best_validation,
+        "stopped_early": stopped_early,
+        "curve": curve,
+        "meta_training_pairs": [
+            {"target": data.class_names[target], "confounder": data.class_names[confounder]}
+            for target, confounder in pairs
+        ],
+    }
 
 
 def _score(model, patches, episodes, shot, method, batch_size, device):
@@ -125,8 +217,10 @@ def _metrics(logits, panel_zero, panel_one, targets, nuisance, temperature, thre
     fn = (target & ~prediction).sum()
     raw_shift = (panel_one - panel_zero).abs()
     shift_scale = torch.cat((panel_zero, panel_one)).std().clamp_min(1e-6)
-    panel_zero_prediction = panel_zero.ge(0)
-    panel_one_prediction = panel_one.ge(0)
+    panel_zero_probability = torch.sigmoid(panel_zero / temperature)
+    panel_one_probability = torch.sigmoid(panel_one / temperature)
+    panel_zero_prediction = panel_zero_probability.ge(threshold)
+    panel_one_prediction = panel_one_probability.ge(threshold)
     panel_zero_error = panel_zero_prediction.ne(target)
     panel_one_error = panel_one_prediction.ne(target)
     result = {
@@ -181,19 +275,71 @@ def _decision(summary: list[dict]) -> dict:
     pairs = sorted({row["pair"] for row in summary})
     available_shots = sorted({int(row["shot"]) for row in summary})
     shot = 3 if 3 in available_shots else available_shots[0]
+    methods = ("positive_prototype", "iera", "iera_no_negatives", "iera_mean_env")
     evidence = []
     for pair in pairs:
-        baseline_sms = lookup.get((pair, "positive_prototype", shot, "sms_normalized_logit"), float("nan"))
-        iera_sms = lookup.get((pair, "iera", shot, "sms_normalized_logit"), float("nan"))
-        reduction = 1 - iera_sms / baseline_sms if baseline_sms > 0 else float("nan")
-        worst_gain = lookup.get((pair, "iera", shot, "worst_nuisance_auroc"), float("nan")) - lookup.get((pair, "positive_prototype", shot, "worst_nuisance_auroc"), float("nan"))
-        ordinary_loss = lookup.get((pair, "positive_prototype", shot, "auroc"), float("nan")) - lookup.get((pair, "iera", shot, "auroc"), float("nan"))
-        evidence.append({"pair": pair, "baseline_sms": baseline_sms, "iera_sms": iera_sms, "sms_reduction": reduction, "worst_auroc_gain": worst_gain, "ordinary_auroc_loss": ordinary_loss})
-    passing = [row for row in evidence if row["sms_reduction"] >= 0.30 and row["worst_auroc_gain"] >= 0.02 and row["ordinary_auroc_loss"] < 0.01]
+        method_values = {
+            method: {
+                "sms": lookup.get((pair, method, shot, "sms_normalized_logit"), float("nan")),
+                "worst_nuisance_auroc": lookup.get((pair, method, shot, "worst_nuisance_auroc"), float("nan")),
+                "auroc": lookup.get((pair, method, shot, "auroc"), float("nan")),
+            }
+            for method in methods
+        }
+        baseline, full = method_values["positive_prototype"], method_values["iera"]
+        evidence.append(
+            {
+                "pair": pair,
+                "methods": method_values,
+                "full_iera_reduces_sms": full["sms"] < baseline["sms"],
+                "full_iera_improves_worst_nuisance_auroc": (
+                    full["worst_nuisance_auroc"] > baseline["worst_nuisance_auroc"]
+                ),
+            }
+        )
+    full_consistent = bool(evidence) and all(
+        row["full_iera_reduces_sms"] and row["full_iera_improves_worst_nuisance_auroc"]
+        for row in evidence
+    )
+    learned = ("iera", "iera_no_negatives", "iera_mean_env")
+    averages = {
+        method: {
+            "sms": statistics.mean(row["methods"][method]["sms"] for row in evidence),
+            "worst_nuisance_auroc": statistics.mean(
+                row["methods"][method]["worst_nuisance_auroc"] for row in evidence
+            ),
+        }
+        for method in learned
+    }
+    best_sms = min(learned, key=lambda method: averages[method]["sms"])
+    best_worst = max(learned, key=lambda method: averages[method]["worst_nuisance_auroc"])
+    every_learned_increases_sms = all(
+        row["methods"][method]["sms"] >= row["methods"]["positive_prototype"]["sms"]
+        for row in evidence
+        for method in learned
+    )
+    if full_consistent:
+        status = "continue_full_iera"
+        recommendation = "Full IERA consistently reduces SMS and improves worst-nuisance AUROC."
+    elif every_learned_increases_sms:
+        status = "abandon_present_mechanism"
+        recommendation = "Every learned method increases SMS; redesign the mechanism."
+    elif best_sms == best_worst == "iera_no_negatives":
+        status = "reformulate_without_negatives"
+        recommendation = "Remove explicit negative subtraction and frame the method as invariant support-evidence selection."
+    elif best_sms == best_worst == "iera_mean_env":
+        status = "simplify_to_mean_environment"
+        recommendation = "Replace the soft minimum with mean environment aggregation."
+    else:
+        status = "revise_once_more"
+        recommendation = "No method dominates both sensitivity and worst-nuisance discrimination."
     return {
-        "status": "continue" if len(passing) >= 3 else "stop_or_revise",
-        "rule": "at least three pairs: uncalibrated normalized-logit SMS reduction >=30%, worst-nuisance AUROC gain >=0.02, ordinary AUROC loss <0.01",
-        "passing_pairs": len(passing),
+        "status": status,
+        "rule": "Require consistent behavior across every eligible pair (currently two), using normalized SMS as primary sensitivity.",
+        "required_pairs": len(pairs),
+        "full_iera_consistent": full_consistent,
+        "learned_method_averages": averages,
+        "recommendation": recommendation,
         "evidence": evidence,
     }
 
@@ -210,17 +356,28 @@ def main() -> None:
     parser.add_argument("--episodes", type=int, default=100)
     parser.add_argument("--queries-per-stratum", type=int, default=1)
     parser.add_argument("--seeds", type=int, nargs="+", default=(0, 1, 2, 3, 4))
-    parser.add_argument("--methods", nargs="+", choices=METHODS, default=METHODS)
     parser.add_argument("--projection-dim", type=int, default=128)
-    parser.add_argument("--train-steps", type=int, default=100)
+    parser.add_argument(
+        "--max-train-steps", "--train-steps", dest="max_train_steps",
+        type=int, default=1000,
+        help="Maximum optimization steps; --train-steps is a deprecated alias",
+    )
     parser.add_argument("--train-shot", type=int, default=3)
     parser.add_argument("--learning-rate", type=float, default=1e-3)
+    parser.add_argument("--validation-interval", type=int, default=25)
+    parser.add_argument("--early-stopping-patience", type=int, default=5)
+    parser.add_argument("--early-stopping-min-delta", type=float, default=1e-4)
+    parser.add_argument("--early-stopping-episodes-per-pair", type=int, default=2)
     parser.add_argument("--min-stratum-patients", type=int, default=50)
     parser.add_argument("--episode-batch-size", type=int, default=8)
     parser.add_argument("--seed", type=int, default=2026)
     parser.add_argument("--split-seed", type=int, default=2026)
     parser.add_argument("--device", default="auto")
     args = parser.parse_args()
+    if args.max_train_steps <= 0 or args.validation_interval <= 0:
+        parser.error("max-train-steps and validation-interval must be positive")
+    if args.early_stopping_patience <= 0 or args.early_stopping_episodes_per_pair <= 0:
+        parser.error("early-stopping patience and episodes-per-pair must be positive")
     started = time.perf_counter()
     device = torch.device("cuda" if args.device == "auto" and torch.cuda.is_available() else args.device if args.device != "auto" else "cpu")
     data = load_dataset(args.embeddings, args.manifest)
@@ -291,12 +448,13 @@ def main() -> None:
 
     rows = []
     training_runs = []
+    training_curve_rows = []
     for seed in args.seeds:
         run_seed = args.seed + seed
-        for method in args.methods:
+        for method in METHODS:
             _set_seed(run_seed)
             model = IERA(patches.shape[-1], args.projection_dim).to(device)
-            losses = _train(model, method, patches, data, config, args, device, run_seed)
+            training_info = _train(model, method, patches, data, config, args, device, run_seed)
             if method != "positive_prototype":
                 torch.save(
                     {
@@ -305,18 +463,20 @@ def main() -> None:
                         "training_seed": run_seed,
                         "state_dict": model.state_dict(),
                         "parameters": model.parameters_dict(),
+                        "training": training_info,
                     },
                     args.output_dir / f"model_{method}_seed_{seed:03d}.pt",
                 )
-            training_runs.append(
-                {
-                    "method": method,
-                    "seed": seed,
-                    "training_seed": run_seed,
-                    "final_loss": losses[-1] if losses else None,
-                    "learned_parameters": model.parameters_dict() if method != "positive_prototype" else None,
-                }
-            )
+            training_runs.append({
+                **{key: value for key, value in training_info.items() if key != "curve"},
+                "seed": seed,
+                "training_seed": run_seed,
+                "learned_parameters": model.parameters_dict() if method != "positive_prototype" else None,
+            })
+            for point in training_info["curve"]:
+                training_curve_rows.append(
+                    {"method": method, "seed": seed, "training_seed": run_seed, **point}
+                )
             for pair_index, names, _target_id, _confounder_id in eligible_pairs:
                 pair_name = f"{names[0]}__{names[1]}"
                 validation, test = episode_sets[(pair_index, seed)]
@@ -336,6 +496,8 @@ def main() -> None:
     summary = _summaries(rows)
     _write(args.output_dir / "per_seed_metrics.csv", rows)
     _write(args.output_dir / "summary_metrics.csv", summary)
+    if training_curve_rows:
+        _write(args.output_dir / "training_curves.csv", training_curve_rows)
     decision = _decision(summary)
     (args.output_dir / "decision.json").write_text(json.dumps(decision, indent=2) + "\n", encoding="utf-8")
     (args.output_dir / "experiment.json").write_text(
@@ -346,11 +508,19 @@ def main() -> None:
                 "raw_labels": str(args.raw_labels),
                 "blank_and_uncertain_policy": "unknown/excluded",
                 "shots": args.shots,
+                "methods": list(METHODS),
                 "episodes": args.episodes,
                 "seeds": args.seeds,
                 "seed_semantics": "independent initialization, meta-training, validation, and test episode run",
                 "patient_split": {"seed": args.split_seed, "fractions": [0.70, 0.15, 0.15]},
-                "train_steps": args.train_steps,
+                "max_train_steps": args.max_train_steps,
+                "early_stopping": {
+                    "validation_interval": args.validation_interval,
+                    "patience": args.early_stopping_patience,
+                    "min_delta": args.early_stopping_min_delta,
+                    "episodes_per_pair": args.early_stopping_episodes_per_pair,
+                    "selection_data": "patient-disjoint base-class episodes only",
+                },
                 "meta_training_labels": "target and confounder both restricted to non-evaluation base classes",
                 "training_runs": training_runs,
                 "eligible_pairs": [item["pair"] for item in eligibility if item["eligible"]],

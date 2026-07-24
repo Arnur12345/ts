@@ -25,9 +25,10 @@ The pilot evaluates:
 
 - standard positive prototype;
 - full two-environment IERA;
-- `E=1`;
 - no negative bank;
 - mean across environments instead of the robust soft minimum.
+
+No other architectural ablations run during this controlled repair cycle.
 
 The four fixed stress pairs are pneumothorax/support devices,
 edema/cardiomegaly, pleural effusion/atelectasis, and
@@ -47,8 +48,8 @@ Reported metrics include AUROC, AUPRC, nuisance-specific and worst-nuisance
 performance, false-positive activation on `c- d+`, Brier score, ECE, and a
 preregistered decision file. SMS is computed from uncalibrated logits and also
 normalized by the method's pooled panel-logit standard deviation; support-swap
-flip rate and panel error metrics are reported separately. Calibration can no
-longer suppress SMS.
+flip rate and panel error metrics use the validation-selected calibrated
+threshold. Calibration can no longer suppress the primary SMS value.
 
 ## 1. Build the patch cache
 
@@ -84,7 +85,9 @@ PYTHONPATH=. python3 -m experiments.iera.run \
   --episodes 100 \
   --queries-per-stratum 1 \
   --seeds 0 1 2 3 4 \
-  --train-steps 100 \
+  --max-train-steps 1000 \
+  --validation-interval 25 \
+  --early-stopping-patience 5 \
   --device cuda
 ```
 
@@ -93,11 +96,23 @@ meta-training run, validation episode set, and test episode set. Models are
 saved separately by method and seed. The existing patch cache remains valid
 after these fixes and does not need to be rebuilt.
 
+Every learned method is trained independently. Checkpoint selection uses a
+separate patient-disjoint set of base-class episodes, never either evaluated
+pair. `training_curves.csv` records train/validation loss, and every saved model
+contains the restored best checkpoint and its best step rather than the final
+optimization state.
+
 For a fast server smoke test, use `--shots 1 3 --episodes 2 --seeds 0
---train-steps 2`. Results are saved as `per_seed_metrics.csv`,
+--max-train-steps 25 --validation-interval 5 --early-stopping-patience 2`. Results are saved as `per_seed_metrics.csv`,
 `summary_metrics.csv`, `decision.json`, `experiment.json`, the learned model,
 and exact episode indices.
 
 `--raw-labels` is mandatory because the earlier residual manifest normalized
 blank labels to zero. IERA reloads the original table and treats only explicit
 0/1 values as verified target status; blank and -1 values are excluded.
+
+`decision.json` requires consistent behavior across both eligible pairs. It
+continues full IERA only when SMS falls and worst-nuisance AUROC rises on both;
+otherwise it recommends the no-negative reformulation, mean aggregation,
+another limited revision, or abandonment according to the controlled repair
+rules in `comments.md`.

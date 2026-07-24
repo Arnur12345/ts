@@ -9,7 +9,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 
 
-METHODS = ("positive_prototype", "iera", "iera_e1", "iera_no_negatives", "iera_mean_env")
+METHODS = ("positive_prototype", "iera", "iera_no_negatives", "iera_mean_env")
 
 
 class IERA(nn.Module):
@@ -60,7 +60,7 @@ class IERA(nn.Module):
         self_environment: int | None = None,
         self_shot: int | None = None,
     ) -> torch.Tensor:
-        environments = 1 if method == "iera_e1" else positive.shape[1]
+        environments = positive.shape[1]
         ratios = []
         for environment in range(environments):
             positive_bank = positive[:, environment].flatten(1, 2)
@@ -87,8 +87,6 @@ class IERA(nn.Module):
 
     def _prototype(self, positive: torch.Tensor, negative: torch.Tensor, method: str) -> torch.Tensor:
         batch, environments, shots, patches, width = positive.shape
-        if method == "iera_e1":
-            environments = 1
         token_groups, evidence_groups = [], []
         for environment in range(environments):
             for shot in range(shots):
