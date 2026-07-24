@@ -1,0 +1,37 @@
+{
+  "proposal": "PAIR-FSL: pathology residuals from real matched controls",
+  "embeddings": "outputs/residuals/biomedclip_multilabel.pt",
+  "manifest": "outputs/residuals/multilabel_manifest.csv",
+  "regimes": [
+    "single_label",
+    "multi_label"
+  ],
+  "methods": [
+    "positive_prototype",
+    "global_negative_centroid",
+    "random_residual",
+    "metadata_matched_residual",
+    "full_embedding_matched_residual",
+    "anatomy_matched_residual",
+    "shuffled_anatomy_match"
+  ],
+  "shots": [
+    1,
+    3,
+    5
+  ],
+  "abundant_controls": 20,
+  "queries_per_class": 1,
+  "episodes": 500,
+  "seeds": [
+    0,
+    1,
+    2,
+    3,
+    4
+  ],
+  "match_temperature": 0.1,
+  "robust_center": "geometric_median",
+  "selection_firewall": "temperature and multi-label threshold selected on validation_novel only",
+  "query_reports_used": false
+}

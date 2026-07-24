@@ -84,3 +84,10 @@ The single-label and native multi-label matched-control experiments live in
 retains comorbid labels and compare positive prototypes, subtraction controls,
 metadata/full-embedding matching, anatomy-masked matching, and a shuffled
 matching control under both `K+/K-` and `K+/M-` support.
+
+## IERA patch-evidence pilot
+
+The invariant evidence-ratio attention implementation and commands are in
+[`iera/README.md`](iera/README.md). It uses positive/negative patch banks from
+two controlled co-label environments and reports the fixed-query support-swap
+stress test proposed in `test-6.pdf`.

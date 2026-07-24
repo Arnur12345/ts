@@ -1,0 +1,1513 @@
+regime,method,shot,negative_shot,support_protocol,temperature,threshold,class,metric,mean,std
+single_label,positive_prototype,1,1,balanced,0.1,nan,No Finding,auroc,0.5136396050453186,0.009196793524244328
+single_label,positive_prototype,1,1,balanced,0.1,nan,No Finding,auprc,0.35598127245903016,0.014731468575014436
+single_label,positive_prototype,1,1,balanced,0.1,nan,No Finding,f1,0.3339687168598175,0.016318345657994643
+single_label,positive_prototype,1,1,balanced,0.1,nan,No Finding,accuracy,0.5714666604995727,0.00899875694215643
+single_label,positive_prototype,1,1,balanced,0.1,nan,No Finding,nll,0.6733277678489685,0.007544076910900565
+single_label,positive_prototype,1,1,balanced,0.1,nan,No Finding,calibration_error,0.09760566502809524,0.0031266698210729612
+single_label,positive_prototype,1,1,balanced,0.1,nan,Fracture,auroc,0.6056284070014953,0.009434535066749747
+single_label,positive_prototype,1,1,balanced,0.1,nan,Fracture,auprc,0.41357211470603944,0.014473582297713103
+single_label,positive_prototype,1,1,balanced,0.1,nan,Fracture,f1,0.4281987905502319,0.01063898736353304
+single_label,positive_prototype,1,1,balanced,0.1,nan,Fracture,accuracy,0.6007999897003173,0.005362424014186809
+single_label,positive_prototype,1,1,balanced,0.1,nan,Fracture,nll,0.6256336808204651,0.005811447233356289
+single_label,positive_prototype,1,1,balanced,0.1,nan,Fracture,calibration_error,0.04298412948846817,0.003980128637144962
+single_label,positive_prototype,1,1,balanced,0.1,nan,Cardiomegaly,auroc,0.6069036006927491,0.013195485800311003
+single_label,positive_prototype,1,1,balanced,0.1,nan,Cardiomegaly,auprc,0.42432316541671755,0.020424225050685373
+single_label,positive_prototype,1,1,balanced,0.1,nan,Cardiomegaly,f1,0.42105313539505007,0.023417162033998316
+single_label,positive_prototype,1,1,balanced,0.1,nan,Cardiomegaly,accuracy,0.6192000031471252,0.014176667110214099
+single_label,positive_prototype,1,1,balanced,0.1,nan,Cardiomegaly,nll,0.6263405561447144,0.007019516006900617
+single_label,positive_prototype,1,1,balanced,0.1,nan,Cardiomegaly,calibration_error,0.03640810549259186,0.006934646126806268
+single_label,global_negative_centroid,1,1,balanced,0.5,nan,No Finding,auroc,0.5047664105892181,0.011757344271822604
+single_label,global_negative_centroid,1,1,balanced,0.5,nan,No Finding,auprc,0.34571818113327024,0.010353617073063292
+single_label,global_negative_centroid,1,1,balanced,0.5,nan,No Finding,f1,0.33660553097724916,0.016517473750357222
+single_label,global_negative_centroid,1,1,balanced,0.5,nan,No Finding,accuracy,0.5661333322525024,0.008998752967975348
+single_label,global_negative_centroid,1,1,balanced,0.5,nan,No Finding,nll,0.6574737310409546,0.003940855090584065
+single_label,global_negative_centroid,1,1,balanced,0.5,nan,No Finding,calibration_error,0.07874439507722855,0.011210228701539749
+single_label,global_negative_centroid,1,1,balanced,0.5,nan,Fracture,auroc,0.5779489874839783,0.011064431563256824
+single_label,global_negative_centroid,1,1,balanced,0.5,nan,Fracture,auprc,0.3934523105621338,0.012118594249990343
+single_label,global_negative_centroid,1,1,balanced,0.5,nan,Fracture,f1,0.40701329708099365,0.020878234786821142
+single_label,global_negative_centroid,1,1,balanced,0.5,nan,Fracture,accuracy,0.5890666604042053,0.01454954585620256
+single_label,global_negative_centroid,1,1,balanced,0.5,nan,Fracture,nll,0.6313161611557007,0.0037727727795859828
+single_label,global_negative_centroid,1,1,balanced,0.5,nan,Fracture,calibration_error,0.029760783165693284,0.007679226694381661
+single_label,global_negative_centroid,1,1,balanced,0.5,nan,Cardiomegaly,auroc,0.5842207908630371,0.01611547118275978
+single_label,global_negative_centroid,1,1,balanced,0.5,nan,Cardiomegaly,auprc,0.403753799200058,0.022056289459335604
+single_label,global_negative_centroid,1,1,balanced,0.5,nan,Cardiomegaly,f1,0.4012773811817169,0.0234845006432981
+single_label,global_negative_centroid,1,1,balanced,0.5,nan,Cardiomegaly,accuracy,0.609333336353302,0.013140272845662786
+single_label,global_negative_centroid,1,1,balanced,0.5,nan,Cardiomegaly,nll,0.6294456720352173,0.005686319722232931
+single_label,global_negative_centroid,1,1,balanced,0.5,nan,Cardiomegaly,calibration_error,0.031307443231344226,0.00895865603123938
+single_label,random_residual,1,1,balanced,0.5,nan,No Finding,auroc,0.5047664105892181,0.011757344271822604
+single_label,random_residual,1,1,balanced,0.5,nan,No Finding,auprc,0.34571818113327024,0.010353617073063292
+single_label,random_residual,1,1,balanced,0.5,nan,No Finding,f1,0.33660553097724916,0.016517473750357222
+single_label,random_residual,1,1,balanced,0.5,nan,No Finding,accuracy,0.5661333322525024,0.008998752967975348
+single_label,random_residual,1,1,balanced,0.5,nan,No Finding,nll,0.6574737310409546,0.003940855090584065
+single_label,random_residual,1,1,balanced,0.5,nan,No Finding,calibration_error,0.07874439507722855,0.011210228701539749
+single_label,random_residual,1,1,balanced,0.5,nan,Fracture,auroc,0.5779489874839783,0.011064431563256824
+single_label,random_residual,1,1,balanced,0.5,nan,Fracture,auprc,0.3934523105621338,0.012118594249990343
+single_label,random_residual,1,1,balanced,0.5,nan,Fracture,f1,0.40701329708099365,0.020878234786821142
+single_label,random_residual,1,1,balanced,0.5,nan,Fracture,accuracy,0.5890666604042053,0.01454954585620256
+single_label,random_residual,1,1,balanced,0.5,nan,Fracture,nll,0.6313161611557007,0.0037727727795859828
+single_label,random_residual,1,1,balanced,0.5,nan,Fracture,calibration_error,0.029760783165693284,0.007679226694381661
+single_label,random_residual,1,1,balanced,0.5,nan,Cardiomegaly,auroc,0.5842207908630371,0.01611547118275978
+single_label,random_residual,1,1,balanced,0.5,nan,Cardiomegaly,auprc,0.403753799200058,0.022056289459335604
+single_label,random_residual,1,1,balanced,0.5,nan,Cardiomegaly,f1,0.4012773811817169,0.0234845006432981
+single_label,random_residual,1,1,balanced,0.5,nan,Cardiomegaly,accuracy,0.609333336353302,0.013140272845662786
+single_label,random_residual,1,1,balanced,0.5,nan,Cardiomegaly,nll,0.6294456720352173,0.005686319722232931
+single_label,random_residual,1,1,balanced,0.5,nan,Cardiomegaly,calibration_error,0.031307443231344226,0.00895865603123938
+single_label,metadata_matched_residual,1,1,balanced,0.5,nan,No Finding,auroc,0.5047664105892181,0.011757344271822604
+single_label,metadata_matched_residual,1,1,balanced,0.5,nan,No Finding,auprc,0.34571818113327024,0.010353617073063292
+single_label,metadata_matched_residual,1,1,balanced,0.5,nan,No Finding,f1,0.33660553097724916,0.016517473750357222
+single_label,metadata_matched_residual,1,1,balanced,0.5,nan,No Finding,accuracy,0.5661333322525024,0.008998752967975348
+single_label,metadata_matched_residual,1,1,balanced,0.5,nan,No Finding,nll,0.6574737310409546,0.003940855090584065
+single_label,metadata_matched_residual,1,1,balanced,0.5,nan,No Finding,calibration_error,0.07874439507722855,0.011210228701539749
+single_label,metadata_matched_residual,1,1,balanced,0.5,nan,Fracture,auroc,0.5779489874839783,0.011064431563256824
+single_label,metadata_matched_residual,1,1,balanced,0.5,nan,Fracture,auprc,0.3934523105621338,0.012118594249990343
+single_label,metadata_matched_residual,1,1,balanced,0.5,nan,Fracture,f1,0.40701329708099365,0.020878234786821142
+single_label,metadata_matched_residual,1,1,balanced,0.5,nan,Fracture,accuracy,0.5890666604042053,0.01454954585620256
+single_label,metadata_matched_residual,1,1,balanced,0.5,nan,Fracture,nll,0.6313161611557007,0.0037727727795859828
+single_label,metadata_matched_residual,1,1,balanced,0.5,nan,Fracture,calibration_error,0.029760783165693284,0.007679226694381661
+single_label,metadata_matched_residual,1,1,balanced,0.5,nan,Cardiomegaly,auroc,0.5842207908630371,0.01611547118275978
+single_label,metadata_matched_residual,1,1,balanced,0.5,nan,Cardiomegaly,auprc,0.403753799200058,0.022056289459335604
+single_label,metadata_matched_residual,1,1,balanced,0.5,nan,Cardiomegaly,f1,0.4012773811817169,0.0234845006432981
+single_label,metadata_matched_residual,1,1,balanced,0.5,nan,Cardiomegaly,accuracy,0.609333336353302,0.013140272845662786
+single_label,metadata_matched_residual,1,1,balanced,0.5,nan,Cardiomegaly,nll,0.6294456720352173,0.005686319722232931
+single_label,metadata_matched_residual,1,1,balanced,0.5,nan,Cardiomegaly,calibration_error,0.031307443231344226,0.00895865603123938
+single_label,full_embedding_matched_residual,1,1,balanced,0.5,nan,No Finding,auroc,0.5047664105892181,0.011757344271822604
+single_label,full_embedding_matched_residual,1,1,balanced,0.5,nan,No Finding,auprc,0.34571818113327024,0.010353617073063292
+single_label,full_embedding_matched_residual,1,1,balanced,0.5,nan,No Finding,f1,0.33660553097724916,0.016517473750357222
+single_label,full_embedding_matched_residual,1,1,balanced,0.5,nan,No Finding,accuracy,0.5661333322525024,0.008998752967975348
+single_label,full_embedding_matched_residual,1,1,balanced,0.5,nan,No Finding,nll,0.6574737310409546,0.003940855090584065
+single_label,full_embedding_matched_residual,1,1,balanced,0.5,nan,No Finding,calibration_error,0.07874439507722855,0.011210228701539749
+single_label,full_embedding_matched_residual,1,1,balanced,0.5,nan,Fracture,auroc,0.5779489874839783,0.011064431563256824
+single_label,full_embedding_matched_residual,1,1,balanced,0.5,nan,Fracture,auprc,0.3934523105621338,0.012118594249990343
+single_label,full_embedding_matched_residual,1,1,balanced,0.5,nan,Fracture,f1,0.40701329708099365,0.020878234786821142
+single_label,full_embedding_matched_residual,1,1,balanced,0.5,nan,Fracture,accuracy,0.5890666604042053,0.01454954585620256
+single_label,full_embedding_matched_residual,1,1,balanced,0.5,nan,Fracture,nll,0.6313161611557007,0.0037727727795859828
+single_label,full_embedding_matched_residual,1,1,balanced,0.5,nan,Fracture,calibration_error,0.029760783165693284,0.007679226694381661
+single_label,full_embedding_matched_residual,1,1,balanced,0.5,nan,Cardiomegaly,auroc,0.5842207908630371,0.01611547118275978
+single_label,full_embedding_matched_residual,1,1,balanced,0.5,nan,Cardiomegaly,auprc,0.403753799200058,0.022056289459335604
+single_label,full_embedding_matched_residual,1,1,balanced,0.5,nan,Cardiomegaly,f1,0.4012773811817169,0.0234845006432981
+single_label,full_embedding_matched_residual,1,1,balanced,0.5,nan,Cardiomegaly,accuracy,0.609333336353302,0.013140272845662786
+single_label,full_embedding_matched_residual,1,1,balanced,0.5,nan,Cardiomegaly,nll,0.6294456720352173,0.005686319722232931
+single_label,full_embedding_matched_residual,1,1,balanced,0.5,nan,Cardiomegaly,calibration_error,0.031307443231344226,0.00895865603123938
+single_label,anatomy_matched_residual,1,1,balanced,0.5,nan,No Finding,auroc,0.5047664105892181,0.011757344271822604
+single_label,anatomy_matched_residual,1,1,balanced,0.5,nan,No Finding,auprc,0.34571818113327024,0.010353617073063292
+single_label,anatomy_matched_residual,1,1,balanced,0.5,nan,No Finding,f1,0.33660553097724916,0.016517473750357222
+single_label,anatomy_matched_residual,1,1,balanced,0.5,nan,No Finding,accuracy,0.5661333322525024,0.008998752967975348
+single_label,anatomy_matched_residual,1,1,balanced,0.5,nan,No Finding,nll,0.6574737310409546,0.003940855090584065
+single_label,anatomy_matched_residual,1,1,balanced,0.5,nan,No Finding,calibration_error,0.07874439507722855,0.011210228701539749
+single_label,anatomy_matched_residual,1,1,balanced,0.5,nan,Fracture,auroc,0.5779489874839783,0.011064431563256824
+single_label,anatomy_matched_residual,1,1,balanced,0.5,nan,Fracture,auprc,0.3934523105621338,0.012118594249990343
+single_label,anatomy_matched_residual,1,1,balanced,0.5,nan,Fracture,f1,0.40701329708099365,0.020878234786821142
+single_label,anatomy_matched_residual,1,1,balanced,0.5,nan,Fracture,accuracy,0.5890666604042053,0.01454954585620256
+single_label,anatomy_matched_residual,1,1,balanced,0.5,nan,Fracture,nll,0.6313161611557007,0.0037727727795859828
+single_label,anatomy_matched_residual,1,1,balanced,0.5,nan,Fracture,calibration_error,0.029760783165693284,0.007679226694381661
+single_label,anatomy_matched_residual,1,1,balanced,0.5,nan,Cardiomegaly,auroc,0.5842207908630371,0.01611547118275978
+single_label,anatomy_matched_residual,1,1,balanced,0.5,nan,Cardiomegaly,auprc,0.403753799200058,0.022056289459335604
+single_label,anatomy_matched_residual,1,1,balanced,0.5,nan,Cardiomegaly,f1,0.4012773811817169,0.0234845006432981
+single_label,anatomy_matched_residual,1,1,balanced,0.5,nan,Cardiomegaly,accuracy,0.609333336353302,0.013140272845662786
+single_label,anatomy_matched_residual,1,1,balanced,0.5,nan,Cardiomegaly,nll,0.6294456720352173,0.005686319722232931
+single_label,anatomy_matched_residual,1,1,balanced,0.5,nan,Cardiomegaly,calibration_error,0.031307443231344226,0.00895865603123938
+single_label,shuffled_anatomy_match,1,1,balanced,0.5,nan,No Finding,auroc,0.5047664105892181,0.011757344271822604
+single_label,shuffled_anatomy_match,1,1,balanced,0.5,nan,No Finding,auprc,0.34571818113327024,0.010353617073063292
+single_label,shuffled_anatomy_match,1,1,balanced,0.5,nan,No Finding,f1,0.33660553097724916,0.016517473750357222
+single_label,shuffled_anatomy_match,1,1,balanced,0.5,nan,No Finding,accuracy,0.5661333322525024,0.008998752967975348
+single_label,shuffled_anatomy_match,1,1,balanced,0.5,nan,No Finding,nll,0.6574737310409546,0.003940855090584065
+single_label,shuffled_anatomy_match,1,1,balanced,0.5,nan,No Finding,calibration_error,0.07874439507722855,0.011210228701539749
+single_label,shuffled_anatomy_match,1,1,balanced,0.5,nan,Fracture,auroc,0.5779489874839783,0.011064431563256824
+single_label,shuffled_anatomy_match,1,1,balanced,0.5,nan,Fracture,auprc,0.3934523105621338,0.012118594249990343
+single_label,shuffled_anatomy_match,1,1,balanced,0.5,nan,Fracture,f1,0.40701329708099365,0.020878234786821142
+single_label,shuffled_anatomy_match,1,1,balanced,0.5,nan,Fracture,accuracy,0.5890666604042053,0.01454954585620256
+single_label,shuffled_anatomy_match,1,1,balanced,0.5,nan,Fracture,nll,0.6313161611557007,0.0037727727795859828
+single_label,shuffled_anatomy_match,1,1,balanced,0.5,nan,Fracture,calibration_error,0.029760783165693284,0.007679226694381661
+single_label,shuffled_anatomy_match,1,1,balanced,0.5,nan,Cardiomegaly,auroc,0.5842207908630371,0.01611547118275978
+single_label,shuffled_anatomy_match,1,1,balanced,0.5,nan,Cardiomegaly,auprc,0.403753799200058,0.022056289459335604
+single_label,shuffled_anatomy_match,1,1,balanced,0.5,nan,Cardiomegaly,f1,0.4012773811817169,0.0234845006432981
+single_label,shuffled_anatomy_match,1,1,balanced,0.5,nan,Cardiomegaly,accuracy,0.609333336353302,0.013140272845662786
+single_label,shuffled_anatomy_match,1,1,balanced,0.5,nan,Cardiomegaly,nll,0.6294456720352173,0.005686319722232931
+single_label,shuffled_anatomy_match,1,1,balanced,0.5,nan,Cardiomegaly,calibration_error,0.031307443231344226,0.00895865603123938
+single_label,positive_prototype,1,20,abundant_controls,0.1,nan,No Finding,auroc,0.5136396050453186,0.009196793524244328
+single_label,positive_prototype,1,20,abundant_controls,0.1,nan,No Finding,auprc,0.35598127245903016,0.014731468575014436
+single_label,positive_prototype,1,20,abundant_controls,0.1,nan,No Finding,f1,0.3339687168598175,0.016318345657994643
+single_label,positive_prototype,1,20,abundant_controls,0.1,nan,No Finding,accuracy,0.5714666604995727,0.00899875694215643
+single_label,positive_prototype,1,20,abundant_controls,0.1,nan,No Finding,nll,0.6733277678489685,0.007544076910900565
+single_label,positive_prototype,1,20,abundant_controls,0.1,nan,No Finding,calibration_error,0.09760566502809524,0.0031266698210729612
+single_label,positive_prototype,1,20,abundant_controls,0.1,nan,Fracture,auroc,0.6056284070014953,0.009434535066749747
+single_label,positive_prototype,1,20,abundant_controls,0.1,nan,Fracture,auprc,0.41357211470603944,0.014473582297713103
+single_label,positive_prototype,1,20,abundant_controls,0.1,nan,Fracture,f1,0.4281987905502319,0.01063898736353304
+single_label,positive_prototype,1,20,abundant_controls,0.1,nan,Fracture,accuracy,0.6007999897003173,0.005362424014186809
+single_label,positive_prototype,1,20,abundant_controls,0.1,nan,Fracture,nll,0.6256336808204651,0.005811447233356289
+single_label,positive_prototype,1,20,abundant_controls,0.1,nan,Fracture,calibration_error,0.04298412948846817,0.003980128637144962
+single_label,positive_prototype,1,20,abundant_controls,0.1,nan,Cardiomegaly,auroc,0.6069036006927491,0.013195485800311003
+single_label,positive_prototype,1,20,abundant_controls,0.1,nan,Cardiomegaly,auprc,0.42432316541671755,0.020424225050685373
+single_label,positive_prototype,1,20,abundant_controls,0.1,nan,Cardiomegaly,f1,0.42105313539505007,0.023417162033998316
+single_label,positive_prototype,1,20,abundant_controls,0.1,nan,Cardiomegaly,accuracy,0.6192000031471252,0.014176667110214099
+single_label,positive_prototype,1,20,abundant_controls,0.1,nan,Cardiomegaly,nll,0.6263405561447144,0.007019516006900617
+single_label,positive_prototype,1,20,abundant_controls,0.1,nan,Cardiomegaly,calibration_error,0.03640810549259186,0.006934646126806268
+single_label,global_negative_centroid,1,20,abundant_controls,0.5,nan,No Finding,auroc,0.5098376154899598,0.00630110930176788
+single_label,global_negative_centroid,1,20,abundant_controls,0.5,nan,No Finding,auprc,0.34761772155761717,0.01309702621000284
+single_label,global_negative_centroid,1,20,abundant_controls,0.5,nan,No Finding,f1,0.3405040204524994,0.011724093665054725
+single_label,global_negative_centroid,1,20,abundant_controls,0.5,nan,No Finding,accuracy,0.5654666781425476,0.005857559996321875
+single_label,global_negative_centroid,1,20,abundant_controls,0.5,nan,No Finding,nll,0.6706283211708068,0.003691076442954861
+single_label,global_negative_centroid,1,20,abundant_controls,0.5,nan,No Finding,calibration_error,0.09463586807250976,0.005545912512243358
+single_label,global_negative_centroid,1,20,abundant_controls,0.5,nan,Fracture,auroc,0.630049192905426,0.015343019050238956
+single_label,global_negative_centroid,1,20,abundant_controls,0.5,nan,Fracture,auprc,0.4251721501350403,0.018991644847485036
+single_label,global_negative_centroid,1,20,abundant_controls,0.5,nan,Fracture,f1,0.43556891679763793,0.019324463265142595
+single_label,global_negative_centroid,1,20,abundant_controls,0.5,nan,Fracture,accuracy,0.6123999953269958,0.01208855634385418
+single_label,global_negative_centroid,1,20,abundant_controls,0.5,nan,Fracture,nll,0.6169341564178467,0.007333707385726402
+single_label,global_negative_centroid,1,20,abundant_controls,0.5,nan,Fracture,calibration_error,0.040828374400734904,0.010243061945693618
+single_label,global_negative_centroid,1,20,abundant_controls,0.5,nan,Cardiomegaly,auroc,0.632399582862854,0.012582803459463167
+single_label,global_negative_centroid,1,20,abundant_controls,0.5,nan,Cardiomegaly,auprc,0.44569610357284545,0.023595892481425705
+single_label,global_negative_centroid,1,20,abundant_controls,0.5,nan,Cardiomegaly,f1,0.448808079957962,0.025181356111788403
+single_label,global_negative_centroid,1,20,abundant_controls,0.5,nan,Cardiomegaly,accuracy,0.6397333383560181,0.008876937611725592
+single_label,global_negative_centroid,1,20,abundant_controls,0.5,nan,Cardiomegaly,nll,0.614676034450531,0.007296953802548776
+single_label,global_negative_centroid,1,20,abundant_controls,0.5,nan,Cardiomegaly,calibration_error,0.030980299785733224,0.011933612982053548
+single_label,random_residual,1,20,abundant_controls,1.0,nan,No Finding,auroc,0.5020103871822357,0.01479692780447843
+single_label,random_residual,1,20,abundant_controls,1.0,nan,No Finding,auprc,0.31443421840667723,0.007471605442723212
+single_label,random_residual,1,20,abundant_controls,1.0,nan,No Finding,f1,0.33307193517684935,0.014329888009531734
+single_label,random_residual,1,20,abundant_controls,1.0,nan,No Finding,accuracy,0.559333324432373,0.002867431399300835
+single_label,random_residual,1,20,abundant_controls,1.0,nan,No Finding,nll,0.6450127840042115,0.0027008616827317224
+single_label,random_residual,1,20,abundant_controls,1.0,nan,No Finding,calibration_error,0.057446423918008804,0.005347656991051781
+single_label,random_residual,1,20,abundant_controls,1.0,nan,Fracture,auroc,0.5559635877609252,0.010087403555927004
+single_label,random_residual,1,20,abundant_controls,1.0,nan,Fracture,auprc,0.4056480467319489,0.010589236004478957
+single_label,random_residual,1,20,abundant_controls,1.0,nan,Fracture,f1,0.3891983091831207,0.013112493227238531
+single_label,random_residual,1,20,abundant_controls,1.0,nan,Fracture,accuracy,0.58253333568573,0.006418708383169347
+single_label,random_residual,1,20,abundant_controls,1.0,nan,Fracture,nll,0.6321742415428162,0.0025931301530738955
+single_label,random_residual,1,20,abundant_controls,1.0,nan,Fracture,calibration_error,0.028747853264212607,0.008749669546239633
+single_label,random_residual,1,20,abundant_controls,1.0,nan,Cardiomegaly,auroc,0.5616335988044738,0.0160682352481698
+single_label,random_residual,1,20,abundant_controls,1.0,nan,Cardiomegaly,auprc,0.4123642921447754,0.028137654094120692
+single_label,random_residual,1,20,abundant_controls,1.0,nan,Cardiomegaly,f1,0.38757742643356324,0.01656800218394609
+single_label,random_residual,1,20,abundant_controls,1.0,nan,Cardiomegaly,accuracy,0.5986666679382324,0.008768627581051385
+single_label,random_residual,1,20,abundant_controls,1.0,nan,Cardiomegaly,nll,0.6308302402496337,0.0041758263448501915
+single_label,random_residual,1,20,abundant_controls,1.0,nan,Cardiomegaly,calibration_error,0.03045964054763317,0.009447994070718125
+single_label,metadata_matched_residual,1,20,abundant_controls,0.5,nan,No Finding,auroc,0.5065127968788147,0.00414914688773883
+single_label,metadata_matched_residual,1,20,abundant_controls,0.5,nan,No Finding,auprc,0.3434899508953094,0.011041451877407814
+single_label,metadata_matched_residual,1,20,abundant_controls,0.5,nan,No Finding,f1,0.3313421607017517,0.006328081899700055
+single_label,metadata_matched_residual,1,20,abundant_controls,0.5,nan,No Finding,accuracy,0.5598666787147522,0.0061896042008533405
+single_label,metadata_matched_residual,1,20,abundant_controls,0.5,nan,No Finding,nll,0.6678598165512085,0.0028159758161989032
+single_label,metadata_matched_residual,1,20,abundant_controls,0.5,nan,No Finding,calibration_error,0.08990754634141922,0.007320579783018128
+single_label,metadata_matched_residual,1,20,abundant_controls,0.5,nan,Fracture,auroc,0.5681268095970153,0.017676156483435786
+single_label,metadata_matched_residual,1,20,abundant_controls,0.5,nan,Fracture,auprc,0.37921044826507566,0.01724238365928022
+single_label,metadata_matched_residual,1,20,abundant_controls,0.5,nan,Fracture,f1,0.3962583005428314,0.02318228935054846
+single_label,metadata_matched_residual,1,20,abundant_controls,0.5,nan,Fracture,accuracy,0.5882666707038879,0.019209958268545248
+single_label,metadata_matched_residual,1,20,abundant_controls,0.5,nan,Fracture,nll,0.6420190095901489,0.0074814337450397825
+single_label,metadata_matched_residual,1,20,abundant_controls,0.5,nan,Fracture,calibration_error,0.0592719167470932,0.012306699254019777
+single_label,metadata_matched_residual,1,20,abundant_controls,0.5,nan,Cardiomegaly,auroc,0.5951584100723266,0.013824719866604647
+single_label,metadata_matched_residual,1,20,abundant_controls,0.5,nan,Cardiomegaly,auprc,0.41651895046234133,0.02270344161610211
+single_label,metadata_matched_residual,1,20,abundant_controls,0.5,nan,Cardiomegaly,f1,0.40992645621299745,0.02730691908907801
+single_label,metadata_matched_residual,1,20,abundant_controls,0.5,nan,Cardiomegaly,accuracy,0.6110666751861572,0.00789655019413772
+single_label,metadata_matched_residual,1,20,abundant_controls,0.5,nan,Cardiomegaly,nll,0.6286802411079406,0.007334999739623506
+single_label,metadata_matched_residual,1,20,abundant_controls,0.5,nan,Cardiomegaly,calibration_error,0.04496017023921013,0.010843207418757819
+single_label,full_embedding_matched_residual,1,20,abundant_controls,0.5,nan,No Finding,auroc,0.5074571967124939,0.00922308267337293
+single_label,full_embedding_matched_residual,1,20,abundant_controls,0.5,nan,No Finding,auprc,0.34530186653137207,0.013068457076573226
+single_label,full_embedding_matched_residual,1,20,abundant_controls,0.5,nan,No Finding,f1,0.3400290131568909,0.015251823699926306
+single_label,full_embedding_matched_residual,1,20,abundant_controls,0.5,nan,No Finding,accuracy,0.5645333290100097,0.010059821116232633
+single_label,full_embedding_matched_residual,1,20,abundant_controls,0.5,nan,No Finding,nll,0.6650019764900208,0.0038262147560327517
+single_label,full_embedding_matched_residual,1,20,abundant_controls,0.5,nan,No Finding,calibration_error,0.08804906606674194,0.007463454000003602
+single_label,full_embedding_matched_residual,1,20,abundant_controls,0.5,nan,Fracture,auroc,0.6031519889831543,0.017119107027982635
+single_label,full_embedding_matched_residual,1,20,abundant_controls,0.5,nan,Fracture,auprc,0.4024717748165131,0.020228262344405397
+single_label,full_embedding_matched_residual,1,20,abundant_controls,0.5,nan,Fracture,f1,0.4123455882072449,0.025315436503947006
+single_label,full_embedding_matched_residual,1,20,abundant_controls,0.5,nan,Fracture,accuracy,0.5991999983787537,0.01607206858230896
+single_label,full_embedding_matched_residual,1,20,abundant_controls,0.5,nan,Fracture,nll,0.6266420483589172,0.006890825057162048
+single_label,full_embedding_matched_residual,1,20,abundant_controls,0.5,nan,Fracture,calibration_error,0.03665023669600487,0.013881856098254073
+single_label,full_embedding_matched_residual,1,20,abundant_controls,0.5,nan,Cardiomegaly,auroc,0.6198751926422119,0.014089067751158384
+single_label,full_embedding_matched_residual,1,20,abundant_controls,0.5,nan,Cardiomegaly,auprc,0.43816677331924436,0.02312742886708096
+single_label,full_embedding_matched_residual,1,20,abundant_controls,0.5,nan,Cardiomegaly,f1,0.43249098062515257,0.020266130397976305
+single_label,full_embedding_matched_residual,1,20,abundant_controls,0.5,nan,Cardiomegaly,accuracy,0.6269333362579346,0.0038470851251502076
+single_label,full_embedding_matched_residual,1,20,abundant_controls,0.5,nan,Cardiomegaly,nll,0.6181309819221497,0.007003766603361317
+single_label,full_embedding_matched_residual,1,20,abundant_controls,0.5,nan,Cardiomegaly,calibration_error,0.027457036077976227,0.006650919630337119
+single_label,anatomy_matched_residual,1,20,abundant_controls,0.5,nan,No Finding,auroc,0.5074975967407227,0.008058215015010209
+single_label,anatomy_matched_residual,1,20,abundant_controls,0.5,nan,No Finding,auprc,0.3455870747566223,0.013327850844399382
+single_label,anatomy_matched_residual,1,20,abundant_controls,0.5,nan,No Finding,f1,0.3369314968585968,0.013710093748393345
+single_label,anatomy_matched_residual,1,20,abundant_controls,0.5,nan,No Finding,accuracy,0.562666654586792,0.008069156642346762
+single_label,anatomy_matched_residual,1,20,abundant_controls,0.5,nan,No Finding,nll,0.6727412462234497,0.003897725018951449
+single_label,anatomy_matched_residual,1,20,abundant_controls,0.5,nan,No Finding,calibration_error,0.09603779315948487,0.005812057813814381
+single_label,anatomy_matched_residual,1,20,abundant_controls,0.5,nan,Fracture,auroc,0.6175298094749451,0.01688893701163406
+single_label,anatomy_matched_residual,1,20,abundant_controls,0.5,nan,Fracture,auprc,0.41483266949653624,0.019810078281466068
+single_label,anatomy_matched_residual,1,20,abundant_controls,0.5,nan,Fracture,f1,0.42012630105018617,0.022396419597353324
+single_label,anatomy_matched_residual,1,20,abundant_controls,0.5,nan,Fracture,accuracy,0.6026666641235352,0.013824285363276453
+single_label,anatomy_matched_residual,1,20,abundant_controls,0.5,nan,Fracture,nll,0.6228689551353455,0.007697681211697831
+single_label,anatomy_matched_residual,1,20,abundant_controls,0.5,nan,Fracture,calibration_error,0.038876398280262944,0.011447028464288234
+single_label,anatomy_matched_residual,1,20,abundant_controls,0.5,nan,Cardiomegaly,auroc,0.6270968079566955,0.013227569127286938
+single_label,anatomy_matched_residual,1,20,abundant_controls,0.5,nan,Cardiomegaly,auprc,0.44198129773139955,0.02366237212935409
+single_label,anatomy_matched_residual,1,20,abundant_controls,0.5,nan,Cardiomegaly,f1,0.43906956911087036,0.015814636298787037
+single_label,anatomy_matched_residual,1,20,abundant_controls,0.5,nan,Cardiomegaly,accuracy,0.6328000068664551,0.003379669196667732
+single_label,anatomy_matched_residual,1,20,abundant_controls,0.5,nan,Cardiomegaly,nll,0.616969907283783,0.007518231760956054
+single_label,anatomy_matched_residual,1,20,abundant_controls,0.5,nan,Cardiomegaly,calibration_error,0.029656510800123215,0.011741003210087907
+single_label,shuffled_anatomy_match,1,20,abundant_controls,0.5,nan,No Finding,auroc,0.5100651979446411,0.00613913962797011
+single_label,shuffled_anatomy_match,1,20,abundant_controls,0.5,nan,No Finding,auprc,0.348473584651947,0.013721942586495029
+single_label,shuffled_anatomy_match,1,20,abundant_controls,0.5,nan,No Finding,f1,0.3394660413265228,0.009659016233450954
+single_label,shuffled_anatomy_match,1,20,abundant_controls,0.5,nan,No Finding,accuracy,0.565333342552185,0.008137718200770572
+single_label,shuffled_anatomy_match,1,20,abundant_controls,0.5,nan,No Finding,nll,0.6705649614334106,0.004091739313833878
+single_label,shuffled_anatomy_match,1,20,abundant_controls,0.5,nan,No Finding,calibration_error,0.09426576644182205,0.006263383716830225
+single_label,shuffled_anatomy_match,1,20,abundant_controls,0.5,nan,Fracture,auroc,0.6293287992477417,0.013979472357471913
+single_label,shuffled_anatomy_match,1,20,abundant_controls,0.5,nan,Fracture,auprc,0.42577849626541137,0.01805034467715715
+single_label,shuffled_anatomy_match,1,20,abundant_controls,0.5,nan,Fracture,f1,0.43960819840431214,0.014536745897571252
+single_label,shuffled_anatomy_match,1,20,abundant_controls,0.5,nan,Fracture,accuracy,0.6149333477020263,0.009172417196952571
+single_label,shuffled_anatomy_match,1,20,abundant_controls,0.5,nan,Fracture,nll,0.6172070980072022,0.006739826592576404
+single_label,shuffled_anatomy_match,1,20,abundant_controls,0.5,nan,Fracture,calibration_error,0.0390147652477026,0.006070365861533654
+single_label,shuffled_anatomy_match,1,20,abundant_controls,0.5,nan,Cardiomegaly,auroc,0.6315124034881592,0.012960106900085339
+single_label,shuffled_anatomy_match,1,20,abundant_controls,0.5,nan,Cardiomegaly,auprc,0.4448243141174316,0.024328705778708947
+single_label,shuffled_anatomy_match,1,20,abundant_controls,0.5,nan,Cardiomegaly,f1,0.4439355254173279,0.024369929874507756
+single_label,shuffled_anatomy_match,1,20,abundant_controls,0.5,nan,Cardiomegaly,accuracy,0.6362666726112366,0.008227342094628212
+single_label,shuffled_anatomy_match,1,20,abundant_controls,0.5,nan,Cardiomegaly,nll,0.6151315569877625,0.007545494342246621
+single_label,shuffled_anatomy_match,1,20,abundant_controls,0.5,nan,Cardiomegaly,calibration_error,0.029564859718084334,0.011125241298535116
+single_label,positive_prototype,3,3,balanced,0.05,nan,No Finding,auroc,0.5289759874343872,0.007456279291597861
+single_label,positive_prototype,3,3,balanced,0.05,nan,No Finding,auprc,0.37201008200645447,0.013916611035738172
+single_label,positive_prototype,3,3,balanced,0.05,nan,No Finding,f1,0.35113086104393004,0.01002201139704866
+single_label,positive_prototype,3,3,balanced,0.05,nan,No Finding,accuracy,0.5857333302497864,0.00857127376560669
+single_label,positive_prototype,3,3,balanced,0.05,nan,No Finding,nll,0.6711525321006775,0.0033547396298680625
+single_label,positive_prototype,3,3,balanced,0.05,nan,No Finding,calibration_error,0.08941451013088227,0.008380185829725871
+single_label,positive_prototype,3,3,balanced,0.05,nan,Fracture,auroc,0.6885764002799988,0.005603987609959972
+single_label,positive_prototype,3,3,balanced,0.05,nan,Fracture,auprc,0.4796490490436554,0.008670013687122769
+single_label,positive_prototype,3,3,balanced,0.05,nan,Fracture,f1,0.48996822237968446,0.01866790730402157
+single_label,positive_prototype,3,3,balanced,0.05,nan,Fracture,accuracy,0.6494666695594787,0.007474390916899449
+single_label,positive_prototype,3,3,balanced,0.05,nan,Fracture,nll,0.5880025863647461,0.002277115880949831
+single_label,positive_prototype,3,3,balanced,0.05,nan,Fracture,calibration_error,0.03920992463827133,0.00807076944763609
+single_label,positive_prototype,3,3,balanced,0.05,nan,Cardiomegaly,auroc,0.6800179958343506,0.0060288721256317925
+single_label,positive_prototype,3,3,balanced,0.05,nan,Cardiomegaly,auprc,0.49797365069389343,0.01083007508498711
+single_label,positive_prototype,3,3,balanced,0.05,nan,Cardiomegaly,f1,0.5001115500926971,0.009422467670625385
+single_label,positive_prototype,3,3,balanced,0.05,nan,Cardiomegaly,accuracy,0.6631999969482422,0.006025874232681825
+single_label,positive_prototype,3,3,balanced,0.05,nan,Cardiomegaly,nll,0.5925731182098388,0.005283615248365275
+single_label,positive_prototype,3,3,balanced,0.05,nan,Cardiomegaly,calibration_error,0.03329819589853287,0.005553262993325589
+single_label,global_negative_centroid,3,3,balanced,0.5,nan,No Finding,auroc,0.5183731913566589,0.008916557256724163
+single_label,global_negative_centroid,3,3,balanced,0.5,nan,No Finding,auprc,0.3521145761013031,0.008903598393550805
+single_label,global_negative_centroid,3,3,balanced,0.5,nan,No Finding,f1,0.34497581124305726,0.014183023930307674
+single_label,global_negative_centroid,3,3,balanced,0.5,nan,No Finding,accuracy,0.5742666602134705,0.007639096200025203
+single_label,global_negative_centroid,3,3,balanced,0.5,nan,No Finding,nll,0.6565458536148071,0.003871510208385074
+single_label,global_negative_centroid,3,3,balanced,0.5,nan,No Finding,calibration_error,0.07712115198373795,0.010324359711617976
+single_label,global_negative_centroid,3,3,balanced,0.5,nan,Fracture,auroc,0.6419036030769348,0.00648258673407123
+single_label,global_negative_centroid,3,3,balanced,0.5,nan,Fracture,auprc,0.4524677753448486,0.012910063036608861
+single_label,global_negative_centroid,3,3,balanced,0.5,nan,Fracture,f1,0.45575750470161436,0.0116991113595723
+single_label,global_negative_centroid,3,3,balanced,0.5,nan,Fracture,accuracy,0.6293333292007446,0.005962835589408699
+single_label,global_negative_centroid,3,3,balanced,0.5,nan,Fracture,nll,0.6079541087150574,0.003012998483610864
+single_label,global_negative_centroid,3,3,balanced,0.5,nan,Fracture,calibration_error,0.02481204755604267,0.005482962955127806
+single_label,global_negative_centroid,3,3,balanced,0.5,nan,Cardiomegaly,auroc,0.6447968006134033,0.007579534982577689
+single_label,global_negative_centroid,3,3,balanced,0.5,nan,Cardiomegaly,auprc,0.45999654531478884,0.01449282098199378
+single_label,global_negative_centroid,3,3,balanced,0.5,nan,Cardiomegaly,f1,0.4585071325302124,0.015361659804125299
+single_label,global_negative_centroid,3,3,balanced,0.5,nan,Cardiomegaly,accuracy,0.6379999995231629,0.010883222886399334
+single_label,global_negative_centroid,3,3,balanced,0.5,nan,Cardiomegaly,nll,0.6070640563964844,0.003689050194698676
+single_label,global_negative_centroid,3,3,balanced,0.5,nan,Cardiomegaly,calibration_error,0.02819766364991665,0.0029594386935197893
+single_label,random_residual,3,3,balanced,0.5,nan,No Finding,auroc,0.5030773997306823,0.019962525875880113
+single_label,random_residual,3,3,balanced,0.5,nan,No Finding,auprc,0.3342179775238037,0.019017743083042257
+single_label,random_residual,3,3,balanced,0.5,nan,No Finding,f1,0.3262068212032318,0.01597881672873562
+single_label,random_residual,3,3,balanced,0.5,nan,No Finding,accuracy,0.5572000026702881,0.009836427736247499
+single_label,random_residual,3,3,balanced,0.5,nan,No Finding,nll,0.6698333978652954,0.008943279553466436
+single_label,random_residual,3,3,balanced,0.5,nan,No Finding,calibration_error,0.0935133308172226,0.009991018483151416
+single_label,random_residual,3,3,balanced,0.5,nan,Fracture,auroc,0.6035555958747864,0.01564526557477288
+single_label,random_residual,3,3,balanced,0.5,nan,Fracture,auprc,0.4138793408870697,0.009911007448985671
+single_label,random_residual,3,3,balanced,0.5,nan,Fracture,f1,0.42607975006103516,0.02299455423428055
+single_label,random_residual,3,3,balanced,0.5,nan,Fracture,accuracy,0.6097333192825317,0.009894985316852995
+single_label,random_residual,3,3,balanced,0.5,nan,Fracture,nll,0.6263056039810181,0.006325841837454709
+single_label,random_residual,3,3,balanced,0.5,nan,Fracture,calibration_error,0.034625185281038286,0.011557800926881454
+single_label,random_residual,3,3,balanced,0.5,nan,Cardiomegaly,auroc,0.6024572134017945,0.009896496315736003
+single_label,random_residual,3,3,balanced,0.5,nan,Cardiomegaly,auprc,0.43076013326644896,0.01352678665339338
+single_label,random_residual,3,3,balanced,0.5,nan,Cardiomegaly,f1,0.4187341630458832,0.012453553140124281
+single_label,random_residual,3,3,balanced,0.5,nan,Cardiomegaly,accuracy,0.6149333357810974,0.012706968596106262
+single_label,random_residual,3,3,balanced,0.5,nan,Cardiomegaly,nll,0.6253309369087219,0.003971462297119981
+single_label,random_residual,3,3,balanced,0.5,nan,Cardiomegaly,calibration_error,0.04426631405949592,0.010860939358090963
+single_label,metadata_matched_residual,3,3,balanced,0.5,nan,No Finding,auroc,0.5092648148536683,0.011110474406793016
+single_label,metadata_matched_residual,3,3,balanced,0.5,nan,No Finding,auprc,0.3402339994907379,0.007441318007175746
+single_label,metadata_matched_residual,3,3,balanced,0.5,nan,No Finding,f1,0.3357359945774078,0.016788255319102507
+single_label,metadata_matched_residual,3,3,balanced,0.5,nan,No Finding,accuracy,0.5656000137329101,0.0065251594087193865
+single_label,metadata_matched_residual,3,3,balanced,0.5,nan,No Finding,nll,0.6748783230781555,0.0054986946127380185
+single_label,metadata_matched_residual,3,3,balanced,0.5,nan,No Finding,calibration_error,0.10660307854413986,0.00990085922927749
+single_label,metadata_matched_residual,3,3,balanced,0.5,nan,Fracture,auroc,0.5942784070968627,0.007487055469464156
+single_label,metadata_matched_residual,3,3,balanced,0.5,nan,Fracture,auprc,0.4123559594154358,0.012397142030871323
+single_label,metadata_matched_residual,3,3,balanced,0.5,nan,Fracture,f1,0.4120877504348755,0.013326728629748699
+single_label,metadata_matched_residual,3,3,balanced,0.5,nan,Fracture,accuracy,0.6065333247184753,0.006007398037536906
+single_label,metadata_matched_residual,3,3,balanced,0.5,nan,Fracture,nll,0.6364888548851013,0.003917490115960949
+single_label,metadata_matched_residual,3,3,balanced,0.5,nan,Fracture,calibration_error,0.059114445745944974,0.009300280607418618
+single_label,metadata_matched_residual,3,3,balanced,0.5,nan,Cardiomegaly,auroc,0.6133495926856994,0.015326212945358257
+single_label,metadata_matched_residual,3,3,balanced,0.5,nan,Cardiomegaly,auprc,0.4252554357051849,0.013488780061278424
+single_label,metadata_matched_residual,3,3,balanced,0.5,nan,Cardiomegaly,f1,0.42690268754959104,0.012550091025899195
+single_label,metadata_matched_residual,3,3,balanced,0.5,nan,Cardiomegaly,accuracy,0.6124000072479248,0.007266369560139991
+single_label,metadata_matched_residual,3,3,balanced,0.5,nan,Cardiomegaly,nll,0.6253388166427613,0.008286672198212653
+single_label,metadata_matched_residual,3,3,balanced,0.5,nan,Cardiomegaly,calibration_error,0.04486042633652687,0.009847506627026562
+single_label,full_embedding_matched_residual,3,3,balanced,0.5,nan,No Finding,auroc,0.5145095944404602,0.011441653021796406
+single_label,full_embedding_matched_residual,3,3,balanced,0.5,nan,No Finding,auprc,0.3472500264644623,0.011004524737575006
+single_label,full_embedding_matched_residual,3,3,balanced,0.5,nan,No Finding,f1,0.34221033453941346,0.024518891946682362
+single_label,full_embedding_matched_residual,3,3,balanced,0.5,nan,No Finding,accuracy,0.5742666602134705,0.009446933532844605
+single_label,full_embedding_matched_residual,3,3,balanced,0.5,nan,No Finding,nll,0.6570599555969239,0.003805209565358257
+single_label,full_embedding_matched_residual,3,3,balanced,0.5,nan,No Finding,calibration_error,0.07545875161886215,0.003690092599717973
+single_label,full_embedding_matched_residual,3,3,balanced,0.5,nan,Fracture,auroc,0.6228186011314392,0.012731741145133636
+single_label,full_embedding_matched_residual,3,3,balanced,0.5,nan,Fracture,auprc,0.436320161819458,0.013344267310493249
+single_label,full_embedding_matched_residual,3,3,balanced,0.5,nan,Fracture,f1,0.4400954008102417,0.018278827713024123
+single_label,full_embedding_matched_residual,3,3,balanced,0.5,nan,Fracture,accuracy,0.6210666537284851,0.015567768368826304
+single_label,full_embedding_matched_residual,3,3,balanced,0.5,nan,Fracture,nll,0.6156710147857666,0.004229371213867967
+single_label,full_embedding_matched_residual,3,3,balanced,0.5,nan,Fracture,calibration_error,0.02595469020307064,0.00580976706268989
+single_label,full_embedding_matched_residual,3,3,balanced,0.5,nan,Cardiomegaly,auroc,0.6333140015602112,0.008196852287620945
+single_label,full_embedding_matched_residual,3,3,balanced,0.5,nan,Cardiomegaly,auprc,0.4485470771789551,0.010682251831301677
+single_label,full_embedding_matched_residual,3,3,balanced,0.5,nan,Cardiomegaly,f1,0.45206369161605836,0.015735584017772527
+single_label,full_embedding_matched_residual,3,3,balanced,0.5,nan,Cardiomegaly,accuracy,0.6299999952316284,0.0047842209117982025
+single_label,full_embedding_matched_residual,3,3,balanced,0.5,nan,Cardiomegaly,nll,0.6113122940063477,0.00328437067314615
+single_label,full_embedding_matched_residual,3,3,balanced,0.5,nan,Cardiomegaly,calibration_error,0.02725156880915165,0.004968664132453528
+single_label,anatomy_matched_residual,3,3,balanced,0.5,nan,No Finding,auroc,0.5164511919021606,0.010719800168196172
+single_label,anatomy_matched_residual,3,3,balanced,0.5,nan,No Finding,auprc,0.3487976372241974,0.011176968046844314
+single_label,anatomy_matched_residual,3,3,balanced,0.5,nan,No Finding,f1,0.34708277583122255,0.01974861292744026
+single_label,anatomy_matched_residual,3,3,balanced,0.5,nan,No Finding,accuracy,0.5754666686058044,0.00790778692535783
+single_label,anatomy_matched_residual,3,3,balanced,0.5,nan,No Finding,nll,0.6578524589538575,0.004109542029088786
+single_label,anatomy_matched_residual,3,3,balanced,0.5,nan,No Finding,calibration_error,0.07951310724020004,0.0037450375710879375
+single_label,anatomy_matched_residual,3,3,balanced,0.5,nan,Fracture,auroc,0.6310055971145629,0.010986829445102224
+single_label,anatomy_matched_residual,3,3,balanced,0.5,nan,Fracture,auprc,0.4427412748336792,0.01246087398912096
+single_label,anatomy_matched_residual,3,3,balanced,0.5,nan,Fracture,f1,0.45249661803245544,0.017256086756030024
+single_label,anatomy_matched_residual,3,3,balanced,0.5,nan,Fracture,accuracy,0.6287999987602234,0.012809727224328151
+single_label,anatomy_matched_residual,3,3,balanced,0.5,nan,Fracture,nll,0.6124732017517089,0.003890093324110031
+single_label,anatomy_matched_residual,3,3,balanced,0.5,nan,Fracture,calibration_error,0.025406065210700036,0.005084713429520338
+single_label,anatomy_matched_residual,3,3,balanced,0.5,nan,Cardiomegaly,auroc,0.6385451912879944,0.008231439376139578
+single_label,anatomy_matched_residual,3,3,balanced,0.5,nan,Cardiomegaly,auprc,0.4531335771083832,0.012241311496562785
+single_label,anatomy_matched_residual,3,3,balanced,0.5,nan,Cardiomegaly,f1,0.4544119119644165,0.01526865170738979
+single_label,anatomy_matched_residual,3,3,balanced,0.5,nan,Cardiomegaly,accuracy,0.6338666677474976,0.002556043004398094
+single_label,anatomy_matched_residual,3,3,balanced,0.5,nan,Cardiomegaly,nll,0.6094830632209778,0.0036945957985863374
+single_label,anatomy_matched_residual,3,3,balanced,0.5,nan,Cardiomegaly,calibration_error,0.03015567772090435,0.007611957623200568
+single_label,shuffled_anatomy_match,3,3,balanced,0.5,nan,No Finding,auroc,0.5192020058631897,0.007914752429626644
+single_label,shuffled_anatomy_match,3,3,balanced,0.5,nan,No Finding,auprc,0.3520041167736053,0.010386158306787727
+single_label,shuffled_anatomy_match,3,3,balanced,0.5,nan,No Finding,f1,0.34283727407455444,0.015190130795206673
+single_label,shuffled_anatomy_match,3,3,balanced,0.5,nan,No Finding,accuracy,0.5712000131607056,0.009109216505553821
+single_label,shuffled_anatomy_match,3,3,balanced,0.5,nan,No Finding,nll,0.6572479963302612,0.004023037142135147
+single_label,shuffled_anatomy_match,3,3,balanced,0.5,nan,No Finding,calibration_error,0.07880210727453232,0.006398605730209401
+single_label,shuffled_anatomy_match,3,3,balanced,0.5,nan,Fracture,auroc,0.6435091972351075,0.007393430565220211
+single_label,shuffled_anatomy_match,3,3,balanced,0.5,nan,Fracture,auprc,0.4559526383876801,0.01247509700226481
+single_label,shuffled_anatomy_match,3,3,balanced,0.5,nan,Fracture,f1,0.4557320475578308,0.018369467550947618
+single_label,shuffled_anatomy_match,3,3,balanced,0.5,nan,Fracture,accuracy,0.6281333327293396,0.006918569676110844
+single_label,shuffled_anatomy_match,3,3,balanced,0.5,nan,Fracture,nll,0.606911587715149,0.0037072169710445826
+single_label,shuffled_anatomy_match,3,3,balanced,0.5,nan,Fracture,calibration_error,0.030033224448561668,0.0069793991917348995
+single_label,shuffled_anatomy_match,3,3,balanced,0.5,nan,Cardiomegaly,auroc,0.6459893941879272,0.006368006621393473
+single_label,shuffled_anatomy_match,3,3,balanced,0.5,nan,Cardiomegaly,auprc,0.46198807954788207,0.010779194245113947
+single_label,shuffled_anatomy_match,3,3,balanced,0.5,nan,Cardiomegaly,f1,0.4559023678302765,0.012050701008173691
+single_label,shuffled_anatomy_match,3,3,balanced,0.5,nan,Cardiomegaly,accuracy,0.6387999892234802,0.010428598811206913
+single_label,shuffled_anatomy_match,3,3,balanced,0.5,nan,Cardiomegaly,nll,0.6063352823257446,0.0031654524245075845
+single_label,shuffled_anatomy_match,3,3,balanced,0.5,nan,Cardiomegaly,calibration_error,0.025870578736066817,0.0092282201544597
+single_label,positive_prototype,3,20,abundant_controls,0.05,nan,No Finding,auroc,0.5289759874343872,0.007456279291597861
+single_label,positive_prototype,3,20,abundant_controls,0.05,nan,No Finding,auprc,0.37201008200645447,0.013916611035738172
+single_label,positive_prototype,3,20,abundant_controls,0.05,nan,No Finding,f1,0.35113086104393004,0.01002201139704866
+single_label,positive_prototype,3,20,abundant_controls,0.05,nan,No Finding,accuracy,0.5857333302497864,0.00857127376560669
+single_label,positive_prototype,3,20,abundant_controls,0.05,nan,No Finding,nll,0.6711525321006775,0.0033547396298680625
+single_label,positive_prototype,3,20,abundant_controls,0.05,nan,No Finding,calibration_error,0.08941451013088227,0.008380185829725871
+single_label,positive_prototype,3,20,abundant_controls,0.05,nan,Fracture,auroc,0.6885764002799988,0.005603987609959972
+single_label,positive_prototype,3,20,abundant_controls,0.05,nan,Fracture,auprc,0.4796490490436554,0.008670013687122769
+single_label,positive_prototype,3,20,abundant_controls,0.05,nan,Fracture,f1,0.48996822237968446,0.01866790730402157
+single_label,positive_prototype,3,20,abundant_controls,0.05,nan,Fracture,accuracy,0.6494666695594787,0.007474390916899449
+single_label,positive_prototype,3,20,abundant_controls,0.05,nan,Fracture,nll,0.5880025863647461,0.002277115880949831
+single_label,positive_prototype,3,20,abundant_controls,0.05,nan,Fracture,calibration_error,0.03920992463827133,0.00807076944763609
+single_label,positive_prototype,3,20,abundant_controls,0.05,nan,Cardiomegaly,auroc,0.6800179958343506,0.0060288721256317925
+single_label,positive_prototype,3,20,abundant_controls,0.05,nan,Cardiomegaly,auprc,0.49797365069389343,0.01083007508498711
+single_label,positive_prototype,3,20,abundant_controls,0.05,nan,Cardiomegaly,f1,0.5001115500926971,0.009422467670625385
+single_label,positive_prototype,3,20,abundant_controls,0.05,nan,Cardiomegaly,accuracy,0.6631999969482422,0.006025874232681825
+single_label,positive_prototype,3,20,abundant_controls,0.05,nan,Cardiomegaly,nll,0.5925731182098388,0.005283615248365275
+single_label,positive_prototype,3,20,abundant_controls,0.05,nan,Cardiomegaly,calibration_error,0.03329819589853287,0.005553262993325589
+single_label,global_negative_centroid,3,20,abundant_controls,0.5,nan,No Finding,auroc,0.5201547861099243,0.007508706294954399
+single_label,global_negative_centroid,3,20,abundant_controls,0.5,nan,No Finding,auprc,0.3571699261665344,0.009623248807949295
+single_label,global_negative_centroid,3,20,abundant_controls,0.5,nan,No Finding,f1,0.33491040468215943,0.018283200466042107
+single_label,global_negative_centroid,3,20,abundant_controls,0.5,nan,No Finding,accuracy,0.5826666712760925,0.004690406203620744
+single_label,global_negative_centroid,3,20,abundant_controls,0.5,nan,No Finding,nll,0.664512288570404,0.0023096733229294956
+single_label,global_negative_centroid,3,20,abundant_controls,0.5,nan,No Finding,calibration_error,0.08268067985773087,0.00412696475498359
+single_label,global_negative_centroid,3,20,abundant_controls,0.5,nan,Fracture,auroc,0.681957995891571,0.008242004207360721
+single_label,global_negative_centroid,3,20,abundant_controls,0.5,nan,Fracture,auprc,0.46953009963035586,0.010400454644222984
+single_label,global_negative_centroid,3,20,abundant_controls,0.5,nan,Fracture,f1,0.48609126806259156,0.012174171313080169
+single_label,global_negative_centroid,3,20,abundant_controls,0.5,nan,Fracture,accuracy,0.6401333332061767,0.007921821272738577
+single_label,global_negative_centroid,3,20,abundant_controls,0.5,nan,Fracture,nll,0.5923145294189454,0.003820163834736178
+single_label,global_negative_centroid,3,20,abundant_controls,0.5,nan,Fracture,calibration_error,0.04192645363509655,0.013853879618646323
+single_label,global_negative_centroid,3,20,abundant_controls,0.5,nan,Cardiomegaly,auroc,0.6887580037117005,0.00861369541771485
+single_label,global_negative_centroid,3,20,abundant_controls,0.5,nan,Cardiomegaly,auprc,0.504254150390625,0.016518622411661753
+single_label,global_negative_centroid,3,20,abundant_controls,0.5,nan,Cardiomegaly,f1,0.499502831697464,0.012201245445033915
+single_label,global_negative_centroid,3,20,abundant_controls,0.5,nan,Cardiomegaly,accuracy,0.6638666749000549,0.004699894983543901
+single_label,global_negative_centroid,3,20,abundant_controls,0.5,nan,Cardiomegaly,nll,0.5870684742927551,0.004781707344416536
+single_label,global_negative_centroid,3,20,abundant_controls,0.5,nan,Cardiomegaly,calibration_error,0.029525086283683777,0.0034054975502724747
+single_label,random_residual,3,20,abundant_controls,0.5,nan,No Finding,auroc,0.5030773997306823,0.019962525875880113
+single_label,random_residual,3,20,abundant_controls,0.5,nan,No Finding,auprc,0.3342179775238037,0.019017743083042257
+single_label,random_residual,3,20,abundant_controls,0.5,nan,No Finding,f1,0.3262068212032318,0.01597881672873562
+single_label,random_residual,3,20,abundant_controls,0.5,nan,No Finding,accuracy,0.5572000026702881,0.009836427736247499
+single_label,random_residual,3,20,abundant_controls,0.5,nan,No Finding,nll,0.6698333978652954,0.008943279553466436
+single_label,random_residual,3,20,abundant_controls,0.5,nan,No Finding,calibration_error,0.0935133308172226,0.009991018483151416
+single_label,random_residual,3,20,abundant_controls,0.5,nan,Fracture,auroc,0.6035555958747864,0.01564526557477288
+single_label,random_residual,3,20,abundant_controls,0.5,nan,Fracture,auprc,0.4138793408870697,0.009911007448985671
+single_label,random_residual,3,20,abundant_controls,0.5,nan,Fracture,f1,0.42607975006103516,0.02299455423428055
+single_label,random_residual,3,20,abundant_controls,0.5,nan,Fracture,accuracy,0.6097333192825317,0.009894985316852995
+single_label,random_residual,3,20,abundant_controls,0.5,nan,Fracture,nll,0.6263056039810181,0.006325841837454709
+single_label,random_residual,3,20,abundant_controls,0.5,nan,Fracture,calibration_error,0.034625185281038286,0.011557800926881454
+single_label,random_residual,3,20,abundant_controls,0.5,nan,Cardiomegaly,auroc,0.6024572134017945,0.009896496315736003
+single_label,random_residual,3,20,abundant_controls,0.5,nan,Cardiomegaly,auprc,0.43076013326644896,0.01352678665339338
+single_label,random_residual,3,20,abundant_controls,0.5,nan,Cardiomegaly,f1,0.4187341630458832,0.012453553140124281
+single_label,random_residual,3,20,abundant_controls,0.5,nan,Cardiomegaly,accuracy,0.6149333357810974,0.012706968596106262
+single_label,random_residual,3,20,abundant_controls,0.5,nan,Cardiomegaly,nll,0.6253309369087219,0.003971462297119981
+single_label,random_residual,3,20,abundant_controls,0.5,nan,Cardiomegaly,calibration_error,0.04426631405949592,0.010860939358090963
+single_label,metadata_matched_residual,3,20,abundant_controls,0.5,nan,No Finding,auroc,0.5208323955535888,0.006706465022635927
+single_label,metadata_matched_residual,3,20,abundant_controls,0.5,nan,No Finding,auprc,0.3498679339885712,0.007302646155066851
+single_label,metadata_matched_residual,3,20,abundant_controls,0.5,nan,No Finding,f1,0.34213335514068605,0.01099372603232797
+single_label,metadata_matched_residual,3,20,abundant_controls,0.5,nan,No Finding,accuracy,0.5772000074386596,0.003812260829751696
+single_label,metadata_matched_residual,3,20,abundant_controls,0.5,nan,No Finding,nll,0.661544120311737,0.003981413344462916
+single_label,metadata_matched_residual,3,20,abundant_controls,0.5,nan,No Finding,calibration_error,0.07916672080755234,0.004373730084133393
+single_label,metadata_matched_residual,3,20,abundant_controls,0.5,nan,Fracture,auroc,0.6059056043624877,0.010064612755342844
+single_label,metadata_matched_residual,3,20,abundant_controls,0.5,nan,Fracture,auprc,0.4083240866661072,0.010260426012606932
+single_label,metadata_matched_residual,3,20,abundant_controls,0.5,nan,Fracture,f1,0.4166487991809845,0.015270902383913322
+single_label,metadata_matched_residual,3,20,abundant_controls,0.5,nan,Fracture,accuracy,0.6047999858856201,0.011347041241763306
+single_label,metadata_matched_residual,3,20,abundant_controls,0.5,nan,Fracture,nll,0.6259631037712097,0.00423934899332782
+single_label,metadata_matched_residual,3,20,abundant_controls,0.5,nan,Fracture,calibration_error,0.039324048161506656,0.00642728132599521
+single_label,metadata_matched_residual,3,20,abundant_controls,0.5,nan,Cardiomegaly,auroc,0.644567608833313,0.008366689302187903
+single_label,metadata_matched_residual,3,20,abundant_controls,0.5,nan,Cardiomegaly,auprc,0.46426865458488464,0.015280021739538702
+single_label,metadata_matched_residual,3,20,abundant_controls,0.5,nan,Cardiomegaly,f1,0.4508258581161499,0.01859476440812378
+single_label,metadata_matched_residual,3,20,abundant_controls,0.5,nan,Cardiomegaly,accuracy,0.6270666718482971,0.0021908865083098356
+single_label,metadata_matched_residual,3,20,abundant_controls,0.5,nan,Cardiomegaly,nll,0.6071635603904724,0.003698070116811916
+single_label,metadata_matched_residual,3,20,abundant_controls,0.5,nan,Cardiomegaly,calibration_error,0.02377817705273628,0.007658638950722109
+single_label,full_embedding_matched_residual,3,20,abundant_controls,0.5,nan,No Finding,auroc,0.5169039964675903,0.00790139528636312
+single_label,full_embedding_matched_residual,3,20,abundant_controls,0.5,nan,No Finding,auprc,0.3520937740802765,0.011073811974289097
+single_label,full_embedding_matched_residual,3,20,abundant_controls,0.5,nan,No Finding,f1,0.3434112727642059,0.017016110014498587
+single_label,full_embedding_matched_residual,3,20,abundant_controls,0.5,nan,No Finding,accuracy,0.5783999919891357,0.002190896483724475
+single_label,full_embedding_matched_residual,3,20,abundant_controls,0.5,nan,No Finding,nll,0.6610981106758118,0.002444483034987451
+single_label,full_embedding_matched_residual,3,20,abundant_controls,0.5,nan,No Finding,calibration_error,0.07919296473264695,0.005035361141565519
+single_label,full_embedding_matched_residual,3,20,abundant_controls,0.5,nan,Fracture,auroc,0.6485980033874512,0.01011075928385532
+single_label,full_embedding_matched_residual,3,20,abundant_controls,0.5,nan,Fracture,auprc,0.4422250270843506,0.013827285871743911
+single_label,full_embedding_matched_residual,3,20,abundant_controls,0.5,nan,Fracture,f1,0.45443601012229917,0.018139163280595887
+single_label,full_embedding_matched_residual,3,20,abundant_controls,0.5,nan,Fracture,accuracy,0.629199993610382,0.010608177591670993
+single_label,full_embedding_matched_residual,3,20,abundant_controls,0.5,nan,Fracture,nll,0.607190728187561,0.0045966257254222735
+single_label,full_embedding_matched_residual,3,20,abundant_controls,0.5,nan,Fracture,calibration_error,0.033885786309838295,0.008717035797333392
+single_label,full_embedding_matched_residual,3,20,abundant_controls,0.5,nan,Cardiomegaly,auroc,0.6759696125984191,0.0070037222679449505
+single_label,full_embedding_matched_residual,3,20,abundant_controls,0.5,nan,Cardiomegaly,auprc,0.4948954999446869,0.013067882047291387
+single_label,full_embedding_matched_residual,3,20,abundant_controls,0.5,nan,Cardiomegaly,f1,0.4891501605510712,0.019678697079241924
+single_label,full_embedding_matched_residual,3,20,abundant_controls,0.5,nan,Cardiomegaly,accuracy,0.6539999961853027,0.007630349035783225
+single_label,full_embedding_matched_residual,3,20,abundant_controls,0.5,nan,Cardiomegaly,nll,0.5932581424713135,0.0030169966146230886
+single_label,full_embedding_matched_residual,3,20,abundant_controls,0.5,nan,Cardiomegaly,calibration_error,0.026928313821554185,0.004622684095804018
+single_label,anatomy_matched_residual,3,20,abundant_controls,0.5,nan,No Finding,auroc,0.5181900024414062,0.008389318402547877
+single_label,anatomy_matched_residual,3,20,abundant_controls,0.5,nan,No Finding,auprc,0.35462536215782164,0.010683521774720917
+single_label,anatomy_matched_residual,3,20,abundant_controls,0.5,nan,No Finding,f1,0.3372746706008911,0.015551654966694377
+single_label,anatomy_matched_residual,3,20,abundant_controls,0.5,nan,No Finding,accuracy,0.5808000087738037,0.002958981218307056
+single_label,anatomy_matched_residual,3,20,abundant_controls,0.5,nan,No Finding,nll,0.6665870070457458,0.0028004722073685867
+single_label,anatomy_matched_residual,3,20,abundant_controls,0.5,nan,No Finding,calibration_error,0.089779232442379,0.006155196019666975
+single_label,anatomy_matched_residual,3,20,abundant_controls,0.5,nan,Fracture,auroc,0.6677320003509521,0.008705766589500058
+single_label,anatomy_matched_residual,3,20,abundant_controls,0.5,nan,Fracture,auprc,0.4581683576107025,0.012719580534912291
+single_label,anatomy_matched_residual,3,20,abundant_controls,0.5,nan,Fracture,f1,0.47390349507331847,0.016012371845644094
+single_label,anatomy_matched_residual,3,20,abundant_controls,0.5,nan,Fracture,accuracy,0.6376000046730042,0.009220753725620512
+single_label,anatomy_matched_residual,3,20,abundant_controls,0.5,nan,Fracture,nll,0.5990477800369263,0.004274188169081777
+single_label,anatomy_matched_residual,3,20,abundant_controls,0.5,nan,Fracture,calibration_error,0.04071114435791969,0.01060229163626282
+single_label,anatomy_matched_residual,3,20,abundant_controls,0.5,nan,Cardiomegaly,auroc,0.6845660090446473,0.007388023301180228
+single_label,anatomy_matched_residual,3,20,abundant_controls,0.5,nan,Cardiomegaly,auprc,0.5015334367752076,0.013674965349396313
+single_label,anatomy_matched_residual,3,20,abundant_controls,0.5,nan,Cardiomegaly,f1,0.49547927975654604,0.016532670468762674
+single_label,anatomy_matched_residual,3,20,abundant_controls,0.5,nan,Cardiomegaly,accuracy,0.6581333398818969,0.0035087158384694193
+single_label,anatomy_matched_residual,3,20,abundant_controls,0.5,nan,Cardiomegaly,nll,0.5888321995735168,0.0038580118866739597
+single_label,anatomy_matched_residual,3,20,abundant_controls,0.5,nan,Cardiomegaly,calibration_error,0.02572171725332737,0.006703026423670544
+single_label,shuffled_anatomy_match,3,20,abundant_controls,0.5,nan,No Finding,auroc,0.5188943982124329,0.006807956148484911
+single_label,shuffled_anatomy_match,3,20,abundant_controls,0.5,nan,No Finding,auprc,0.3574586510658264,0.009519016803563068
+single_label,shuffled_anatomy_match,3,20,abundant_controls,0.5,nan,No Finding,f1,0.3321163535118103,0.009928866625719969
+single_label,shuffled_anatomy_match,3,20,abundant_controls,0.5,nan,No Finding,accuracy,0.5786666631698608,0.004000000655666358
+single_label,shuffled_anatomy_match,3,20,abundant_controls,0.5,nan,No Finding,nll,0.6647390961647034,0.002415003025507973
+single_label,shuffled_anatomy_match,3,20,abundant_controls,0.5,nan,No Finding,calibration_error,0.0833906039595604,0.0028333031116835818
+single_label,shuffled_anatomy_match,3,20,abundant_controls,0.5,nan,Fracture,auroc,0.6804708003997803,0.008407143830440209
+single_label,shuffled_anatomy_match,3,20,abundant_controls,0.5,nan,Fracture,auprc,0.4706088125705719,0.010571215382747438
+single_label,shuffled_anatomy_match,3,20,abundant_controls,0.5,nan,Fracture,f1,0.48555283546447753,0.016299521656259457
+single_label,shuffled_anatomy_match,3,20,abundant_controls,0.5,nan,Fracture,accuracy,0.6399999856948853,0.008602319603834351
+single_label,shuffled_anatomy_match,3,20,abundant_controls,0.5,nan,Fracture,nll,0.5929540872573853,0.003905956064218597
+single_label,shuffled_anatomy_match,3,20,abundant_controls,0.5,nan,Fracture,calibration_error,0.03981014080345631,0.008914251869379714
+single_label,shuffled_anatomy_match,3,20,abundant_controls,0.5,nan,Cardiomegaly,auroc,0.6870872020721436,0.007768670025737072
+single_label,shuffled_anatomy_match,3,20,abundant_controls,0.5,nan,Cardiomegaly,auprc,0.501379644870758,0.01581305053712507
+single_label,shuffled_anatomy_match,3,20,abundant_controls,0.5,nan,Cardiomegaly,f1,0.493280690908432,0.010319850274442639
+single_label,shuffled_anatomy_match,3,20,abundant_controls,0.5,nan,Cardiomegaly,accuracy,0.6610666632652282,0.005155365307923171
+single_label,shuffled_anatomy_match,3,20,abundant_controls,0.5,nan,Cardiomegaly,nll,0.5881037950515747,0.004520816239732116
+single_label,shuffled_anatomy_match,3,20,abundant_controls,0.5,nan,Cardiomegaly,calibration_error,0.030360758677124976,0.005546502413656308
+single_label,positive_prototype,5,5,balanced,0.05,nan,No Finding,auroc,0.5314932107925415,0.008949670952989893
+single_label,positive_prototype,5,5,balanced,0.05,nan,No Finding,auprc,0.3788228213787079,0.013321791665391073
+single_label,positive_prototype,5,5,balanced,0.05,nan,No Finding,f1,0.34719316363334657,0.014506629183371124
+single_label,positive_prototype,5,5,balanced,0.05,nan,No Finding,accuracy,0.5834666728973389,0.006805227499975704
+single_label,positive_prototype,5,5,balanced,0.05,nan,No Finding,nll,0.6526484847068786,0.003452856774572818
+single_label,positive_prototype,5,5,balanced,0.05,nan,No Finding,calibration_error,0.06935714483261109,0.008269083828128621
+single_label,positive_prototype,5,5,balanced,0.05,nan,Fracture,auroc,0.7273851990699768,0.004763321045771164
+single_label,positive_prototype,5,5,balanced,0.05,nan,Fracture,auprc,0.5085132122039795,0.01703432877415395
+single_label,positive_prototype,5,5,balanced,0.05,nan,Fracture,f1,0.5208722114562988,0.005634853166333613
+single_label,positive_prototype,5,5,balanced,0.05,nan,Fracture,accuracy,0.6708000063896179,0.008398406147763975
+single_label,positive_prototype,5,5,balanced,0.05,nan,Fracture,nll,0.5700726509094238,0.00297276334171341
+single_label,positive_prototype,5,5,balanced,0.05,nan,Fracture,calibration_error,0.061925873160362244,0.007487685975809822
+single_label,positive_prototype,5,5,balanced,0.05,nan,Cardiomegaly,auroc,0.7106695890426635,0.01351924499990346
+single_label,positive_prototype,5,5,balanced,0.05,nan,Cardiomegaly,auprc,0.526454746723175,0.016968301365600354
+single_label,positive_prototype,5,5,balanced,0.05,nan,Cardiomegaly,f1,0.513897716999054,0.0064423662479506875
+single_label,positive_prototype,5,5,balanced,0.05,nan,Cardiomegaly,accuracy,0.6721333384513855,0.005257792595326188
+single_label,positive_prototype,5,5,balanced,0.05,nan,Cardiomegaly,nll,0.5779108881950379,0.007561974373289951
+single_label,positive_prototype,5,5,balanced,0.05,nan,Cardiomegaly,calibration_error,0.04376359730958938,0.005731343082701848
+single_label,global_negative_centroid,5,5,balanced,0.2,nan,No Finding,auroc,0.5136995911598206,0.012061310913209292
+single_label,global_negative_centroid,5,5,balanced,0.2,nan,No Finding,auprc,0.35397539734840394,0.01033110668723052
+single_label,global_negative_centroid,5,5,balanced,0.2,nan,No Finding,f1,0.334279727935791,0.017877277231043775
+single_label,global_negative_centroid,5,5,balanced,0.2,nan,No Finding,accuracy,0.5735999941825867,0.013487460379269891
+single_label,global_negative_centroid,5,5,balanced,0.2,nan,No Finding,nll,0.7921793222427368,0.013638563662743249
+single_label,global_negative_centroid,5,5,balanced,0.2,nan,No Finding,calibration_error,0.18065007627010346,0.00843520563584637
+single_label,global_negative_centroid,5,5,balanced,0.2,nan,Fracture,auroc,0.6732691884040832,0.011099376716462227
+single_label,global_negative_centroid,5,5,balanced,0.2,nan,Fracture,auprc,0.46225130558013916,0.02052551889615689
+single_label,global_negative_centroid,5,5,balanced,0.2,nan,Fracture,f1,0.47571382522583006,0.012582929350949927
+single_label,global_negative_centroid,5,5,balanced,0.2,nan,Fracture,accuracy,0.6409333229064942,0.012663156346339341
+single_label,global_negative_centroid,5,5,balanced,0.2,nan,Fracture,nll,0.6472737193107605,0.011620739601405174
+single_label,global_negative_centroid,5,5,balanced,0.2,nan,Fracture,calibration_error,0.10934678316116334,0.01095209582572391
+single_label,global_negative_centroid,5,5,balanced,0.2,nan,Cardiomegaly,auroc,0.6724460005760193,0.012903010015329123
+single_label,global_negative_centroid,5,5,balanced,0.2,nan,Cardiomegaly,auprc,0.4851468324661255,0.014145235860855658
+single_label,global_negative_centroid,5,5,balanced,0.2,nan,Cardiomegaly,f1,0.49124390482902525,0.010096729109488455
+single_label,global_negative_centroid,5,5,balanced,0.2,nan,Cardiomegaly,accuracy,0.6569333434104919,0.009172417196952571
+single_label,global_negative_centroid,5,5,balanced,0.2,nan,Cardiomegaly,nll,0.6485671401023865,0.018531518782257426
+single_label,global_negative_centroid,5,5,balanced,0.2,nan,Cardiomegaly,calibration_error,0.10391886234283447,0.01034580241593438
+single_label,random_residual,5,5,balanced,0.5,nan,No Finding,auroc,0.5077174067497253,0.013773189091701724
+single_label,random_residual,5,5,balanced,0.5,nan,No Finding,auprc,0.341900497674942,0.00641746378091928
+single_label,random_residual,5,5,balanced,0.5,nan,No Finding,f1,0.3317496657371521,0.012949441157123272
+single_label,random_residual,5,5,balanced,0.5,nan,No Finding,accuracy,0.5648000001907348,0.006384026233032491
+single_label,random_residual,5,5,balanced,0.5,nan,No Finding,nll,0.6673909068107605,0.0052222094353074665
+single_label,random_residual,5,5,balanced,0.5,nan,No Finding,calibration_error,0.08965392857789993,0.005886608224855734
+single_label,random_residual,5,5,balanced,0.5,nan,Fracture,auroc,0.621947991847992,0.010226215302395111
+single_label,random_residual,5,5,balanced,0.5,nan,Fracture,auprc,0.4300741136074066,0.015620546792277779
+single_label,random_residual,5,5,balanced,0.5,nan,Fracture,f1,0.4396926462650299,0.01063460711206728
+single_label,random_residual,5,5,balanced,0.5,nan,Fracture,accuracy,0.6167999982833863,0.009421023484568941
+single_label,random_residual,5,5,balanced,0.5,nan,Fracture,nll,0.6188951015472413,0.00498400746668558
+single_label,random_residual,5,5,balanced,0.5,nan,Fracture,calibration_error,0.03279093168675899,0.004276047642459124
+single_label,random_residual,5,5,balanced,0.5,nan,Cardiomegaly,auroc,0.6260488033294678,0.015492748155594191
+single_label,random_residual,5,5,balanced,0.5,nan,Cardiomegaly,auprc,0.441738224029541,0.01857146456846614
+single_label,random_residual,5,5,balanced,0.5,nan,Cardiomegaly,f1,0.4499609112739563,0.016462568425953276
+single_label,random_residual,5,5,balanced,0.5,nan,Cardiomegaly,accuracy,0.6343999981880188,0.014503634626865335
+single_label,random_residual,5,5,balanced,0.5,nan,Cardiomegaly,nll,0.6169333934783936,0.00815557434807552
+single_label,random_residual,5,5,balanced,0.5,nan,Cardiomegaly,calibration_error,0.03495570868253708,0.006346168754214123
+single_label,metadata_matched_residual,5,5,balanced,0.5,nan,No Finding,auroc,0.5012988030910492,0.017462850255432306
+single_label,metadata_matched_residual,5,5,balanced,0.5,nan,No Finding,auprc,0.3368206322193146,0.009530225663107255
+single_label,metadata_matched_residual,5,5,balanced,0.5,nan,No Finding,f1,0.33028430342674253,0.024764482683066975
+single_label,metadata_matched_residual,5,5,balanced,0.5,nan,No Finding,accuracy,0.559600007534027,0.0173115277659665
+single_label,metadata_matched_residual,5,5,balanced,0.5,nan,No Finding,nll,0.6763527274131775,0.007630603343108998
+single_label,metadata_matched_residual,5,5,balanced,0.5,nan,No Finding,calibration_error,0.10177705138921737,0.013108298000014397
+single_label,metadata_matched_residual,5,5,balanced,0.5,nan,Fracture,auroc,0.6077460050582886,0.008528701718287063
+single_label,metadata_matched_residual,5,5,balanced,0.5,nan,Fracture,auprc,0.4126478433609009,0.006559266685435393
+single_label,metadata_matched_residual,5,5,balanced,0.5,nan,Fracture,f1,0.4209912300109863,0.0200573865754746
+single_label,metadata_matched_residual,5,5,balanced,0.5,nan,Fracture,accuracy,0.615066659450531,0.01358593819338022
+single_label,metadata_matched_residual,5,5,balanced,0.5,nan,Fracture,nll,0.6287566661834717,0.0031456667176467078
+single_label,metadata_matched_residual,5,5,balanced,0.5,nan,Fracture,calibration_error,0.05348963588476181,0.008207787909876915
+single_label,metadata_matched_residual,5,5,balanced,0.5,nan,Cardiomegaly,auroc,0.628684401512146,0.013262935042609527
+single_label,metadata_matched_residual,5,5,balanced,0.5,nan,Cardiomegaly,auprc,0.4437874794006348,0.014962885825045683
+single_label,metadata_matched_residual,5,5,balanced,0.5,nan,Cardiomegaly,f1,0.44411409497261045,0.014456153432344137
+single_label,metadata_matched_residual,5,5,balanced,0.5,nan,Cardiomegaly,accuracy,0.623466682434082,0.011228926159817687
+single_label,metadata_matched_residual,5,5,balanced,0.5,nan,Cardiomegaly,nll,0.616491973400116,0.007043178787167928
+single_label,metadata_matched_residual,5,5,balanced,0.5,nan,Cardiomegaly,calibration_error,0.04628805592656136,0.007482948998572892
+single_label,full_embedding_matched_residual,5,5,balanced,0.2,nan,No Finding,auroc,0.5101520001888276,0.01628601257693872
+single_label,full_embedding_matched_residual,5,5,balanced,0.2,nan,No Finding,auprc,0.3506216526031494,0.013342273171832432
+single_label,full_embedding_matched_residual,5,5,balanced,0.2,nan,No Finding,f1,0.33769463896751406,0.022412742601063733
+single_label,full_embedding_matched_residual,5,5,balanced,0.2,nan,No Finding,accuracy,0.5703999996185303,0.01909391431861607
+single_label,full_embedding_matched_residual,5,5,balanced,0.2,nan,No Finding,nll,0.7833240866661072,0.010994885799756129
+single_label,full_embedding_matched_residual,5,5,balanced,0.2,nan,No Finding,calibration_error,0.18207098543643951,0.010498618364468155
+single_label,full_embedding_matched_residual,5,5,balanced,0.2,nan,Fracture,auroc,0.6447979807853699,0.014535473386363141
+single_label,full_embedding_matched_residual,5,5,balanced,0.2,nan,Fracture,auprc,0.4426859438419342,0.02219733819991591
+single_label,full_embedding_matched_residual,5,5,balanced,0.2,nan,Fracture,f1,0.45796963572502136,0.009037657103976453
+single_label,full_embedding_matched_residual,5,5,balanced,0.2,nan,Fracture,accuracy,0.6339999914169312,0.015383970651971671
+single_label,full_embedding_matched_residual,5,5,balanced,0.2,nan,Fracture,nll,0.6661768674850463,0.015950906058870427
+single_label,full_embedding_matched_residual,5,5,balanced,0.2,nan,Fracture,calibration_error,0.11408777385950089,0.009007743189677756
+single_label,full_embedding_matched_residual,5,5,balanced,0.2,nan,Cardiomegaly,auroc,0.6568032026290893,0.012638048534950208
+single_label,full_embedding_matched_residual,5,5,balanced,0.2,nan,Cardiomegaly,auprc,0.47401870489120485,0.011126325842379553
+single_label,full_embedding_matched_residual,5,5,balanced,0.2,nan,Cardiomegaly,f1,0.4744041919708252,0.01017203283609418
+single_label,full_embedding_matched_residual,5,5,balanced,0.2,nan,Cardiomegaly,accuracy,0.6446666598320008,0.004737561509423709
+single_label,full_embedding_matched_residual,5,5,balanced,0.2,nan,Cardiomegaly,nll,0.6537404179573059,0.015539243006342731
+single_label,full_embedding_matched_residual,5,5,balanced,0.2,nan,Cardiomegaly,calibration_error,0.11227702349424362,0.006323053428990877
+single_label,anatomy_matched_residual,5,5,balanced,0.2,nan,No Finding,auroc,0.5119392037391662,0.014829477493673613
+single_label,anatomy_matched_residual,5,5,balanced,0.2,nan,No Finding,auprc,0.3528943836688995,0.013815301756906588
+single_label,anatomy_matched_residual,5,5,balanced,0.2,nan,No Finding,f1,0.33680564165115356,0.019519893096168243
+single_label,anatomy_matched_residual,5,5,balanced,0.2,nan,No Finding,accuracy,0.573466670513153,0.01815611014095245
+single_label,anatomy_matched_residual,5,5,balanced,0.2,nan,No Finding,nll,0.7965973138809204,0.012472498480671461
+single_label,anatomy_matched_residual,5,5,balanced,0.2,nan,No Finding,calibration_error,0.18492267429828643,0.013181348705699356
+single_label,anatomy_matched_residual,5,5,balanced,0.2,nan,Fracture,auroc,0.6579140067100525,0.013476027367230747
+single_label,anatomy_matched_residual,5,5,balanced,0.2,nan,Fracture,auprc,0.4520635724067688,0.02184491248852135
+single_label,anatomy_matched_residual,5,5,balanced,0.2,nan,Fracture,f1,0.46766912937164307,0.009481063344304047
+single_label,anatomy_matched_residual,5,5,balanced,0.2,nan,Fracture,accuracy,0.6377333402633667,0.010248035001169645
+single_label,anatomy_matched_residual,5,5,balanced,0.2,nan,Fracture,nll,0.6631307005882263,0.015444147170049742
+single_label,anatomy_matched_residual,5,5,balanced,0.2,nan,Fracture,calibration_error,0.11855417191982269,0.006921447160460134
+single_label,anatomy_matched_residual,5,5,balanced,0.2,nan,Cardiomegaly,auroc,0.663945198059082,0.012593771158799833
+single_label,anatomy_matched_residual,5,5,balanced,0.2,nan,Cardiomegaly,auprc,0.4791032552719116,0.011582256946337828
+single_label,anatomy_matched_residual,5,5,balanced,0.2,nan,Cardiomegaly,f1,0.48281988501548767,0.007654640139640357
+single_label,anatomy_matched_residual,5,5,balanced,0.2,nan,Cardiomegaly,accuracy,0.6504000067710877,0.004889914212726553
+single_label,anatomy_matched_residual,5,5,balanced,0.2,nan,Cardiomegaly,nll,0.6573064088821411,0.017361026502222515
+single_label,anatomy_matched_residual,5,5,balanced,0.2,nan,Cardiomegaly,calibration_error,0.11238323003053666,0.005580610206640121
+single_label,shuffled_anatomy_match,5,5,balanced,0.2,nan,No Finding,auroc,0.5109379947185516,0.011572985431695555
+single_label,shuffled_anatomy_match,5,5,balanced,0.2,nan,No Finding,auprc,0.3519608020782471,0.008036421469322064
+single_label,shuffled_anatomy_match,5,5,balanced,0.2,nan,No Finding,f1,0.3315361499786377,0.009989563428243595
+single_label,shuffled_anatomy_match,5,5,balanced,0.2,nan,No Finding,accuracy,0.5701333284378052,0.010460516721735752
+single_label,shuffled_anatomy_match,5,5,balanced,0.2,nan,No Finding,nll,0.7952489018440246,0.013097839451492146
+single_label,shuffled_anatomy_match,5,5,balanced,0.2,nan,No Finding,calibration_error,0.1833978056907654,0.011340772170903084
+single_label,shuffled_anatomy_match,5,5,balanced,0.2,nan,Fracture,auroc,0.6719446182250977,0.010434127454760925
+single_label,shuffled_anatomy_match,5,5,balanced,0.2,nan,Fracture,auprc,0.46163411140441896,0.02131552213984098
+single_label,shuffled_anatomy_match,5,5,balanced,0.2,nan,Fracture,f1,0.4850017368793488,0.012317128758079636
+single_label,shuffled_anatomy_match,5,5,balanced,0.2,nan,Fracture,accuracy,0.6453333258628845,0.008485277496765142
+single_label,shuffled_anatomy_match,5,5,balanced,0.2,nan,Fracture,nll,0.6477603554725647,0.011377490816388149
+single_label,shuffled_anatomy_match,5,5,balanced,0.2,nan,Fracture,calibration_error,0.11207492053508758,0.009147221176204465
+single_label,shuffled_anatomy_match,5,5,balanced,0.2,nan,Cardiomegaly,auroc,0.6704495906829834,0.013567606470275871
+single_label,shuffled_anatomy_match,5,5,balanced,0.2,nan,Cardiomegaly,auprc,0.4842785120010376,0.01488161570859758
+single_label,shuffled_anatomy_match,5,5,balanced,0.2,nan,Cardiomegaly,f1,0.4842329978942871,0.004395324265781083
+single_label,shuffled_anatomy_match,5,5,balanced,0.2,nan,Cardiomegaly,accuracy,0.6554666638374329,0.005042054344831305
+single_label,shuffled_anatomy_match,5,5,balanced,0.2,nan,Cardiomegaly,nll,0.6508665323257447,0.01919123629085961
+single_label,shuffled_anatomy_match,5,5,balanced,0.2,nan,Cardiomegaly,calibration_error,0.10648843795061111,0.011914664608788568
+single_label,positive_prototype,5,20,abundant_controls,0.05,nan,No Finding,auroc,0.5314932107925415,0.008949670952989893
+single_label,positive_prototype,5,20,abundant_controls,0.05,nan,No Finding,auprc,0.3788228213787079,0.013321791665391073
+single_label,positive_prototype,5,20,abundant_controls,0.05,nan,No Finding,f1,0.34719316363334657,0.014506629183371124
+single_label,positive_prototype,5,20,abundant_controls,0.05,nan,No Finding,accuracy,0.5834666728973389,0.006805227499975704
+single_label,positive_prototype,5,20,abundant_controls,0.05,nan,No Finding,nll,0.6526484847068786,0.003452856774572818
+single_label,positive_prototype,5,20,abundant_controls,0.05,nan,No Finding,calibration_error,0.06935714483261109,0.008269083828128621
+single_label,positive_prototype,5,20,abundant_controls,0.05,nan,Fracture,auroc,0.7273851990699768,0.004763321045771164
+single_label,positive_prototype,5,20,abundant_controls,0.05,nan,Fracture,auprc,0.5085132122039795,0.01703432877415395
+single_label,positive_prototype,5,20,abundant_controls,0.05,nan,Fracture,f1,0.5208722114562988,0.005634853166333613
+single_label,positive_prototype,5,20,abundant_controls,0.05,nan,Fracture,accuracy,0.6708000063896179,0.008398406147763975
+single_label,positive_prototype,5,20,abundant_controls,0.05,nan,Fracture,nll,0.5700726509094238,0.00297276334171341
+single_label,positive_prototype,5,20,abundant_controls,0.05,nan,Fracture,calibration_error,0.061925873160362244,0.007487685975809822
+single_label,positive_prototype,5,20,abundant_controls,0.05,nan,Cardiomegaly,auroc,0.7106695890426635,0.01351924499990346
+single_label,positive_prototype,5,20,abundant_controls,0.05,nan,Cardiomegaly,auprc,0.526454746723175,0.016968301365600354
+single_label,positive_prototype,5,20,abundant_controls,0.05,nan,Cardiomegaly,f1,0.513897716999054,0.0064423662479506875
+single_label,positive_prototype,5,20,abundant_controls,0.05,nan,Cardiomegaly,accuracy,0.6721333384513855,0.005257792595326188
+single_label,positive_prototype,5,20,abundant_controls,0.05,nan,Cardiomegaly,nll,0.5779108881950379,0.007561974373289951
+single_label,positive_prototype,5,20,abundant_controls,0.05,nan,Cardiomegaly,calibration_error,0.04376359730958938,0.005731343082701848
+single_label,global_negative_centroid,5,20,abundant_controls,0.2,nan,No Finding,auroc,0.5143343925476074,0.007908760626852904
+single_label,global_negative_centroid,5,20,abundant_controls,0.2,nan,No Finding,auprc,0.35520626306533815,0.009764169063245008
+single_label,global_negative_centroid,5,20,abundant_controls,0.2,nan,No Finding,f1,0.3282391369342804,0.014314351179939802
+single_label,global_negative_centroid,5,20,abundant_controls,0.2,nan,No Finding,accuracy,0.5801333427429199,0.004770291628919529
+single_label,global_negative_centroid,5,20,abundant_controls,0.2,nan,No Finding,nll,0.8240401983261109,0.008534236522328794
+single_label,global_negative_centroid,5,20,abundant_controls,0.2,nan,No Finding,calibration_error,0.1971184492111206,0.003584551548917645
+single_label,global_negative_centroid,5,20,abundant_controls,0.2,nan,Fracture,auroc,0.7041279911994934,0.0054490089637073014
+single_label,global_negative_centroid,5,20,abundant_controls,0.2,nan,Fracture,auprc,0.48299524188041687,0.014074590705752007
+single_label,global_negative_centroid,5,20,abundant_controls,0.2,nan,Fracture,f1,0.5123086154460907,0.014994683600461842
+single_label,global_negative_centroid,5,20,abundant_controls,0.2,nan,Fracture,accuracy,0.6575999975204467,0.007462476863749873
+single_label,global_negative_centroid,5,20,abundant_controls,0.2,nan,Fracture,nll,0.6396586537361145,0.009720138375045373
+single_label,global_negative_centroid,5,20,abundant_controls,0.2,nan,Fracture,calibration_error,0.1116989254951477,0.007987199073736295
+single_label,global_negative_centroid,5,20,abundant_controls,0.2,nan,Cardiomegaly,auroc,0.707475209236145,0.01047406923599252
+single_label,global_negative_centroid,5,20,abundant_controls,0.2,nan,Cardiomegaly,auprc,0.5229445338249207,0.02071530053828669
+single_label,global_negative_centroid,5,20,abundant_controls,0.2,nan,Cardiomegaly,f1,0.5180465698242187,0.01988588785806401
+single_label,global_negative_centroid,5,20,abundant_controls,0.2,nan,Cardiomegaly,accuracy,0.6761333227157593,0.008033258197436015
+single_label,global_negative_centroid,5,20,abundant_controls,0.2,nan,Cardiomegaly,nll,0.6324917316436768,0.020993414239635484
+single_label,global_negative_centroid,5,20,abundant_controls,0.2,nan,Cardiomegaly,calibration_error,0.10511187016963959,0.013548465150414475
+single_label,random_residual,5,20,abundant_controls,0.5,nan,No Finding,auroc,0.5077174067497253,0.013773189091701724
+single_label,random_residual,5,20,abundant_controls,0.5,nan,No Finding,auprc,0.341900497674942,0.00641746378091928
+single_label,random_residual,5,20,abundant_controls,0.5,nan,No Finding,f1,0.3317496657371521,0.012949441157123272
+single_label,random_residual,5,20,abundant_controls,0.5,nan,No Finding,accuracy,0.5648000001907348,0.006384026233032491
+single_label,random_residual,5,20,abundant_controls,0.5,nan,No Finding,nll,0.6673909068107605,0.0052222094353074665
+single_label,random_residual,5,20,abundant_controls,0.5,nan,No Finding,calibration_error,0.08965392857789993,0.005886608224855734
+single_label,random_residual,5,20,abundant_controls,0.5,nan,Fracture,auroc,0.621947991847992,0.010226215302395111
+single_label,random_residual,5,20,abundant_controls,0.5,nan,Fracture,auprc,0.4300741136074066,0.015620546792277779
+single_label,random_residual,5,20,abundant_controls,0.5,nan,Fracture,f1,0.4396926462650299,0.01063460711206728
+single_label,random_residual,5,20,abundant_controls,0.5,nan,Fracture,accuracy,0.6167999982833863,0.009421023484568941
+single_label,random_residual,5,20,abundant_controls,0.5,nan,Fracture,nll,0.6188951015472413,0.00498400746668558
+single_label,random_residual,5,20,abundant_controls,0.5,nan,Fracture,calibration_error,0.03279093168675899,0.004276047642459124
+single_label,random_residual,5,20,abundant_controls,0.5,nan,Cardiomegaly,auroc,0.6260488033294678,0.015492748155594191
+single_label,random_residual,5,20,abundant_controls,0.5,nan,Cardiomegaly,auprc,0.441738224029541,0.01857146456846614
+single_label,random_residual,5,20,abundant_controls,0.5,nan,Cardiomegaly,f1,0.4499609112739563,0.016462568425953276
+single_label,random_residual,5,20,abundant_controls,0.5,nan,Cardiomegaly,accuracy,0.6343999981880188,0.014503634626865335
+single_label,random_residual,5,20,abundant_controls,0.5,nan,Cardiomegaly,nll,0.6169333934783936,0.00815557434807552
+single_label,random_residual,5,20,abundant_controls,0.5,nan,Cardiomegaly,calibration_error,0.03495570868253708,0.006346168754214123
+single_label,metadata_matched_residual,5,20,abundant_controls,0.5,nan,No Finding,auroc,0.5176740050315857,0.0097426210274711
+single_label,metadata_matched_residual,5,20,abundant_controls,0.5,nan,No Finding,auprc,0.35329240560531616,0.008201218080995434
+single_label,metadata_matched_residual,5,20,abundant_controls,0.5,nan,No Finding,f1,0.3265981912612915,0.011806003546853678
+single_label,metadata_matched_residual,5,20,abundant_controls,0.5,nan,No Finding,accuracy,0.5726666688919068,0.01142121238428974
+single_label,metadata_matched_residual,5,20,abundant_controls,0.5,nan,No Finding,nll,0.6613737583160401,0.004685088904245818
+single_label,metadata_matched_residual,5,20,abundant_controls,0.5,nan,No Finding,calibration_error,0.08606264740228653,0.0052264441337792926
+single_label,metadata_matched_residual,5,20,abundant_controls,0.5,nan,Fracture,auroc,0.6296413898468017,0.010194141582685449
+single_label,metadata_matched_residual,5,20,abundant_controls,0.5,nan,Fracture,auprc,0.42033185958862307,0.006813158595244274
+single_label,metadata_matched_residual,5,20,abundant_controls,0.5,nan,Fracture,f1,0.4413804650306702,0.012307936415058214
+single_label,metadata_matched_residual,5,20,abundant_controls,0.5,nan,Fracture,accuracy,0.618666672706604,0.009128709291768075
+single_label,metadata_matched_residual,5,20,abundant_controls,0.5,nan,Fracture,nll,0.6168576121330261,0.004410948523191565
+single_label,metadata_matched_residual,5,20,abundant_controls,0.5,nan,Fracture,calibration_error,0.041936568915843964,0.010521706718458144
+single_label,metadata_matched_residual,5,20,abundant_controls,0.5,nan,Cardiomegaly,auroc,0.6654691815376281,0.011843766577397656
+single_label,metadata_matched_residual,5,20,abundant_controls,0.5,nan,Cardiomegaly,auprc,0.4849884569644928,0.019235937495628918
+single_label,metadata_matched_residual,5,20,abundant_controls,0.5,nan,Cardiomegaly,f1,0.4805452823638916,0.01486911599265354
+single_label,metadata_matched_residual,5,20,abundant_controls,0.5,nan,Cardiomegaly,accuracy,0.645466661453247,0.004407072914206658
+single_label,metadata_matched_residual,5,20,abundant_controls,0.5,nan,Cardiomegaly,nll,0.5977079629898071,0.005771302424126991
+single_label,metadata_matched_residual,5,20,abundant_controls,0.5,nan,Cardiomegaly,calibration_error,0.02553393952548504,0.006637232436666543
+single_label,full_embedding_matched_residual,5,20,abundant_controls,0.2,nan,No Finding,auroc,0.5106571972370147,0.010409279521271339
+single_label,full_embedding_matched_residual,5,20,abundant_controls,0.2,nan,No Finding,auprc,0.35072205662727357,0.010944812270597378
+single_label,full_embedding_matched_residual,5,20,abundant_controls,0.2,nan,No Finding,f1,0.3237870275974274,0.007008829736083984
+single_label,full_embedding_matched_residual,5,20,abundant_controls,0.2,nan,No Finding,accuracy,0.5717333197593689,0.007342419513638149
+single_label,full_embedding_matched_residual,5,20,abundant_controls,0.2,nan,No Finding,nll,0.8031988382339478,0.009452622432190432
+single_label,full_embedding_matched_residual,5,20,abundant_controls,0.2,nan,No Finding,calibration_error,0.1894428938627243,0.006834682030983576
+single_label,full_embedding_matched_residual,5,20,abundant_controls,0.2,nan,Fracture,auroc,0.6680320024490356,0.00739683895307194
+single_label,full_embedding_matched_residual,5,20,abundant_controls,0.2,nan,Fracture,auprc,0.45306692719459535,0.015857714454145796
+single_label,full_embedding_matched_residual,5,20,abundant_controls,0.2,nan,Fracture,f1,0.4684710741043091,0.012507248987630693
+single_label,full_embedding_matched_residual,5,20,abundant_controls,0.2,nan,Fracture,accuracy,0.6365333557128906,0.005320818355721976
+single_label,full_embedding_matched_residual,5,20,abundant_controls,0.2,nan,Fracture,nll,0.6585898399353027,0.013097654733965382
+single_label,full_embedding_matched_residual,5,20,abundant_controls,0.2,nan,Fracture,calibration_error,0.11727568358182908,0.004433493514886742
+single_label,full_embedding_matched_residual,5,20,abundant_controls,0.2,nan,Cardiomegaly,auroc,0.6938411951065063,0.007753185027804708
+single_label,full_embedding_matched_residual,5,20,abundant_controls,0.2,nan,Cardiomegaly,auprc,0.5127257585525513,0.015402393546361125
+single_label,full_embedding_matched_residual,5,20,abundant_controls,0.2,nan,Cardiomegaly,f1,0.5022601664066315,0.013380401323847263
+single_label,full_embedding_matched_residual,5,20,abundant_controls,0.2,nan,Cardiomegaly,accuracy,0.660266661643982,0.008635846394908728
+single_label,full_embedding_matched_residual,5,20,abundant_controls,0.2,nan,Cardiomegaly,nll,0.6313091874122619,0.012366726674662265
+single_label,full_embedding_matched_residual,5,20,abundant_controls,0.2,nan,Cardiomegaly,calibration_error,0.10574890524148942,0.007600225804276629
+single_label,anatomy_matched_residual,5,20,abundant_controls,0.2,nan,No Finding,auroc,0.5128412008285522,0.009595994327310807
+single_label,anatomy_matched_residual,5,20,abundant_controls,0.2,nan,No Finding,auprc,0.3547519385814667,0.010645809831217937
+single_label,anatomy_matched_residual,5,20,abundant_controls,0.2,nan,No Finding,f1,0.3260581433773041,0.006065660564038478
+single_label,anatomy_matched_residual,5,20,abundant_controls,0.2,nan,No Finding,accuracy,0.5784000039100647,0.005133776877417958
+single_label,anatomy_matched_residual,5,20,abundant_controls,0.2,nan,No Finding,nll,0.834622585773468,0.009371444897826625
+single_label,anatomy_matched_residual,5,20,abundant_controls,0.2,nan,No Finding,calibration_error,0.20012698769569398,0.007755291608054172
+single_label,anatomy_matched_residual,5,20,abundant_controls,0.2,nan,Fracture,auroc,0.6890959978103638,0.007005241215909117
+single_label,anatomy_matched_residual,5,20,abundant_controls,0.2,nan,Fracture,auprc,0.47008060216903685,0.015359342013803476
+single_label,anatomy_matched_residual,5,20,abundant_controls,0.2,nan,Fracture,f1,0.49677053689956663,0.012720050814820805
+single_label,anatomy_matched_residual,5,20,abundant_controls,0.2,nan,Fracture,accuracy,0.6506666779518128,0.005416029242194401
+single_label,anatomy_matched_residual,5,20,abundant_controls,0.2,nan,Fracture,nll,0.6599323987960816,0.013309569380867315
+single_label,anatomy_matched_residual,5,20,abundant_controls,0.2,nan,Fracture,calibration_error,0.1242883175611496,0.0033556331556109627
+single_label,anatomy_matched_residual,5,20,abundant_controls,0.2,nan,Cardiomegaly,auroc,0.7028387904167175,0.008345973814623568
+single_label,anatomy_matched_residual,5,20,abundant_controls,0.2,nan,Cardiomegaly,auprc,0.5192945539951325,0.017319012982396537
+single_label,anatomy_matched_residual,5,20,abundant_controls,0.2,nan,Cardiomegaly,f1,0.5131563186645508,0.014777311142926665
+single_label,anatomy_matched_residual,5,20,abundant_controls,0.2,nan,Cardiomegaly,accuracy,0.6690666675567627,0.00741768284099857
+single_label,anatomy_matched_residual,5,20,abundant_controls,0.2,nan,Cardiomegaly,nll,0.6421101450920105,0.016705207255691402
+single_label,anatomy_matched_residual,5,20,abundant_controls,0.2,nan,Cardiomegaly,calibration_error,0.11635676622390748,0.010047787025267305
+single_label,shuffled_anatomy_match,5,20,abundant_controls,0.2,nan,No Finding,auroc,0.5131787955760956,0.009718091885276108
+single_label,shuffled_anatomy_match,5,20,abundant_controls,0.2,nan,No Finding,auprc,0.3565620958805084,0.010712581433917543
+single_label,shuffled_anatomy_match,5,20,abundant_controls,0.2,nan,No Finding,f1,0.32330199480056765,0.014842942361400085
+single_label,shuffled_anatomy_match,5,20,abundant_controls,0.2,nan,No Finding,accuracy,0.5771999955177307,0.007563085851792708
+single_label,shuffled_anatomy_match,5,20,abundant_controls,0.2,nan,No Finding,nll,0.8236308097839355,0.010311293869781133
+single_label,shuffled_anatomy_match,5,20,abundant_controls,0.2,nan,No Finding,calibration_error,0.19566139280796052,0.007822828634489304
+single_label,shuffled_anatomy_match,5,20,abundant_controls,0.2,nan,Fracture,auroc,0.7018172025680542,0.005222607543629844
+single_label,shuffled_anatomy_match,5,20,abundant_controls,0.2,nan,Fracture,auprc,0.48302279114723207,0.014460384087632708
+single_label,shuffled_anatomy_match,5,20,abundant_controls,0.2,nan,Fracture,f1,0.5123502910137177,0.014095967652830952
+single_label,shuffled_anatomy_match,5,20,abundant_controls,0.2,nan,Fracture,accuracy,0.6598666667938232,0.006589557929800141
+single_label,shuffled_anatomy_match,5,20,abundant_controls,0.2,nan,Fracture,nll,0.640280258655548,0.009344868697064378
+single_label,shuffled_anatomy_match,5,20,abundant_controls,0.2,nan,Fracture,calibration_error,0.1132777065038681,0.007591298797503353
+single_label,shuffled_anatomy_match,5,20,abundant_controls,0.2,nan,Cardiomegaly,auroc,0.7054916024208069,0.009492600557559462
+single_label,shuffled_anatomy_match,5,20,abundant_controls,0.2,nan,Cardiomegaly,auprc,0.5185394883155823,0.01873249081091683
+single_label,shuffled_anatomy_match,5,20,abundant_controls,0.2,nan,Cardiomegaly,f1,0.5155289947986603,0.015514415407058713
+single_label,shuffled_anatomy_match,5,20,abundant_controls,0.2,nan,Cardiomegaly,accuracy,0.671999990940094,0.0059066875190347465
+single_label,shuffled_anatomy_match,5,20,abundant_controls,0.2,nan,Cardiomegaly,nll,0.634204375743866,0.019154189675455572
+single_label,shuffled_anatomy_match,5,20,abundant_controls,0.2,nan,Cardiomegaly,calibration_error,0.10563367307186126,0.01351164588204915
+multi_label,positive_prototype,1,1,balanced,10.0,0.1,No Finding,auroc,0.5227474808692932,0.0035889085168593136
+multi_label,positive_prototype,1,1,balanced,10.0,0.1,No Finding,auprc,0.2954693138599396,0.008192055245231642
+multi_label,positive_prototype,1,1,balanced,10.0,0.1,No Finding,f1,0.42377463579177854,0.005551589383679622
+multi_label,positive_prototype,1,1,balanced,10.0,0.1,No Finding,accuracy,0.26886667013168336,0.004463433105394739
+multi_label,positive_prototype,1,1,balanced,10.0,0.1,No Finding,nll,0.7131534814834595,0.00034918845855598036
+multi_label,positive_prototype,1,1,balanced,10.0,0.1,No Finding,calibration_error,0.2519036054611206,0.004449393619392194
+multi_label,positive_prototype,1,1,balanced,10.0,0.1,Fracture,auroc,0.5546229481697083,0.02178255561199162
+multi_label,positive_prototype,1,1,balanced,10.0,0.1,Fracture,auprc,0.21359049379825593,0.013250498199060736
+multi_label,positive_prototype,1,1,balanced,10.0,0.1,Fracture,f1,0.31895069479942323,0.0008425406225350692
+multi_label,positive_prototype,1,1,balanced,10.0,0.1,Fracture,accuracy,0.18973333537578582,0.0005962873907480687
+multi_label,positive_prototype,1,1,balanced,10.0,0.1,Fracture,nll,0.7196759223937989,7.16314996720573e-05
+multi_label,positive_prototype,1,1,balanced,10.0,0.1,Fracture,calibration_error,0.33108954429626464,0.0005780669505018047
+multi_label,positive_prototype,1,1,balanced,10.0,0.1,Cardiomegaly,auroc,0.5332084655761719,0.012606881332062534
+multi_label,positive_prototype,1,1,balanced,10.0,0.1,Cardiomegaly,auprc,0.34300925135612487,0.011081065769715773
+multi_label,positive_prototype,1,1,balanced,10.0,0.1,Cardiomegaly,f1,0.48849974274635316,0.004949313064876097
+multi_label,positive_prototype,1,1,balanced,10.0,0.1,Cardiomegaly,accuracy,0.323199999332428,0.004330767117120813
+multi_label,positive_prototype,1,1,balanced,10.0,0.1,Cardiomegaly,nll,0.7084694981575013,0.00037886986101955686
+multi_label,positive_prototype,1,1,balanced,10.0,0.1,Cardiomegaly,calibration_error,0.1974942922592163,0.004300869183183896
+multi_label,global_negative_centroid,1,1,balanced,10.0,0.5,No Finding,auroc,0.5142351508140564,0.006441779587017817
+multi_label,global_negative_centroid,1,1,balanced,10.0,0.5,No Finding,auprc,0.28920015692710876,0.004419789074541803
+multi_label,global_negative_centroid,1,1,balanced,10.0,0.5,No Finding,f1,0.42226208448410035,0.005640983012814239
+multi_label,global_negative_centroid,1,1,balanced,10.0,0.5,No Finding,accuracy,0.27273333072662354,0.0037520404251949837
+multi_label,global_negative_centroid,1,1,balanced,10.0,0.5,No Finding,nll,0.7047569870948791,0.00016789282884332557
+multi_label,global_negative_centroid,1,1,balanced,10.0,0.5,No Finding,calibration_error,0.24348987340927125,0.004445018564479311
+multi_label,global_negative_centroid,1,1,balanced,10.0,0.5,Fracture,auroc,0.5362371921539306,0.01933653131604585
+multi_label,global_negative_centroid,1,1,balanced,10.0,0.5,Fracture,auprc,0.2056979328393936,0.008100464190882123
+multi_label,global_negative_centroid,1,1,balanced,10.0,0.5,Fracture,f1,0.31907349824905396,0.0010772087824920974
+multi_label,global_negative_centroid,1,1,balanced,10.0,0.5,Fracture,accuracy,0.19560000002384187,0.0007958246626937796
+multi_label,global_negative_centroid,1,1,balanced,10.0,0.5,Fracture,nll,0.7085567355155945,0.0002225342649553529
+multi_label,global_negative_centroid,1,1,balanced,10.0,0.5,Fracture,calibration_error,0.32267849445343016,0.0005783888904162675
+multi_label,global_negative_centroid,1,1,balanced,10.0,0.5,Cardiomegaly,auroc,0.5297083139419556,0.009888622417312597
+multi_label,global_negative_centroid,1,1,balanced,10.0,0.5,Cardiomegaly,auprc,0.3437985360622406,0.010648125353612726
+multi_label,global_negative_centroid,1,1,balanced,10.0,0.5,Cardiomegaly,f1,0.4885581374168396,0.005006265109876192
+multi_label,global_negative_centroid,1,1,balanced,10.0,0.5,Cardiomegaly,accuracy,0.32879999876022337,0.004592259344107585
+multi_label,global_negative_centroid,1,1,balanced,10.0,0.5,Cardiomegaly,nll,0.7015339851379394,0.0003555529333645799
+multi_label,global_negative_centroid,1,1,balanced,10.0,0.5,Cardiomegaly,calibration_error,0.18882465362548828,0.004279581630136226
+multi_label,random_residual,1,1,balanced,10.0,0.5,No Finding,auroc,0.5142351508140564,0.006441779587017817
+multi_label,random_residual,1,1,balanced,10.0,0.5,No Finding,auprc,0.28920015692710876,0.004419789074541803
+multi_label,random_residual,1,1,balanced,10.0,0.5,No Finding,f1,0.42226208448410035,0.005640983012814239
+multi_label,random_residual,1,1,balanced,10.0,0.5,No Finding,accuracy,0.27273333072662354,0.0037520404251949837
+multi_label,random_residual,1,1,balanced,10.0,0.5,No Finding,nll,0.7047569870948791,0.00016789282884332557
+multi_label,random_residual,1,1,balanced,10.0,0.5,No Finding,calibration_error,0.24348987340927125,0.004445018564479311
+multi_label,random_residual,1,1,balanced,10.0,0.5,Fracture,auroc,0.5362371921539306,0.01933653131604585
+multi_label,random_residual,1,1,balanced,10.0,0.5,Fracture,auprc,0.2056979328393936,0.008100464190882123
+multi_label,random_residual,1,1,balanced,10.0,0.5,Fracture,f1,0.31907349824905396,0.0010772087824920974
+multi_label,random_residual,1,1,balanced,10.0,0.5,Fracture,accuracy,0.19560000002384187,0.0007958246626937796
+multi_label,random_residual,1,1,balanced,10.0,0.5,Fracture,nll,0.7085567355155945,0.0002225342649553529
+multi_label,random_residual,1,1,balanced,10.0,0.5,Fracture,calibration_error,0.32267849445343016,0.0005783888904162675
+multi_label,random_residual,1,1,balanced,10.0,0.5,Cardiomegaly,auroc,0.5297083139419556,0.009888622417312597
+multi_label,random_residual,1,1,balanced,10.0,0.5,Cardiomegaly,auprc,0.3437985360622406,0.010648125353612726
+multi_label,random_residual,1,1,balanced,10.0,0.5,Cardiomegaly,f1,0.4885581374168396,0.005006265109876192
+multi_label,random_residual,1,1,balanced,10.0,0.5,Cardiomegaly,accuracy,0.32879999876022337,0.004592259344107585
+multi_label,random_residual,1,1,balanced,10.0,0.5,Cardiomegaly,nll,0.7015339851379394,0.0003555529333645799
+multi_label,random_residual,1,1,balanced,10.0,0.5,Cardiomegaly,calibration_error,0.18882465362548828,0.004279581630136226
+multi_label,metadata_matched_residual,1,1,balanced,10.0,0.5,No Finding,auroc,0.5142351508140564,0.006441779587017817
+multi_label,metadata_matched_residual,1,1,balanced,10.0,0.5,No Finding,auprc,0.28920015692710876,0.004419789074541803
+multi_label,metadata_matched_residual,1,1,balanced,10.0,0.5,No Finding,f1,0.42226208448410035,0.005640983012814239
+multi_label,metadata_matched_residual,1,1,balanced,10.0,0.5,No Finding,accuracy,0.27273333072662354,0.0037520404251949837
+multi_label,metadata_matched_residual,1,1,balanced,10.0,0.5,No Finding,nll,0.7047569870948791,0.00016789282884332557
+multi_label,metadata_matched_residual,1,1,balanced,10.0,0.5,No Finding,calibration_error,0.24348987340927125,0.004445018564479311
+multi_label,metadata_matched_residual,1,1,balanced,10.0,0.5,Fracture,auroc,0.5362371921539306,0.01933653131604585
+multi_label,metadata_matched_residual,1,1,balanced,10.0,0.5,Fracture,auprc,0.2056979328393936,0.008100464190882123
+multi_label,metadata_matched_residual,1,1,balanced,10.0,0.5,Fracture,f1,0.31907349824905396,0.0010772087824920974
+multi_label,metadata_matched_residual,1,1,balanced,10.0,0.5,Fracture,accuracy,0.19560000002384187,0.0007958246626937796
+multi_label,metadata_matched_residual,1,1,balanced,10.0,0.5,Fracture,nll,0.7085567355155945,0.0002225342649553529
+multi_label,metadata_matched_residual,1,1,balanced,10.0,0.5,Fracture,calibration_error,0.32267849445343016,0.0005783888904162675
+multi_label,metadata_matched_residual,1,1,balanced,10.0,0.5,Cardiomegaly,auroc,0.5297083139419556,0.009888622417312597
+multi_label,metadata_matched_residual,1,1,balanced,10.0,0.5,Cardiomegaly,auprc,0.3437985360622406,0.010648125353612726
+multi_label,metadata_matched_residual,1,1,balanced,10.0,0.5,Cardiomegaly,f1,0.4885581374168396,0.005006265109876192
+multi_label,metadata_matched_residual,1,1,balanced,10.0,0.5,Cardiomegaly,accuracy,0.32879999876022337,0.004592259344107585
+multi_label,metadata_matched_residual,1,1,balanced,10.0,0.5,Cardiomegaly,nll,0.7015339851379394,0.0003555529333645799
+multi_label,metadata_matched_residual,1,1,balanced,10.0,0.5,Cardiomegaly,calibration_error,0.18882465362548828,0.004279581630136226
+multi_label,full_embedding_matched_residual,1,1,balanced,10.0,0.5,No Finding,auroc,0.5142351508140564,0.006441779587017817
+multi_label,full_embedding_matched_residual,1,1,balanced,10.0,0.5,No Finding,auprc,0.28920015692710876,0.004419789074541803
+multi_label,full_embedding_matched_residual,1,1,balanced,10.0,0.5,No Finding,f1,0.42226208448410035,0.005640983012814239
+multi_label,full_embedding_matched_residual,1,1,balanced,10.0,0.5,No Finding,accuracy,0.27273333072662354,0.0037520404251949837
+multi_label,full_embedding_matched_residual,1,1,balanced,10.0,0.5,No Finding,nll,0.7047569870948791,0.00016789282884332557
+multi_label,full_embedding_matched_residual,1,1,balanced,10.0,0.5,No Finding,calibration_error,0.24348987340927125,0.004445018564479311
+multi_label,full_embedding_matched_residual,1,1,balanced,10.0,0.5,Fracture,auroc,0.5362371921539306,0.01933653131604585
+multi_label,full_embedding_matched_residual,1,1,balanced,10.0,0.5,Fracture,auprc,0.2056979328393936,0.008100464190882123
+multi_label,full_embedding_matched_residual,1,1,balanced,10.0,0.5,Fracture,f1,0.31907349824905396,0.0010772087824920974
+multi_label,full_embedding_matched_residual,1,1,balanced,10.0,0.5,Fracture,accuracy,0.19560000002384187,0.0007958246626937796
+multi_label,full_embedding_matched_residual,1,1,balanced,10.0,0.5,Fracture,nll,0.7085567355155945,0.0002225342649553529
+multi_label,full_embedding_matched_residual,1,1,balanced,10.0,0.5,Fracture,calibration_error,0.32267849445343016,0.0005783888904162675
+multi_label,full_embedding_matched_residual,1,1,balanced,10.0,0.5,Cardiomegaly,auroc,0.5297083139419556,0.009888622417312597
+multi_label,full_embedding_matched_residual,1,1,balanced,10.0,0.5,Cardiomegaly,auprc,0.3437985360622406,0.010648125353612726
+multi_label,full_embedding_matched_residual,1,1,balanced,10.0,0.5,Cardiomegaly,f1,0.4885581374168396,0.005006265109876192
+multi_label,full_embedding_matched_residual,1,1,balanced,10.0,0.5,Cardiomegaly,accuracy,0.32879999876022337,0.004592259344107585
+multi_label,full_embedding_matched_residual,1,1,balanced,10.0,0.5,Cardiomegaly,nll,0.7015339851379394,0.0003555529333645799
+multi_label,full_embedding_matched_residual,1,1,balanced,10.0,0.5,Cardiomegaly,calibration_error,0.18882465362548828,0.004279581630136226
+multi_label,anatomy_matched_residual,1,1,balanced,10.0,0.5,No Finding,auroc,0.5142351508140564,0.006441779587017817
+multi_label,anatomy_matched_residual,1,1,balanced,10.0,0.5,No Finding,auprc,0.28920015692710876,0.004419789074541803
+multi_label,anatomy_matched_residual,1,1,balanced,10.0,0.5,No Finding,f1,0.42226208448410035,0.005640983012814239
+multi_label,anatomy_matched_residual,1,1,balanced,10.0,0.5,No Finding,accuracy,0.27273333072662354,0.0037520404251949837
+multi_label,anatomy_matched_residual,1,1,balanced,10.0,0.5,No Finding,nll,0.7047569870948791,0.00016789282884332557
+multi_label,anatomy_matched_residual,1,1,balanced,10.0,0.5,No Finding,calibration_error,0.24348987340927125,0.004445018564479311
+multi_label,anatomy_matched_residual,1,1,balanced,10.0,0.5,Fracture,auroc,0.5362371921539306,0.01933653131604585
+multi_label,anatomy_matched_residual,1,1,balanced,10.0,0.5,Fracture,auprc,0.2056979328393936,0.008100464190882123
+multi_label,anatomy_matched_residual,1,1,balanced,10.0,0.5,Fracture,f1,0.31907349824905396,0.0010772087824920974
+multi_label,anatomy_matched_residual,1,1,balanced,10.0,0.5,Fracture,accuracy,0.19560000002384187,0.0007958246626937796
+multi_label,anatomy_matched_residual,1,1,balanced,10.0,0.5,Fracture,nll,0.7085567355155945,0.0002225342649553529
+multi_label,anatomy_matched_residual,1,1,balanced,10.0,0.5,Fracture,calibration_error,0.32267849445343016,0.0005783888904162675
+multi_label,anatomy_matched_residual,1,1,balanced,10.0,0.5,Cardiomegaly,auroc,0.5297083139419556,0.009888622417312597
+multi_label,anatomy_matched_residual,1,1,balanced,10.0,0.5,Cardiomegaly,auprc,0.3437985360622406,0.010648125353612726
+multi_label,anatomy_matched_residual,1,1,balanced,10.0,0.5,Cardiomegaly,f1,0.4885581374168396,0.005006265109876192
+multi_label,anatomy_matched_residual,1,1,balanced,10.0,0.5,Cardiomegaly,accuracy,0.32879999876022337,0.004592259344107585
+multi_label,anatomy_matched_residual,1,1,balanced,10.0,0.5,Cardiomegaly,nll,0.7015339851379394,0.0003555529333645799
+multi_label,anatomy_matched_residual,1,1,balanced,10.0,0.5,Cardiomegaly,calibration_error,0.18882465362548828,0.004279581630136226
+multi_label,shuffled_anatomy_match,1,1,balanced,10.0,0.5,No Finding,auroc,0.5142351508140564,0.006441779587017817
+multi_label,shuffled_anatomy_match,1,1,balanced,10.0,0.5,No Finding,auprc,0.28920015692710876,0.004419789074541803
+multi_label,shuffled_anatomy_match,1,1,balanced,10.0,0.5,No Finding,f1,0.42226208448410035,0.005640983012814239
+multi_label,shuffled_anatomy_match,1,1,balanced,10.0,0.5,No Finding,accuracy,0.27273333072662354,0.0037520404251949837
+multi_label,shuffled_anatomy_match,1,1,balanced,10.0,0.5,No Finding,nll,0.7047569870948791,0.00016789282884332557
+multi_label,shuffled_anatomy_match,1,1,balanced,10.0,0.5,No Finding,calibration_error,0.24348987340927125,0.004445018564479311
+multi_label,shuffled_anatomy_match,1,1,balanced,10.0,0.5,Fracture,auroc,0.5362371921539306,0.01933653131604585
+multi_label,shuffled_anatomy_match,1,1,balanced,10.0,0.5,Fracture,auprc,0.2056979328393936,0.008100464190882123
+multi_label,shuffled_anatomy_match,1,1,balanced,10.0,0.5,Fracture,f1,0.31907349824905396,0.0010772087824920974
+multi_label,shuffled_anatomy_match,1,1,balanced,10.0,0.5,Fracture,accuracy,0.19560000002384187,0.0007958246626937796
+multi_label,shuffled_anatomy_match,1,1,balanced,10.0,0.5,Fracture,nll,0.7085567355155945,0.0002225342649553529
+multi_label,shuffled_anatomy_match,1,1,balanced,10.0,0.5,Fracture,calibration_error,0.32267849445343016,0.0005783888904162675
+multi_label,shuffled_anatomy_match,1,1,balanced,10.0,0.5,Cardiomegaly,auroc,0.5297083139419556,0.009888622417312597
+multi_label,shuffled_anatomy_match,1,1,balanced,10.0,0.5,Cardiomegaly,auprc,0.3437985360622406,0.010648125353612726
+multi_label,shuffled_anatomy_match,1,1,balanced,10.0,0.5,Cardiomegaly,f1,0.4885581374168396,0.005006265109876192
+multi_label,shuffled_anatomy_match,1,1,balanced,10.0,0.5,Cardiomegaly,accuracy,0.32879999876022337,0.004592259344107585
+multi_label,shuffled_anatomy_match,1,1,balanced,10.0,0.5,Cardiomegaly,nll,0.7015339851379394,0.0003555529333645799
+multi_label,shuffled_anatomy_match,1,1,balanced,10.0,0.5,Cardiomegaly,calibration_error,0.18882465362548828,0.004279581630136226
+multi_label,positive_prototype,1,20,abundant_controls,10.0,0.1,No Finding,auroc,0.5227474808692932,0.0035889085168593136
+multi_label,positive_prototype,1,20,abundant_controls,10.0,0.1,No Finding,auprc,0.2954693138599396,0.008192055245231642
+multi_label,positive_prototype,1,20,abundant_controls,10.0,0.1,No Finding,f1,0.42377463579177854,0.005551589383679622
+multi_label,positive_prototype,1,20,abundant_controls,10.0,0.1,No Finding,accuracy,0.26886667013168336,0.004463433105394739
+multi_label,positive_prototype,1,20,abundant_controls,10.0,0.1,No Finding,nll,0.7131534814834595,0.00034918845855598036
+multi_label,positive_prototype,1,20,abundant_controls,10.0,0.1,No Finding,calibration_error,0.2519036054611206,0.004449393619392194
+multi_label,positive_prototype,1,20,abundant_controls,10.0,0.1,Fracture,auroc,0.5546229481697083,0.02178255561199162
+multi_label,positive_prototype,1,20,abundant_controls,10.0,0.1,Fracture,auprc,0.21359049379825593,0.013250498199060736
+multi_label,positive_prototype,1,20,abundant_controls,10.0,0.1,Fracture,f1,0.31895069479942323,0.0008425406225350692
+multi_label,positive_prototype,1,20,abundant_controls,10.0,0.1,Fracture,accuracy,0.18973333537578582,0.0005962873907480687
+multi_label,positive_prototype,1,20,abundant_controls,10.0,0.1,Fracture,nll,0.7196759223937989,7.16314996720573e-05
+multi_label,positive_prototype,1,20,abundant_controls,10.0,0.1,Fracture,calibration_error,0.33108954429626464,0.0005780669505018047
+multi_label,positive_prototype,1,20,abundant_controls,10.0,0.1,Cardiomegaly,auroc,0.5332084655761719,0.012606881332062534
+multi_label,positive_prototype,1,20,abundant_controls,10.0,0.1,Cardiomegaly,auprc,0.34300925135612487,0.011081065769715773
+multi_label,positive_prototype,1,20,abundant_controls,10.0,0.1,Cardiomegaly,f1,0.48849974274635316,0.004949313064876097
+multi_label,positive_prototype,1,20,abundant_controls,10.0,0.1,Cardiomegaly,accuracy,0.323199999332428,0.004330767117120813
+multi_label,positive_prototype,1,20,abundant_controls,10.0,0.1,Cardiomegaly,nll,0.7084694981575013,0.00037886986101955686
+multi_label,positive_prototype,1,20,abundant_controls,10.0,0.1,Cardiomegaly,calibration_error,0.1974942922592163,0.004300869183183896
+multi_label,global_negative_centroid,1,20,abundant_controls,10.0,0.5,No Finding,auroc,0.5206568479537964,0.004833708244764421
+multi_label,global_negative_centroid,1,20,abundant_controls,10.0,0.5,No Finding,auprc,0.29212613105773927,0.0037462065393123398
+multi_label,global_negative_centroid,1,20,abundant_controls,10.0,0.5,No Finding,f1,0.3800714075565338,0.005533300043313924
+multi_label,global_negative_centroid,1,20,abundant_controls,10.0,0.5,No Finding,accuracy,0.4791999995708466,0.008719706012812094
+multi_label,global_negative_centroid,1,20,abundant_controls,10.0,0.5,No Finding,nll,0.6941739439964294,0.0001664651896557673
+multi_label,global_negative_centroid,1,20,abundant_controls,10.0,0.5,No Finding,calibration_error,0.23258193731307983,0.004417596835843128
+multi_label,global_negative_centroid,1,20,abundant_controls,10.0,0.5,Fracture,auroc,0.556348729133606,0.021677889601762985
+multi_label,global_negative_centroid,1,20,abundant_controls,10.0,0.5,Fracture,auprc,0.21623985171318055,0.012596490007965888
+multi_label,global_negative_centroid,1,20,abundant_controls,10.0,0.5,Fracture,f1,0.3153201103210449,0.015101641902471617
+multi_label,global_negative_centroid,1,20,abundant_controls,10.0,0.5,Fracture,accuracy,0.48333332538604734,0.010839739833941778
+multi_label,global_negative_centroid,1,20,abundant_controls,10.0,0.5,Fracture,nll,0.6941490173339844,0.00026676057270952645
+multi_label,global_negative_centroid,1,20,abundant_controls,10.0,0.5,Fracture,calibration_error,0.31160051822662355,0.0005783552281486379
+multi_label,global_negative_centroid,1,20,abundant_controls,10.0,0.5,Cardiomegaly,auroc,0.54499671459198,0.015407695280418798
+multi_label,global_negative_centroid,1,20,abundant_controls,10.0,0.5,Cardiomegaly,auprc,0.3515069842338562,0.011936977002011668
+multi_label,global_negative_centroid,1,20,abundant_controls,10.0,0.5,Cardiomegaly,f1,0.4402600347995758,0.011854626357350682
+multi_label,global_negative_centroid,1,20,abundant_controls,10.0,0.5,Cardiomegaly,accuracy,0.5075333297252655,0.01405268559845187
+multi_label,global_negative_centroid,1,20,abundant_controls,10.0,0.5,Cardiomegaly,nll,0.6932081460952759,0.00042077178959556196
+multi_label,global_negative_centroid,1,20,abundant_controls,10.0,0.5,Cardiomegaly,calibration_error,0.17800498008728027,0.004310608448860391
+multi_label,random_residual,1,20,abundant_controls,10.0,0.5,No Finding,auroc,0.77498779296875,0.008708182092605833
+multi_label,random_residual,1,20,abundant_controls,10.0,0.5,No Finding,auprc,0.6762887120246888,0.011751026504157037
+multi_label,random_residual,1,20,abundant_controls,10.0,0.5,No Finding,f1,0.5075361013412476,0.006605803818407413
+multi_label,random_residual,1,20,abundant_controls,10.0,0.5,No Finding,accuracy,0.5785333275794983,0.006058046157422751
+multi_label,random_residual,1,20,abundant_controls,10.0,0.5,No Finding,nll,0.6891448855400085,0.00028779507448714516
+multi_label,random_residual,1,20,abundant_controls,10.0,0.5,No Finding,calibration_error,0.23326690196990968,0.0044494785692540265
+multi_label,random_residual,1,20,abundant_controls,10.0,0.5,Fracture,auroc,0.428097265958786,0.013672472510014202
+multi_label,random_residual,1,20,abundant_controls,10.0,0.5,Fracture,auprc,0.15387807488441468,0.00328438264853677
+multi_label,random_residual,1,20,abundant_controls,10.0,0.5,Fracture,f1,0.25773411989212036,0.01637667471739248
+multi_label,random_residual,1,20,abundant_controls,10.0,0.5,Fracture,accuracy,0.4287999987602234,0.01112703768062934
+multi_label,random_residual,1,20,abundant_controls,10.0,0.5,Fracture,nll,0.697170615196228,0.00021276781521101468
+multi_label,random_residual,1,20,abundant_controls,10.0,0.5,Fracture,calibration_error,0.3123602747917175,0.000511319644019507
+multi_label,random_residual,1,20,abundant_controls,10.0,0.5,Cardiomegaly,auroc,0.41531599760055543,0.015310390889729873
+multi_label,random_residual,1,20,abundant_controls,10.0,0.5,Cardiomegaly,auprc,0.2623942196369171,0.007198636434466696
+multi_label,random_residual,1,20,abundant_controls,10.0,0.5,Cardiomegaly,f1,0.3745948910713196,0.011297858026470466
+multi_label,random_residual,1,20,abundant_controls,10.0,0.5,Cardiomegaly,accuracy,0.43286666870117185,0.009702805263586325
+multi_label,random_residual,1,20,abundant_controls,10.0,0.5,Cardiomegaly,nll,0.6967884063720703,0.0003634162807453424
+multi_label,random_residual,1,20,abundant_controls,10.0,0.5,Cardiomegaly,calibration_error,0.17882128953933715,0.004283638695954869
+multi_label,metadata_matched_residual,1,20,abundant_controls,10.0,0.5,No Finding,auroc,0.5197142243385315,0.002461668288806212
+multi_label,metadata_matched_residual,1,20,abundant_controls,10.0,0.5,No Finding,auprc,0.29149778485298156,0.0050154084830281165
+multi_label,metadata_matched_residual,1,20,abundant_controls,10.0,0.5,No Finding,f1,0.3779643177986145,0.006714566747740107
+multi_label,metadata_matched_residual,1,20,abundant_controls,10.0,0.5,No Finding,accuracy,0.4711999952793121,0.008241497956773949
+multi_label,metadata_matched_residual,1,20,abundant_controls,10.0,0.5,No Finding,nll,0.6942419886589051,0.00012292389317504056
+multi_label,metadata_matched_residual,1,20,abundant_controls,10.0,0.5,No Finding,calibration_error,0.23261152505874633,0.0044459387901649465
+multi_label,metadata_matched_residual,1,20,abundant_controls,10.0,0.5,Fracture,auroc,0.525367271900177,0.02054449009389467
+multi_label,metadata_matched_residual,1,20,abundant_controls,10.0,0.5,Fracture,auprc,0.2007407307624817,0.012009858693244554
+multi_label,metadata_matched_residual,1,20,abundant_controls,10.0,0.5,Fracture,f1,0.3003396153450012,0.012181595285187601
+multi_label,metadata_matched_residual,1,20,abundant_controls,10.0,0.5,Fracture,accuracy,0.46766666173934934,0.010024967095729637
+multi_label,metadata_matched_residual,1,20,abundant_controls,10.0,0.5,Fracture,nll,0.6945530056953431,0.0002923574997924674
+multi_label,metadata_matched_residual,1,20,abundant_controls,10.0,0.5,Fracture,calibration_error,0.31158154010772704,0.0005579220160714067
+multi_label,metadata_matched_residual,1,20,abundant_controls,10.0,0.5,Cardiomegaly,auroc,0.5341763257980346,0.019681055093047697
+multi_label,metadata_matched_residual,1,20,abundant_controls,10.0,0.5,Cardiomegaly,auprc,0.3431355834007263,0.01457623071842529
+multi_label,metadata_matched_residual,1,20,abundant_controls,10.0,0.5,Cardiomegaly,f1,0.43780933022499086,0.01730756205661025
+multi_label,metadata_matched_residual,1,20,abundant_controls,10.0,0.5,Cardiomegaly,accuracy,0.4990666687488556,0.016762063663840816
+multi_label,metadata_matched_residual,1,20,abundant_controls,10.0,0.5,Cardiomegaly,nll,0.6934685111045837,0.0004502079819397136
+multi_label,metadata_matched_residual,1,20,abundant_controls,10.0,0.5,Cardiomegaly,calibration_error,0.17800867557525635,0.00433893297916071
+multi_label,full_embedding_matched_residual,1,20,abundant_controls,10.0,0.5,No Finding,auroc,0.5172793149948121,0.004542571091665301
+multi_label,full_embedding_matched_residual,1,20,abundant_controls,10.0,0.5,No Finding,auprc,0.28942607045173646,0.0055870247634680825
+multi_label,full_embedding_matched_residual,1,20,abundant_controls,10.0,0.5,No Finding,f1,0.37716209292411806,0.0048858177635349755
+multi_label,full_embedding_matched_residual,1,20,abundant_controls,10.0,0.5,No Finding,accuracy,0.47400000095367434,0.007792446128936079
+multi_label,full_embedding_matched_residual,1,20,abundant_controls,10.0,0.5,No Finding,nll,0.6941860318183899,0.00015660784390653012
+multi_label,full_embedding_matched_residual,1,20,abundant_controls,10.0,0.5,No Finding,calibration_error,0.23252149820327758,0.004416553367506718
+multi_label,full_embedding_matched_residual,1,20,abundant_controls,10.0,0.5,Fracture,auroc,0.5443364024162293,0.021012883590722446
+multi_label,full_embedding_matched_residual,1,20,abundant_controls,10.0,0.5,Fracture,auprc,0.2101265400648117,0.011995181272284532
+multi_label,full_embedding_matched_residual,1,20,abundant_controls,10.0,0.5,Fracture,f1,0.3118817925453186,0.011088642729584715
+multi_label,full_embedding_matched_residual,1,20,abundant_controls,10.0,0.5,Fracture,accuracy,0.4749333322048187,0.008555044409958343
+multi_label,full_embedding_matched_residual,1,20,abundant_controls,10.0,0.5,Fracture,nll,0.6943443298339844,0.00024372974935783773
+multi_label,full_embedding_matched_residual,1,20,abundant_controls,10.0,0.5,Fracture,calibration_error,0.3115804195404053,0.0005668339226148348
+multi_label,full_embedding_matched_residual,1,20,abundant_controls,10.0,0.5,Cardiomegaly,auroc,0.5404416203498841,0.015719533357514283
+multi_label,full_embedding_matched_residual,1,20,abundant_controls,10.0,0.5,Cardiomegaly,auprc,0.34994466304779054,0.011549047428494679
+multi_label,full_embedding_matched_residual,1,20,abundant_controls,10.0,0.5,Cardiomegaly,f1,0.4382540822029114,0.012828167260147964
+multi_label,full_embedding_matched_residual,1,20,abundant_controls,10.0,0.5,Cardiomegaly,accuracy,0.5014666676521301,0.017140920972670844
+multi_label,full_embedding_matched_residual,1,20,abundant_controls,10.0,0.5,Cardiomegaly,nll,0.6933794140815734,0.0003757562430611597
+multi_label,full_embedding_matched_residual,1,20,abundant_controls,10.0,0.5,Cardiomegaly,calibration_error,0.17800843715667725,0.004299593689831789
+multi_label,anatomy_matched_residual,1,20,abundant_controls,10.0,0.5,No Finding,auroc,0.5184752583503723,0.00423907350018722
+multi_label,anatomy_matched_residual,1,20,abundant_controls,10.0,0.5,No Finding,auprc,0.2907429218292236,0.004437494489419894
+multi_label,anatomy_matched_residual,1,20,abundant_controls,10.0,0.5,No Finding,f1,0.37758828997612,0.0047265581460275265
+multi_label,anatomy_matched_residual,1,20,abundant_controls,10.0,0.5,No Finding,accuracy,0.4794000029563904,0.007440132256249095
+multi_label,anatomy_matched_residual,1,20,abundant_controls,10.0,0.5,No Finding,nll,0.694195032119751,0.000166676889076388
+multi_label,anatomy_matched_residual,1,20,abundant_controls,10.0,0.5,No Finding,calibration_error,0.23256994485855104,0.004413419797991168
+multi_label,anatomy_matched_residual,1,20,abundant_controls,10.0,0.5,Fracture,auroc,0.5509227275848388,0.021277259537230496
+multi_label,anatomy_matched_residual,1,20,abundant_controls,10.0,0.5,Fracture,auprc,0.21353458166122435,0.012861456111175278
+multi_label,anatomy_matched_residual,1,20,abundant_controls,10.0,0.5,Fracture,f1,0.3145216703414917,0.014645324971008617
+multi_label,anatomy_matched_residual,1,20,abundant_controls,10.0,0.5,Fracture,accuracy,0.48220000267028806,0.011315185509478656
+multi_label,anatomy_matched_residual,1,20,abundant_controls,10.0,0.5,Fracture,nll,0.6942559599876403,0.000279956031880305
+multi_label,anatomy_matched_residual,1,20,abundant_controls,10.0,0.5,Fracture,calibration_error,0.3116255640983582,0.000569412542753019
+multi_label,anatomy_matched_residual,1,20,abundant_controls,10.0,0.5,Cardiomegaly,auroc,0.5430211544036865,0.015429759459152015
+multi_label,anatomy_matched_residual,1,20,abundant_controls,10.0,0.5,Cardiomegaly,auprc,0.35088372230529785,0.011590498630883213
+multi_label,anatomy_matched_residual,1,20,abundant_controls,10.0,0.5,Cardiomegaly,f1,0.4384202539920807,0.013010722293869955
+multi_label,anatomy_matched_residual,1,20,abundant_controls,10.0,0.5,Cardiomegaly,accuracy,0.5059333324432373,0.014117380679293044
+multi_label,anatomy_matched_residual,1,20,abundant_controls,10.0,0.5,Cardiomegaly,nll,0.6932589530944824,0.00041711369466000176
+multi_label,anatomy_matched_residual,1,20,abundant_controls,10.0,0.5,Cardiomegaly,calibration_error,0.17802441120147705,0.004293617375926628
+multi_label,shuffled_anatomy_match,1,20,abundant_controls,10.0,0.5,No Finding,auroc,0.5205271601676941,0.004328587455534274
+multi_label,shuffled_anatomy_match,1,20,abundant_controls,10.0,0.5,No Finding,auprc,0.291342693567276,0.004011083569126475
+multi_label,shuffled_anatomy_match,1,20,abundant_controls,10.0,0.5,No Finding,f1,0.38153000473976134,0.005484847284659569
+multi_label,shuffled_anatomy_match,1,20,abundant_controls,10.0,0.5,No Finding,accuracy,0.47766667008399966,0.007153091297157986
+multi_label,shuffled_anatomy_match,1,20,abundant_controls,10.0,0.5,No Finding,nll,0.6942526817321777,0.00017815591717875337
+multi_label,shuffled_anatomy_match,1,20,abundant_controls,10.0,0.5,No Finding,calibration_error,0.2326587200164795,0.004407363962519538
+multi_label,shuffled_anatomy_match,1,20,abundant_controls,10.0,0.5,Fracture,auroc,0.5556315302848815,0.022773014590684534
+multi_label,shuffled_anatomy_match,1,20,abundant_controls,10.0,0.5,Fracture,auprc,0.21579444110393525,0.012961874842777901
+multi_label,shuffled_anatomy_match,1,20,abundant_controls,10.0,0.5,Fracture,f1,0.31475536823272704,0.017001404355410157
+multi_label,shuffled_anatomy_match,1,20,abundant_controls,10.0,0.5,Fracture,accuracy,0.4805999994277954,0.01107148522915666
+multi_label,shuffled_anatomy_match,1,20,abundant_controls,10.0,0.5,Fracture,nll,0.694231653213501,0.000276432981863233
+multi_label,shuffled_anatomy_match,1,20,abundant_controls,10.0,0.5,Fracture,calibration_error,0.31166025400161745,0.0005800073496590598
+multi_label,shuffled_anatomy_match,1,20,abundant_controls,10.0,0.5,Cardiomegaly,auroc,0.5442482113838196,0.01436663944889499
+multi_label,shuffled_anatomy_match,1,20,abundant_controls,10.0,0.5,Cardiomegaly,auprc,0.3511450529098511,0.010848413963637038
+multi_label,shuffled_anatomy_match,1,20,abundant_controls,10.0,0.5,Cardiomegaly,f1,0.4413589835166931,0.012507825596962119
+multi_label,shuffled_anatomy_match,1,20,abundant_controls,10.0,0.5,Cardiomegaly,accuracy,0.5060666680335999,0.01345858636487764
+multi_label,shuffled_anatomy_match,1,20,abundant_controls,10.0,0.5,Cardiomegaly,nll,0.6932746291160583,0.00039004328031974617
+multi_label,shuffled_anatomy_match,1,20,abundant_controls,10.0,0.5,Cardiomegaly,calibration_error,0.1780752420425415,0.0043004463473488895
+multi_label,positive_prototype,3,3,balanced,10.0,0.1,No Finding,auroc,0.5406072616577149,0.006124416630709981
+multi_label,positive_prototype,3,3,balanced,10.0,0.1,No Finding,auprc,0.3035355269908905,0.009664319482511527
+multi_label,positive_prototype,3,3,balanced,10.0,0.1,No Finding,f1,0.42377463579177854,0.005551589383679622
+multi_label,positive_prototype,3,3,balanced,10.0,0.1,No Finding,accuracy,0.26886667013168336,0.004463433105394739
+multi_label,positive_prototype,3,3,balanced,10.0,0.1,No Finding,nll,0.7143534302711487,0.0003896217246535686
+multi_label,positive_prototype,3,3,balanced,10.0,0.1,No Finding,calibration_error,0.25312294960021975,0.004446601428236757
+multi_label,positive_prototype,3,3,balanced,10.0,0.1,Fracture,auroc,0.5713074088096619,0.015788163644554494
+multi_label,positive_prototype,3,3,balanced,10.0,0.1,Fracture,auprc,0.2142723649740219,0.006836482979800393
+multi_label,positive_prototype,3,3,balanced,10.0,0.1,Fracture,f1,0.31895069479942323,0.0008425406225350692
+multi_label,positive_prototype,3,3,balanced,10.0,0.1,Fracture,accuracy,0.18973333537578582,0.0005962873907480687
+multi_label,positive_prototype,3,3,balanced,10.0,0.1,Fracture,nll,0.7211917281150818,1.6119976727927676e-05
+multi_label,positive_prototype,3,3,balanced,10.0,0.1,Fracture,calibration_error,0.3322444796562195,0.0005788852080734918
+multi_label,positive_prototype,3,3,balanced,10.0,0.1,Cardiomegaly,auroc,0.5545820713043212,0.009633022258474608
+multi_label,positive_prototype,3,3,balanced,10.0,0.1,Cardiomegaly,auprc,0.35575435757637025,0.011499356481374541
+multi_label,positive_prototype,3,3,balanced,10.0,0.1,Cardiomegaly,f1,0.48849974274635316,0.004949313064876097
+multi_label,positive_prototype,3,3,balanced,10.0,0.1,Cardiomegaly,accuracy,0.323199999332428,0.004330767117120813
+multi_label,positive_prototype,3,3,balanced,10.0,0.1,Cardiomegaly,nll,0.7094058275222779,0.0003878072852091369
+multi_label,positive_prototype,3,3,balanced,10.0,0.1,Cardiomegaly,calibration_error,0.19871150255203246,0.004316777857901858
+multi_label,global_negative_centroid,3,3,balanced,10.0,0.5,No Finding,auroc,0.5223459720611572,0.007105992596243059
+multi_label,global_negative_centroid,3,3,balanced,10.0,0.5,No Finding,auprc,0.29134002327919006,0.009191795530011138
+multi_label,global_negative_centroid,3,3,balanced,10.0,0.5,No Finding,f1,0.419478577375412,0.006268177529066119
+multi_label,global_negative_centroid,3,3,balanced,10.0,0.5,No Finding,accuracy,0.30680000185966494,0.005805166729420663
+multi_label,global_negative_centroid,3,3,balanced,10.0,0.5,No Finding,nll,0.7009827852249145,0.00022042826994822886
+multi_label,global_negative_centroid,3,3,balanced,10.0,0.5,No Finding,calibration_error,0.23976720571517945,0.004487691527150213
+multi_label,global_negative_centroid,3,3,balanced,10.0,0.5,Fracture,auroc,0.5570441842079162,0.013156120460182904
+multi_label,global_negative_centroid,3,3,balanced,10.0,0.5,Fracture,auprc,0.2181726485490799,0.008245999993614238
+multi_label,global_negative_centroid,3,3,balanced,10.0,0.5,Fracture,f1,0.32309370636940005,0.0028360570513532115
+multi_label,global_negative_centroid,3,3,balanced,10.0,0.5,Fracture,accuracy,0.24966666400432586,0.008488557349463573
+multi_label,global_negative_centroid,3,3,balanced,10.0,0.5,Fracture,nll,0.7033016920089722,0.00024389281690633663
+multi_label,global_negative_centroid,3,3,balanced,10.0,0.5,Fracture,calibration_error,0.3188390851020813,0.0006092005720211853
+multi_label,global_negative_centroid,3,3,balanced,10.0,0.5,Cardiomegaly,auroc,0.5600184917449951,0.009454283507046444
+multi_label,global_negative_centroid,3,3,balanced,10.0,0.5,Cardiomegaly,auprc,0.36442060470581056,0.006929684368176462
+multi_label,global_negative_centroid,3,3,balanced,10.0,0.5,Cardiomegaly,f1,0.4898816704750061,0.007185328678258169
+multi_label,global_negative_centroid,3,3,balanced,10.0,0.5,Cardiomegaly,accuracy,0.3716666638851166,0.007524035844506294
+multi_label,global_negative_centroid,3,3,balanced,10.0,0.5,Cardiomegaly,nll,0.6980708241462708,0.00028869078518404243
+multi_label,global_negative_centroid,3,3,balanced,10.0,0.5,Cardiomegaly,calibration_error,0.18498492240905762,0.004267833777474288
+multi_label,random_residual,3,3,balanced,10.0,0.5,No Finding,auroc,0.5154665052890778,0.01286404077838961
+multi_label,random_residual,3,3,balanced,10.0,0.5,No Finding,auprc,0.2877272188663483,0.013879072450202286
+multi_label,random_residual,3,3,balanced,10.0,0.5,No Finding,f1,0.41312417984008787,0.005389811618606397
+multi_label,random_residual,3,3,balanced,10.0,0.5,No Finding,accuracy,0.3346000015735626,0.006448093814924627
+multi_label,random_residual,3,3,balanced,10.0,0.5,No Finding,nll,0.6994518637657166,0.00036216987530709744
+multi_label,random_residual,3,3,balanced,10.0,0.5,No Finding,calibration_error,0.23804382085800171,0.004500419912412096
+multi_label,random_residual,3,3,balanced,10.0,0.5,Fracture,auroc,0.5377095460891723,0.013777366521850886
+multi_label,random_residual,3,3,balanced,10.0,0.5,Fracture,auprc,0.2124381572008133,0.008740192253664219
+multi_label,random_residual,3,3,balanced,10.0,0.5,Fracture,f1,0.3172819077968597,0.004713254306139034
+multi_label,random_residual,3,3,balanced,10.0,0.5,Fracture,accuracy,0.2815999984741211,0.005804217146971878
+multi_label,random_residual,3,3,balanced,10.0,0.5,Fracture,nll,0.7013802766799927,0.00028700854088948094
+multi_label,random_residual,3,3,balanced,10.0,0.5,Fracture,calibration_error,0.31714227199554446,0.0005934417524204668
+multi_label,random_residual,3,3,balanced,10.0,0.5,Cardiomegaly,auroc,0.5474053621292114,0.008918369461884817
+multi_label,random_residual,3,3,balanced,10.0,0.5,Cardiomegaly,auprc,0.35953882336616516,0.011657793994548126
+multi_label,random_residual,3,3,balanced,10.0,0.5,Cardiomegaly,f1,0.4834586620330811,0.005768793769467922
+multi_label,random_residual,3,3,balanced,10.0,0.5,Cardiomegaly,accuracy,0.3914666652679443,0.005570753557851
+multi_label,random_residual,3,3,balanced,10.0,0.5,Cardiomegaly,nll,0.6970697641372681,0.00026240202416948804
+multi_label,random_residual,3,3,balanced,10.0,0.5,Cardiomegaly,calibration_error,0.18338990211486816,0.004288210879946412
+multi_label,metadata_matched_residual,3,3,balanced,10.0,0.5,No Finding,auroc,0.5133547961711884,0.009840628885088964
+multi_label,metadata_matched_residual,3,3,balanced,10.0,0.5,No Finding,auprc,0.28384789228439333,0.009090278627394215
+multi_label,metadata_matched_residual,3,3,balanced,10.0,0.5,No Finding,f1,0.4144013226032257,0.00623673646036294
+multi_label,metadata_matched_residual,3,3,balanced,10.0,0.5,No Finding,accuracy,0.33206666111946104,0.009659197843557536
+multi_label,metadata_matched_residual,3,3,balanced,10.0,0.5,No Finding,nll,0.7006021857261657,0.00032753705584873344
+multi_label,metadata_matched_residual,3,3,balanced,10.0,0.5,No Finding,calibration_error,0.23923124074935914,0.004518209039962488
+multi_label,metadata_matched_residual,3,3,balanced,10.0,0.5,Fracture,auroc,0.5433155655860901,0.014696857503517643
+multi_label,metadata_matched_residual,3,3,balanced,10.0,0.5,Fracture,auprc,0.21513883471488954,0.008991600981247131
+multi_label,metadata_matched_residual,3,3,balanced,10.0,0.5,Fracture,f1,0.31600667238235475,0.003612859976776785
+multi_label,metadata_matched_residual,3,3,balanced,10.0,0.5,Fracture,accuracy,0.28546667098999023,0.004463434329501271
+multi_label,metadata_matched_residual,3,3,balanced,10.0,0.5,Fracture,nll,0.7023750424385071,0.0003269723697766174
+multi_label,metadata_matched_residual,3,3,balanced,10.0,0.5,Fracture,calibration_error,0.3179988622665405,0.0006016549299927157
+multi_label,metadata_matched_residual,3,3,balanced,10.0,0.5,Cardiomegaly,auroc,0.5481708884239197,0.008507059085418406
+multi_label,metadata_matched_residual,3,3,balanced,10.0,0.5,Cardiomegaly,auprc,0.355647873878479,0.009264263076904393
+multi_label,metadata_matched_residual,3,3,balanced,10.0,0.5,Cardiomegaly,f1,0.4869320333003998,0.005991896973888226
+multi_label,metadata_matched_residual,3,3,balanced,10.0,0.5,Cardiomegaly,accuracy,0.39186667203903197,0.00651323604886743
+multi_label,metadata_matched_residual,3,3,balanced,10.0,0.5,Cardiomegaly,nll,0.6978264093399048,0.0003135717133818969
+multi_label,metadata_matched_residual,3,3,balanced,10.0,0.5,Cardiomegaly,calibration_error,0.1845384120941162,0.004280856807433889
+multi_label,full_embedding_matched_residual,3,3,balanced,10.0,0.5,No Finding,auroc,0.522077476978302,0.004637861536462636
+multi_label,full_embedding_matched_residual,3,3,balanced,10.0,0.5,No Finding,auprc,0.2921759247779846,0.011269615044717945
+multi_label,full_embedding_matched_residual,3,3,balanced,10.0,0.5,No Finding,f1,0.4183603048324585,0.0039461845938034154
+multi_label,full_embedding_matched_residual,3,3,balanced,10.0,0.5,No Finding,accuracy,0.2996666669845581,0.004955349919536593
+multi_label,full_embedding_matched_residual,3,3,balanced,10.0,0.5,No Finding,nll,0.7009958028793335,0.00021657811707850587
+multi_label,full_embedding_matched_residual,3,3,balanced,10.0,0.5,No Finding,calibration_error,0.23975803852081298,0.004473036598437171
+multi_label,full_embedding_matched_residual,3,3,balanced,10.0,0.5,Fracture,auroc,0.5484648227691651,0.01171271998600317
+multi_label,full_embedding_matched_residual,3,3,balanced,10.0,0.5,Fracture,auprc,0.2152118891477585,0.006786536611204663
+multi_label,full_embedding_matched_residual,3,3,balanced,10.0,0.5,Fracture,f1,0.32073407173156737,0.0027252063871753677
+multi_label,full_embedding_matched_residual,3,3,balanced,10.0,0.5,Fracture,accuracy,0.23726666569709778,0.00630432269703295
+multi_label,full_embedding_matched_residual,3,3,balanced,10.0,0.5,Fracture,nll,0.7034706115722656,0.0002230587051134066
+multi_label,full_embedding_matched_residual,3,3,balanced,10.0,0.5,Fracture,calibration_error,0.3188700318336487,0.0006059277758794279
+multi_label,full_embedding_matched_residual,3,3,balanced,10.0,0.5,Cardiomegaly,auroc,0.5542520046234131,0.010070019089018311
+multi_label,full_embedding_matched_residual,3,3,balanced,10.0,0.5,Cardiomegaly,auprc,0.3610151052474976,0.007287142792283302
+multi_label,full_embedding_matched_residual,3,3,balanced,10.0,0.5,Cardiomegaly,f1,0.48964760899543763,0.006661083497361401
+multi_label,full_embedding_matched_residual,3,3,balanced,10.0,0.5,Cardiomegaly,accuracy,0.36286666989326477,0.0071593024779460284
+multi_label,full_embedding_matched_residual,3,3,balanced,10.0,0.5,Cardiomegaly,nll,0.6982445359230042,0.00027564736402531826
+multi_label,full_embedding_matched_residual,3,3,balanced,10.0,0.5,Cardiomegaly,calibration_error,0.18503596782684326,0.004254521957641296
+multi_label,anatomy_matched_residual,3,3,balanced,10.0,0.5,No Finding,auroc,0.5227569460868835,0.0061284325270087436
+multi_label,anatomy_matched_residual,3,3,balanced,10.0,0.5,No Finding,auprc,0.29288779497146605,0.010959259833847518
+multi_label,anatomy_matched_residual,3,3,balanced,10.0,0.5,No Finding,f1,0.4183375895023346,0.005253509223158838
+multi_label,anatomy_matched_residual,3,3,balanced,10.0,0.5,No Finding,accuracy,0.30146666765213015,0.005904803272799302
+multi_label,anatomy_matched_residual,3,3,balanced,10.0,0.5,No Finding,nll,0.7012390613555908,0.0002326788732829001
+multi_label,anatomy_matched_residual,3,3,balanced,10.0,0.5,No Finding,calibration_error,0.24002454280853272,0.004483983768118407
+multi_label,anatomy_matched_residual,3,3,balanced,10.0,0.5,Fracture,auroc,0.5520406842231751,0.012271363151112855
+multi_label,anatomy_matched_residual,3,3,balanced,10.0,0.5,Fracture,auprc,0.21633442342281342,0.00659380927559006
+multi_label,anatomy_matched_residual,3,3,balanced,10.0,0.5,Fracture,f1,0.3215185940265656,0.0032993084945344814
+multi_label,anatomy_matched_residual,3,3,balanced,10.0,0.5,Fracture,accuracy,0.24026666283607484,0.007854223302070354
+multi_label,anatomy_matched_residual,3,3,balanced,10.0,0.5,Fracture,nll,0.7037437081336975,0.0002247862382887425
+multi_label,anatomy_matched_residual,3,3,balanced,10.0,0.5,Fracture,calibration_error,0.319131338596344,0.0006165241783151796
+multi_label,anatomy_matched_residual,3,3,balanced,10.0,0.5,Cardiomegaly,auroc,0.5568512201309204,0.0095908711178886
+multi_label,anatomy_matched_residual,3,3,balanced,10.0,0.5,Cardiomegaly,auprc,0.36258843541145325,0.006586764697881131
+multi_label,anatomy_matched_residual,3,3,balanced,10.0,0.5,Cardiomegaly,f1,0.4899842619895935,0.008180067830419541
+multi_label,anatomy_matched_residual,3,3,balanced,10.0,0.5,Cardiomegaly,accuracy,0.365666663646698,0.009240610584526784
+multi_label,anatomy_matched_residual,3,3,balanced,10.0,0.5,Cardiomegaly,nll,0.6983419299125672,0.0002811839739086925
+multi_label,anatomy_matched_residual,3,3,balanced,10.0,0.5,Cardiomegaly,calibration_error,0.18527144193649292,0.004246866750252477
+multi_label,shuffled_anatomy_match,3,3,balanced,10.0,0.5,No Finding,auroc,0.5220906138420105,0.0060923037128325945
+multi_label,shuffled_anatomy_match,3,3,balanced,10.0,0.5,No Finding,auprc,0.289191734790802,0.010651357118060891
+multi_label,shuffled_anatomy_match,3,3,balanced,10.0,0.5,No Finding,f1,0.4181081593036652,0.006334192615243543
+multi_label,shuffled_anatomy_match,3,3,balanced,10.0,0.5,No Finding,accuracy,0.3097333312034607,0.006804404706665854
+multi_label,shuffled_anatomy_match,3,3,balanced,10.0,0.5,No Finding,nll,0.7008917212486268,0.00029014450528703665
+multi_label,shuffled_anatomy_match,3,3,balanced,10.0,0.5,No Finding,calibration_error,0.23966689109802247,0.004472239974051009
+multi_label,shuffled_anatomy_match,3,3,balanced,10.0,0.5,Fracture,auroc,0.557172155380249,0.013256828660999047
+multi_label,shuffled_anatomy_match,3,3,balanced,10.0,0.5,Fracture,auprc,0.2189033031463623,0.009678335069901203
+multi_label,shuffled_anatomy_match,3,3,balanced,10.0,0.5,Fracture,f1,0.3229468584060669,0.005042526609140483
+multi_label,shuffled_anatomy_match,3,3,balanced,10.0,0.5,Fracture,accuracy,0.2533999979496002,0.005917959582868142
+multi_label,shuffled_anatomy_match,3,3,balanced,10.0,0.5,Fracture,nll,0.7031872391700744,0.0003182570944173597
+multi_label,shuffled_anatomy_match,3,3,balanced,10.0,0.5,Fracture,calibration_error,0.31875905990600584,0.0005781440607387546
+multi_label,shuffled_anatomy_match,3,3,balanced,10.0,0.5,Cardiomegaly,auroc,0.5593007206916809,0.01057954694550211
+multi_label,shuffled_anatomy_match,3,3,balanced,10.0,0.5,Cardiomegaly,auprc,0.3630427122116089,0.007403745593925986
+multi_label,shuffled_anatomy_match,3,3,balanced,10.0,0.5,Cardiomegaly,f1,0.49116719961166383,0.006817015660843823
+multi_label,shuffled_anatomy_match,3,3,balanced,10.0,0.5,Cardiomegaly,accuracy,0.3765333354473114,0.007801705797856905
+multi_label,shuffled_anatomy_match,3,3,balanced,10.0,0.5,Cardiomegaly,nll,0.6980144858360291,0.00031387321321826097
+multi_label,shuffled_anatomy_match,3,3,balanced,10.0,0.5,Cardiomegaly,calibration_error,0.1849203586578369,0.004277245895915306
+multi_label,positive_prototype,3,20,abundant_controls,10.0,0.1,No Finding,auroc,0.5406072616577149,0.006124416630709981
+multi_label,positive_prototype,3,20,abundant_controls,10.0,0.1,No Finding,auprc,0.3035355269908905,0.009664319482511527
+multi_label,positive_prototype,3,20,abundant_controls,10.0,0.1,No Finding,f1,0.42377463579177854,0.005551589383679622
+multi_label,positive_prototype,3,20,abundant_controls,10.0,0.1,No Finding,accuracy,0.26886667013168336,0.004463433105394739
+multi_label,positive_prototype,3,20,abundant_controls,10.0,0.1,No Finding,nll,0.7143534302711487,0.0003896217246535686
+multi_label,positive_prototype,3,20,abundant_controls,10.0,0.1,No Finding,calibration_error,0.25312294960021975,0.004446601428236757
+multi_label,positive_prototype,3,20,abundant_controls,10.0,0.1,Fracture,auroc,0.5713074088096619,0.015788163644554494
+multi_label,positive_prototype,3,20,abundant_controls,10.0,0.1,Fracture,auprc,0.2142723649740219,0.006836482979800393
+multi_label,positive_prototype,3,20,abundant_controls,10.0,0.1,Fracture,f1,0.31895069479942323,0.0008425406225350692
+multi_label,positive_prototype,3,20,abundant_controls,10.0,0.1,Fracture,accuracy,0.18973333537578582,0.0005962873907480687
+multi_label,positive_prototype,3,20,abundant_controls,10.0,0.1,Fracture,nll,0.7211917281150818,1.6119976727927676e-05
+multi_label,positive_prototype,3,20,abundant_controls,10.0,0.1,Fracture,calibration_error,0.3322444796562195,0.0005788852080734918
+multi_label,positive_prototype,3,20,abundant_controls,10.0,0.1,Cardiomegaly,auroc,0.5545820713043212,0.009633022258474608
+multi_label,positive_prototype,3,20,abundant_controls,10.0,0.1,Cardiomegaly,auprc,0.35575435757637025,0.011499356481374541
+multi_label,positive_prototype,3,20,abundant_controls,10.0,0.1,Cardiomegaly,f1,0.48849974274635316,0.004949313064876097
+multi_label,positive_prototype,3,20,abundant_controls,10.0,0.1,Cardiomegaly,accuracy,0.323199999332428,0.004330767117120813
+multi_label,positive_prototype,3,20,abundant_controls,10.0,0.1,Cardiomegaly,nll,0.7094058275222779,0.0003878072852091369
+multi_label,positive_prototype,3,20,abundant_controls,10.0,0.1,Cardiomegaly,calibration_error,0.19871150255203246,0.004316777857901858
+multi_label,global_negative_centroid,3,20,abundant_controls,10.0,0.5,No Finding,auroc,0.533871304988861,0.004523482505660654
+multi_label,global_negative_centroid,3,20,abundant_controls,10.0,0.5,No Finding,auprc,0.29768115282058716,0.007517314173540626
+multi_label,global_negative_centroid,3,20,abundant_controls,10.0,0.5,No Finding,f1,0.3957648754119873,0.0049284109822936755
+multi_label,global_negative_centroid,3,20,abundant_controls,10.0,0.5,No Finding,accuracy,0.45806666612625124,0.009878144787842704
+multi_label,global_negative_centroid,3,20,abundant_controls,10.0,0.5,No Finding,nll,0.6946991443634033,0.00016928038438787223
+multi_label,global_negative_centroid,3,20,abundant_controls,10.0,0.5,No Finding,calibration_error,0.233378803730011,0.004412473029699378
+multi_label,global_negative_centroid,3,20,abundant_controls,10.0,0.5,Fracture,auroc,0.5764716982841491,0.015484980007944411
+multi_label,global_negative_centroid,3,20,abundant_controls,10.0,0.5,Fracture,auprc,0.224823996424675,0.008345114871744738
+multi_label,global_negative_centroid,3,20,abundant_controls,10.0,0.5,Fracture,f1,0.3308818519115448,0.008892206018295786
+multi_label,global_negative_centroid,3,20,abundant_controls,10.0,0.5,Fracture,accuracy,0.4651333332061768,0.00517795002551206
+multi_label,global_negative_centroid,3,20,abundant_controls,10.0,0.5,Fracture,nll,0.6947545886039734,0.00020304158598325635
+multi_label,global_negative_centroid,3,20,abundant_controls,10.0,0.5,Fracture,calibration_error,0.31235758066177366,0.0006197061026629703
+multi_label,global_negative_centroid,3,20,abundant_controls,10.0,0.5,Cardiomegaly,auroc,0.5717655777931213,0.009483897568517332
+multi_label,global_negative_centroid,3,20,abundant_controls,10.0,0.5,Cardiomegaly,auprc,0.3721451282501221,0.011457324077097292
+multi_label,global_negative_centroid,3,20,abundant_controls,10.0,0.5,Cardiomegaly,f1,0.47021969556808474,0.011150672014663042
+multi_label,global_negative_centroid,3,20,abundant_controls,10.0,0.5,Cardiomegaly,accuracy,0.5076666593551635,0.009868571282658717
+multi_label,global_negative_centroid,3,20,abundant_controls,10.0,0.5,Cardiomegaly,nll,0.6931654691696167,0.0003121512273487435
+multi_label,global_negative_centroid,3,20,abundant_controls,10.0,0.5,Cardiomegaly,calibration_error,0.17869491577148439,0.004293181058746619
+multi_label,random_residual,3,20,abundant_controls,10.0,0.5,No Finding,auroc,0.5596445679664612,0.009465667044793522
+multi_label,random_residual,3,20,abundant_controls,10.0,0.5,No Finding,auprc,0.30952308177947996,0.00927462296053129
+multi_label,random_residual,3,20,abundant_controls,10.0,0.5,No Finding,f1,0.4201950550079346,0.010180324962738515
+multi_label,random_residual,3,20,abundant_controls,10.0,0.5,No Finding,accuracy,0.4486666738986969,0.013880441735498043
+multi_label,random_residual,3,20,abundant_controls,10.0,0.5,No Finding,nll,0.695346224308014,0.0003020866698015111
+multi_label,random_residual,3,20,abundant_controls,10.0,0.5,No Finding,calibration_error,0.2346414089202881,0.004542641323125266
+multi_label,random_residual,3,20,abundant_controls,10.0,0.5,Fracture,auroc,0.6788911938667297,0.012859988338858843
+multi_label,random_residual,3,20,abundant_controls,10.0,0.5,Fracture,auprc,0.30893046259880064,0.015084529700836515
+multi_label,random_residual,3,20,abundant_controls,10.0,0.5,Fracture,f1,0.37459973692893983,0.004486933780312571
+multi_label,random_residual,3,20,abundant_controls,10.0,0.5,Fracture,accuracy,0.4584000051021576,0.006742894220142407
+multi_label,random_residual,3,20,abundant_controls,10.0,0.5,Fracture,nll,0.6948734402656556,0.00020756028664891858
+multi_label,random_residual,3,20,abundant_controls,10.0,0.5,Fracture,calibration_error,0.3137304425239563,0.0005473968470145666
+multi_label,random_residual,3,20,abundant_controls,10.0,0.5,Cardiomegaly,auroc,0.4844396233558655,0.009019709130102936
+multi_label,random_residual,3,20,abundant_controls,10.0,0.5,Cardiomegaly,auprc,0.31401021480560304,0.00947797175223223
+multi_label,random_residual,3,20,abundant_controls,10.0,0.5,Cardiomegaly,f1,0.43103077411651614,0.005939789007273145
+multi_label,random_residual,3,20,abundant_controls,10.0,0.5,Cardiomegaly,accuracy,0.426800000667572,0.006176119200684288
+multi_label,random_residual,3,20,abundant_controls,10.0,0.5,Cardiomegaly,nll,0.6958903074264526,0.0002710324787411305
+multi_label,random_residual,3,20,abundant_controls,10.0,0.5,Cardiomegaly,calibration_error,0.18013839721679686,0.0042783618800397195
+multi_label,metadata_matched_residual,3,20,abundant_controls,10.0,0.5,No Finding,auroc,0.5343411564826965,0.0058388407521228
+multi_label,metadata_matched_residual,3,20,abundant_controls,10.0,0.5,No Finding,auprc,0.2976580798625946,0.007655281560296485
+multi_label,metadata_matched_residual,3,20,abundant_controls,10.0,0.5,No Finding,f1,0.39739119410514834,0.006255558216490912
+multi_label,metadata_matched_residual,3,20,abundant_controls,10.0,0.5,No Finding,accuracy,0.45393332839012146,0.007473664988795389
+multi_label,metadata_matched_residual,3,20,abundant_controls,10.0,0.5,No Finding,nll,0.6947519779205322,0.0001872358411360319
+multi_label,metadata_matched_residual,3,20,abundant_controls,10.0,0.5,No Finding,calibration_error,0.2334025263786316,0.004425940029660812
+multi_label,metadata_matched_residual,3,20,abundant_controls,10.0,0.5,Fracture,auroc,0.5374659538269043,0.01624878509300769
+multi_label,metadata_matched_residual,3,20,abundant_controls,10.0,0.5,Fracture,auprc,0.20628706216812134,0.010595382641577895
+multi_label,metadata_matched_residual,3,20,abundant_controls,10.0,0.5,Fracture,f1,0.31124561429023745,0.006965009603534341
+multi_label,metadata_matched_residual,3,20,abundant_controls,10.0,0.5,Fracture,accuracy,0.43546666502952575,0.012271462852660963
+multi_label,metadata_matched_residual,3,20,abundant_controls,10.0,0.5,Fracture,nll,0.6953559041023254,0.0002590492106098745
+multi_label,metadata_matched_residual,3,20,abundant_controls,10.0,0.5,Fracture,calibration_error,0.3123549818992615,0.0006029219120363585
+multi_label,metadata_matched_residual,3,20,abundant_controls,10.0,0.5,Cardiomegaly,auroc,0.5543988585472107,0.014708130266353054
+multi_label,metadata_matched_residual,3,20,abundant_controls,10.0,0.5,Cardiomegaly,auprc,0.3586972773075104,0.01352016200635585
+multi_label,metadata_matched_residual,3,20,abundant_controls,10.0,0.5,Cardiomegaly,f1,0.46138153672218324,0.01729188147518309
+multi_label,metadata_matched_residual,3,20,abundant_controls,10.0,0.5,Cardiomegaly,accuracy,0.49153333306312563,0.013631259506271526
+multi_label,metadata_matched_residual,3,20,abundant_controls,10.0,0.5,Cardiomegaly,nll,0.6935943961143494,0.00034336108345160623
+multi_label,metadata_matched_residual,3,20,abundant_controls,10.0,0.5,Cardiomegaly,calibration_error,0.17872833013534545,0.004309059725060217
+multi_label,full_embedding_matched_residual,3,20,abundant_controls,10.0,0.5,No Finding,auroc,0.5312025904655456,0.005147374878399313
+multi_label,full_embedding_matched_residual,3,20,abundant_controls,10.0,0.5,No Finding,auprc,0.29493064880371095,0.010427697814545101
+multi_label,full_embedding_matched_residual,3,20,abundant_controls,10.0,0.5,No Finding,f1,0.3951289117336273,0.007957134365501281
+multi_label,full_embedding_matched_residual,3,20,abundant_controls,10.0,0.5,No Finding,accuracy,0.4539333403110504,0.0055547762530334145
+multi_label,full_embedding_matched_residual,3,20,abundant_controls,10.0,0.5,No Finding,nll,0.6947198987007142,0.00013898347730159782
+multi_label,full_embedding_matched_residual,3,20,abundant_controls,10.0,0.5,No Finding,calibration_error,0.23330273628234863,0.0044007907656035085
+multi_label,full_embedding_matched_residual,3,20,abundant_controls,10.0,0.5,Fracture,auroc,0.5609004735946655,0.01622141272686814
+multi_label,full_embedding_matched_residual,3,20,abundant_controls,10.0,0.5,Fracture,auprc,0.21698318123817445,0.009776692556790962
+multi_label,full_embedding_matched_residual,3,20,abundant_controls,10.0,0.5,Fracture,f1,0.32554776072502134,0.009948910309321296
+multi_label,full_embedding_matched_residual,3,20,abundant_controls,10.0,0.5,Fracture,accuracy,0.4484666705131531,0.005444677700056044
+multi_label,full_embedding_matched_residual,3,20,abundant_controls,10.0,0.5,Fracture,nll,0.6950582385063171,0.00017094904842723533
+multi_label,full_embedding_matched_residual,3,20,abundant_controls,10.0,0.5,Fracture,calibration_error,0.3123395204544067,0.000619733898009679
+multi_label,full_embedding_matched_residual,3,20,abundant_controls,10.0,0.5,Cardiomegaly,auroc,0.5651618003845215,0.01067419319439122
+multi_label,full_embedding_matched_residual,3,20,abundant_controls,10.0,0.5,Cardiomegaly,auprc,0.36859729290008547,0.011860977387465417
+multi_label,full_embedding_matched_residual,3,20,abundant_controls,10.0,0.5,Cardiomegaly,f1,0.4675912201404572,0.006459149298550607
+multi_label,full_embedding_matched_residual,3,20,abundant_controls,10.0,0.5,Cardiomegaly,accuracy,0.49733333587646483,0.009809293621295973
+multi_label,full_embedding_matched_residual,3,20,abundant_controls,10.0,0.5,Cardiomegaly,nll,0.6934627532958985,0.0003087937936000118
+multi_label,full_embedding_matched_residual,3,20,abundant_controls,10.0,0.5,Cardiomegaly,calibration_error,0.1787405252456665,0.004297581398926651
+multi_label,anatomy_matched_residual,3,20,abundant_controls,10.0,0.5,No Finding,auroc,0.5318488717079163,0.0052067128520215545
+multi_label,anatomy_matched_residual,3,20,abundant_controls,10.0,0.5,No Finding,auprc,0.2968681871891022,0.008878855821289406
+multi_label,anatomy_matched_residual,3,20,abundant_controls,10.0,0.5,No Finding,f1,0.3943142890930176,0.005749922532982393
+multi_label,anatomy_matched_residual,3,20,abundant_controls,10.0,0.5,No Finding,accuracy,0.45673333406448363,0.005604561411780379
+multi_label,anatomy_matched_residual,3,20,abundant_controls,10.0,0.5,No Finding,nll,0.6947783350944519,0.00016378681480080863
+multi_label,anatomy_matched_residual,3,20,abundant_controls,10.0,0.5,No Finding,calibration_error,0.23342857360839844,0.004396454043428956
+multi_label,anatomy_matched_residual,3,20,abundant_controls,10.0,0.5,Fracture,auroc,0.569002342224121,0.016553780670434597
+multi_label,anatomy_matched_residual,3,20,abundant_controls,10.0,0.5,Fracture,auprc,0.221552711725235,0.009065783785013286
+multi_label,anatomy_matched_residual,3,20,abundant_controls,10.0,0.5,Fracture,f1,0.3271737813949585,0.01180428889791868
+multi_label,anatomy_matched_residual,3,20,abundant_controls,10.0,0.5,Fracture,accuracy,0.4580000042915344,0.007564537154030882
+multi_label,anatomy_matched_residual,3,20,abundant_controls,10.0,0.5,Fracture,nll,0.6949914932250977,0.00020785159057852573
+multi_label,anatomy_matched_residual,3,20,abundant_controls,10.0,0.5,Fracture,calibration_error,0.3124527931213379,0.0006183450511570506
+multi_label,anatomy_matched_residual,3,20,abundant_controls,10.0,0.5,Cardiomegaly,auroc,0.5692495346069336,0.010287174551274793
+multi_label,anatomy_matched_residual,3,20,abundant_controls,10.0,0.5,Cardiomegaly,auprc,0.37097777128219606,0.011395558494140373
+multi_label,anatomy_matched_residual,3,20,abundant_controls,10.0,0.5,Cardiomegaly,f1,0.46846150159835814,0.009450975977771508
+multi_label,anatomy_matched_residual,3,20,abundant_controls,10.0,0.5,Cardiomegaly,accuracy,0.5040000021457672,0.009588763388305074
+multi_label,anatomy_matched_residual,3,20,abundant_controls,10.0,0.5,Cardiomegaly,nll,0.6932951450347901,0.0003336055424207744
+multi_label,anatomy_matched_residual,3,20,abundant_controls,10.0,0.5,Cardiomegaly,calibration_error,0.17880760431289672,0.004288093250478755
+multi_label,shuffled_anatomy_match,3,20,abundant_controls,10.0,0.5,No Finding,auroc,0.5330634355545044,0.0037512399376004326
+multi_label,shuffled_anatomy_match,3,20,abundant_controls,10.0,0.5,No Finding,auprc,0.2970394968986511,0.008037347269875435
+multi_label,shuffled_anatomy_match,3,20,abundant_controls,10.0,0.5,No Finding,f1,0.39645588397979736,0.008301255208371097
+multi_label,shuffled_anatomy_match,3,20,abundant_controls,10.0,0.5,No Finding,accuracy,0.45760000348091123,0.011390554212704601
+multi_label,shuffled_anatomy_match,3,20,abundant_controls,10.0,0.5,No Finding,nll,0.6948118329048156,0.0001491585209981268
+multi_label,shuffled_anatomy_match,3,20,abundant_controls,10.0,0.5,No Finding,calibration_error,0.2334831953048706,0.004419032364451518
+multi_label,shuffled_anatomy_match,3,20,abundant_controls,10.0,0.5,Fracture,auroc,0.5757422685623169,0.01419304359363723
+multi_label,shuffled_anatomy_match,3,20,abundant_controls,10.0,0.5,Fracture,auprc,0.22471281588077546,0.007507441187430339
+multi_label,shuffled_anatomy_match,3,20,abundant_controls,10.0,0.5,Fracture,f1,0.32993297576904296,0.008487224561632218
+multi_label,shuffled_anatomy_match,3,20,abundant_controls,10.0,0.5,Fracture,accuracy,0.4598666727542877,0.004220323210585898
+multi_label,shuffled_anatomy_match,3,20,abundant_controls,10.0,0.5,Fracture,nll,0.6948663473129273,0.00018239971542070117
+multi_label,shuffled_anatomy_match,3,20,abundant_controls,10.0,0.5,Fracture,calibration_error,0.3124407410621643,0.0006246179190191838
+multi_label,shuffled_anatomy_match,3,20,abundant_controls,10.0,0.5,Cardiomegaly,auroc,0.5718083858489991,0.008325069949524783
+multi_label,shuffled_anatomy_match,3,20,abundant_controls,10.0,0.5,Cardiomegaly,auprc,0.37231373190879824,0.01099596626034104
+multi_label,shuffled_anatomy_match,3,20,abundant_controls,10.0,0.5,Cardiomegaly,f1,0.47046494483947754,0.009083942655472924
+multi_label,shuffled_anatomy_match,3,20,abundant_controls,10.0,0.5,Cardiomegaly,accuracy,0.5047333240509033,0.007715054553984448
+multi_label,shuffled_anatomy_match,3,20,abundant_controls,10.0,0.5,Cardiomegaly,nll,0.6932365775108338,0.00030795308162720545
+multi_label,shuffled_anatomy_match,3,20,abundant_controls,10.0,0.5,Cardiomegaly,calibration_error,0.17879457473754884,0.004295793287592312
+multi_label,positive_prototype,5,5,balanced,10.0,0.1,No Finding,auroc,0.5476437568664551,0.00673203640436363
+multi_label,positive_prototype,5,5,balanced,10.0,0.1,No Finding,auprc,0.31396942138671874,0.011998096510986267
+multi_label,positive_prototype,5,5,balanced,10.0,0.1,No Finding,f1,0.42377463579177854,0.005551589383679622
+multi_label,positive_prototype,5,5,balanced,10.0,0.1,No Finding,accuracy,0.26886667013168336,0.004463433105394739
+multi_label,positive_prototype,5,5,balanced,10.0,0.1,No Finding,nll,0.7146477818489074,0.00039639298433006003
+multi_label,positive_prototype,5,5,balanced,10.0,0.1,No Finding,calibration_error,0.2534179091453552,0.004449036207249473
+multi_label,positive_prototype,5,5,balanced,10.0,0.1,Fracture,auroc,0.580931544303894,0.01443058790494727
+multi_label,positive_prototype,5,5,balanced,10.0,0.1,Fracture,auprc,0.21612618565559388,0.005481103916100624
+multi_label,positive_prototype,5,5,balanced,10.0,0.1,Fracture,f1,0.31895069479942323,0.0008425406225350692
+multi_label,positive_prototype,5,5,balanced,10.0,0.1,Fracture,accuracy,0.18973333537578582,0.0005962873907480687
+multi_label,positive_prototype,5,5,balanced,10.0,0.1,Fracture,nll,0.7215412616729736,2.3104147357658476e-05
+multi_label,positive_prototype,5,5,balanced,10.0,0.1,Fracture,calibration_error,0.3325151801109314,0.0005749990027679738
+multi_label,positive_prototype,5,5,balanced,10.0,0.1,Cardiomegaly,auroc,0.5654186844825745,0.012157729625629327
+multi_label,positive_prototype,5,5,balanced,10.0,0.1,Cardiomegaly,auprc,0.3668928503990173,0.012396442711185186
+multi_label,positive_prototype,5,5,balanced,10.0,0.1,Cardiomegaly,f1,0.48849974274635316,0.004949313064876097
+multi_label,positive_prototype,5,5,balanced,10.0,0.1,Cardiomegaly,accuracy,0.323199999332428,0.004330767117120813
+multi_label,positive_prototype,5,5,balanced,10.0,0.1,Cardiomegaly,nll,0.7096247196197509,0.0003917719703537378
+multi_label,positive_prototype,5,5,balanced,10.0,0.1,Cardiomegaly,calibration_error,0.19901124238967896,0.004310831173631929
+multi_label,global_negative_centroid,5,5,balanced,10.0,0.5,No Finding,auroc,0.5327161312103271,0.011571878793344037
+multi_label,global_negative_centroid,5,5,balanced,10.0,0.5,No Finding,auprc,0.2966057062149048,0.00645893666877998
+multi_label,global_negative_centroid,5,5,balanced,10.0,0.5,No Finding,f1,0.4203659355640411,0.0029343407599122027
+multi_label,global_negative_centroid,5,5,balanced,10.0,0.5,No Finding,accuracy,0.33759999871253965,0.002975835692880664
+multi_label,global_negative_centroid,5,5,balanced,10.0,0.5,No Finding,nll,0.6993803977966309,0.00022886839345359373
+multi_label,global_negative_centroid,5,5,balanced,10.0,0.5,No Finding,calibration_error,0.23826777935028076,0.0045129097022941385
+multi_label,global_negative_centroid,5,5,balanced,10.0,0.5,Fracture,auroc,0.5730372190475463,0.010260387365007312
+multi_label,global_negative_centroid,5,5,balanced,10.0,0.5,Fracture,auprc,0.2257821798324585,0.008734057760692396
+multi_label,global_negative_centroid,5,5,balanced,10.0,0.5,Fracture,f1,0.33322531580924986,0.0041214116718341935
+multi_label,global_negative_centroid,5,5,balanced,10.0,0.5,Fracture,accuracy,0.3084666669368744,0.008221246818432233
+multi_label,global_negative_centroid,5,5,balanced,10.0,0.5,Fracture,nll,0.7009270429611206,0.0002309461191027827
+multi_label,global_negative_centroid,5,5,balanced,10.0,0.5,Fracture,calibration_error,0.31719944477081297,0.000553284439537605
+multi_label,global_negative_centroid,5,5,balanced,10.0,0.5,Cardiomegaly,auroc,0.5822761058807373,0.011656196167297014
+multi_label,global_negative_centroid,5,5,balanced,10.0,0.5,Cardiomegaly,auprc,0.3834771990776062,0.010077629513543934
+multi_label,global_negative_centroid,5,5,balanced,10.0,0.5,Cardiomegaly,f1,0.49395180940628053,0.009719780047603049
+multi_label,global_negative_centroid,5,5,balanced,10.0,0.5,Cardiomegaly,accuracy,0.4037333369255066,0.008622967903276584
+multi_label,global_negative_centroid,5,5,balanced,10.0,0.5,Cardiomegaly,nll,0.6965332150459289,0.0003636278346952545
+multi_label,global_negative_centroid,5,5,balanced,10.0,0.5,Cardiomegaly,calibration_error,0.1835099458694458,0.004225331329842374
+multi_label,random_residual,5,5,balanced,10.0,0.5,No Finding,auroc,0.5152640461921691,0.00930636078461315
+multi_label,random_residual,5,5,balanced,10.0,0.5,No Finding,auprc,0.28435884714126586,0.011224163744167053
+multi_label,random_residual,5,5,balanced,10.0,0.5,No Finding,f1,0.4085064589977264,0.00494285591352305
+multi_label,random_residual,5,5,balanced,10.0,0.5,No Finding,accuracy,0.36426666378974915,0.005604562563903585
+multi_label,random_residual,5,5,balanced,10.0,0.5,No Finding,nll,0.6980200171470642,0.00019487168487423772
+multi_label,random_residual,5,5,balanced,10.0,0.5,No Finding,calibration_error,0.2365379214286804,0.004512221977896414
+multi_label,random_residual,5,5,balanced,10.0,0.5,Fracture,auroc,0.5493798613548279,0.01839701101822675
+multi_label,random_residual,5,5,balanced,10.0,0.5,Fracture,auprc,0.21685974597930907,0.010361705417332332
+multi_label,random_residual,5,5,balanced,10.0,0.5,Fracture,f1,0.31907185912132263,0.0038414722856767634
+multi_label,random_residual,5,5,balanced,10.0,0.5,Fracture,accuracy,0.331333327293396,0.004288224656296341
+multi_label,random_residual,5,5,balanced,10.0,0.5,Fracture,nll,0.6991554021835327,0.00025636712777473715
+multi_label,random_residual,5,5,balanced,10.0,0.5,Fracture,calibration_error,0.3155336856842041,0.0005867770947220598
+multi_label,random_residual,5,5,balanced,10.0,0.5,Cardiomegaly,auroc,0.5668213605880738,0.013016508977054347
+multi_label,random_residual,5,5,balanced,10.0,0.5,Cardiomegaly,auprc,0.3731343150138855,0.014139430917664777
+multi_label,random_residual,5,5,balanced,10.0,0.5,Cardiomegaly,f1,0.4887730062007904,0.006942993666776768
+multi_label,random_residual,5,5,balanced,10.0,0.5,Cardiomegaly,accuracy,0.43140000104904175,0.010412058239631941
+multi_label,random_residual,5,5,balanced,10.0,0.5,Cardiomegaly,nll,0.6956206560134888,0.0003845330520958737
+multi_label,random_residual,5,5,balanced,10.0,0.5,Cardiomegaly,calibration_error,0.18191064596176149,0.004267195950082473
+multi_label,metadata_matched_residual,5,5,balanced,10.0,0.5,No Finding,auroc,0.5232789039611816,0.015276828260530895
+multi_label,metadata_matched_residual,5,5,balanced,10.0,0.5,No Finding,auprc,0.2876031219959259,0.015703118507538104
+multi_label,metadata_matched_residual,5,5,balanced,10.0,0.5,No Finding,f1,0.41297181248664855,0.005411888013874273
+multi_label,metadata_matched_residual,5,5,balanced,10.0,0.5,No Finding,accuracy,0.3441999971866608,0.008214489093487183
+multi_label,metadata_matched_residual,5,5,balanced,10.0,0.5,No Finding,nll,0.699254322052002,0.00031925312839792616
+multi_label,metadata_matched_residual,5,5,balanced,10.0,0.5,No Finding,calibration_error,0.23797165155410765,0.004520344241215773
+multi_label,metadata_matched_residual,5,5,balanced,10.0,0.5,Fracture,auroc,0.5451101064682007,0.010658749352340863
+multi_label,metadata_matched_residual,5,5,balanced,10.0,0.5,Fracture,auprc,0.21446213722229004,0.006074154797960945
+multi_label,metadata_matched_residual,5,5,balanced,10.0,0.5,Fracture,f1,0.32144766449928286,0.005526291869243523
+multi_label,metadata_matched_residual,5,5,balanced,10.0,0.5,Fracture,accuracy,0.31393333077430724,0.0029097539759539155
+multi_label,metadata_matched_residual,5,5,balanced,10.0,0.5,Fracture,nll,0.7008140087127686,0.00012005074622970534
+multi_label,metadata_matched_residual,5,5,balanced,10.0,0.5,Fracture,calibration_error,0.3168214440345764,0.0005680142878861793
+multi_label,metadata_matched_residual,5,5,balanced,10.0,0.5,Cardiomegaly,auroc,0.5637470006942749,0.010619147900943838
+multi_label,metadata_matched_residual,5,5,balanced,10.0,0.5,Cardiomegaly,auprc,0.3687578082084656,0.01177709120278811
+multi_label,metadata_matched_residual,5,5,balanced,10.0,0.5,Cardiomegaly,f1,0.489116770029068,0.008603211030556899
+multi_label,metadata_matched_residual,5,5,balanced,10.0,0.5,Cardiomegaly,accuracy,0.4092666685581207,0.009520148675180617
+multi_label,metadata_matched_residual,5,5,balanced,10.0,0.5,Cardiomegaly,nll,0.6966169476509094,0.000379274824951306
+multi_label,metadata_matched_residual,5,5,balanced,10.0,0.5,Cardiomegaly,calibration_error,0.18329641819000245,0.004240981798464262
+multi_label,full_embedding_matched_residual,5,5,balanced,10.0,0.5,No Finding,auroc,0.5292508482933045,0.011494720645780608
+multi_label,full_embedding_matched_residual,5,5,balanced,10.0,0.5,No Finding,auprc,0.2946052670478821,0.005971333383785771
+multi_label,full_embedding_matched_residual,5,5,balanced,10.0,0.5,No Finding,f1,0.41887646317481997,0.0039235301939292205
+multi_label,full_embedding_matched_residual,5,5,balanced,10.0,0.5,No Finding,accuracy,0.3244666695594788,0.004885357886360345
+multi_label,full_embedding_matched_residual,5,5,balanced,10.0,0.5,No Finding,nll,0.6994822144508361,0.00023192789361817118
+multi_label,full_embedding_matched_residual,5,5,balanced,10.0,0.5,No Finding,calibration_error,0.23828912973403932,0.004520582000787004
+multi_label,full_embedding_matched_residual,5,5,balanced,10.0,0.5,Fracture,auroc,0.5599380373954773,0.011779979994423834
+multi_label,full_embedding_matched_residual,5,5,balanced,10.0,0.5,Fracture,auprc,0.21964153349399568,0.007509711637650085
+multi_label,full_embedding_matched_residual,5,5,balanced,10.0,0.5,Fracture,f1,0.3269203782081604,0.0034604592093077967
+multi_label,full_embedding_matched_residual,5,5,balanced,10.0,0.5,Fracture,accuracy,0.27886666655540465,0.004958724882129483
+multi_label,full_embedding_matched_residual,5,5,balanced,10.0,0.5,Fracture,nll,0.7013322830200195,0.00027920475687681965
+multi_label,full_embedding_matched_residual,5,5,balanced,10.0,0.5,Fracture,calibration_error,0.3173235535621643,0.0005906291637974358
+multi_label,full_embedding_matched_residual,5,5,balanced,10.0,0.5,Cardiomegaly,auroc,0.5746630787849426,0.01443641139112896
+multi_label,full_embedding_matched_residual,5,5,balanced,10.0,0.5,Cardiomegaly,auprc,0.37813655138015745,0.010895527014070108
+multi_label,full_embedding_matched_residual,5,5,balanced,10.0,0.5,Cardiomegaly,f1,0.49198792576789857,0.008689645127923636
+multi_label,full_embedding_matched_residual,5,5,balanced,10.0,0.5,Cardiomegaly,accuracy,0.389466667175293,0.009864641614785718
+multi_label,full_embedding_matched_residual,5,5,balanced,10.0,0.5,Cardiomegaly,nll,0.6968592047691345,0.00040744214637455716
+multi_label,full_embedding_matched_residual,5,5,balanced,10.0,0.5,Cardiomegaly,calibration_error,0.1836351275444031,0.004224910205596841
+multi_label,anatomy_matched_residual,5,5,balanced,10.0,0.5,No Finding,auroc,0.5301974415779114,0.011965515317631676
+multi_label,anatomy_matched_residual,5,5,balanced,10.0,0.5,No Finding,auprc,0.29641465544700624,0.0061355619856287465
+multi_label,anatomy_matched_residual,5,5,balanced,10.0,0.5,No Finding,f1,0.4176460921764374,0.005072451938979308
+multi_label,anatomy_matched_residual,5,5,balanced,10.0,0.5,No Finding,accuracy,0.32699999809265134,0.005390321484068259
+multi_label,anatomy_matched_residual,5,5,balanced,10.0,0.5,No Finding,nll,0.6997363567352295,0.0002548403819243094
+multi_label,anatomy_matched_residual,5,5,balanced,10.0,0.5,No Finding,calibration_error,0.2385914921760559,0.004517091384673109
+multi_label,anatomy_matched_residual,5,5,balanced,10.0,0.5,Fracture,auroc,0.5653432011604309,0.010817077302407288
+multi_label,anatomy_matched_residual,5,5,balanced,10.0,0.5,Fracture,auprc,0.2222546875476837,0.007409188238665615
+multi_label,anatomy_matched_residual,5,5,balanced,10.0,0.5,Fracture,f1,0.3281315863132477,0.004185852627733899
+multi_label,anatomy_matched_residual,5,5,balanced,10.0,0.5,Fracture,accuracy,0.2899333298206329,0.006093718435096981
+multi_label,anatomy_matched_residual,5,5,balanced,10.0,0.5,Fracture,nll,0.7015320062637329,0.0002838183267839323
+multi_label,anatomy_matched_residual,5,5,balanced,10.0,0.5,Fracture,calibration_error,0.317582380771637,0.0005771029265539723
+multi_label,anatomy_matched_residual,5,5,balanced,10.0,0.5,Cardiomegaly,auroc,0.5783016085624695,0.013171661833908674
+multi_label,anatomy_matched_residual,5,5,balanced,10.0,0.5,Cardiomegaly,auprc,0.3815018117427826,0.009771368356846288
+multi_label,anatomy_matched_residual,5,5,balanced,10.0,0.5,Cardiomegaly,f1,0.4932157099246979,0.009379155697419136
+multi_label,anatomy_matched_residual,5,5,balanced,10.0,0.5,Cardiomegaly,accuracy,0.395333331823349,0.010834608460237819
+multi_label,anatomy_matched_residual,5,5,balanced,10.0,0.5,Cardiomegaly,nll,0.6968925356864929,0.0004176192675204403
+multi_label,anatomy_matched_residual,5,5,balanced,10.0,0.5,Cardiomegaly,calibration_error,0.1838825225830078,0.004224509317700259
+multi_label,shuffled_anatomy_match,5,5,balanced,10.0,0.5,No Finding,auroc,0.5326293110847473,0.010668827466553574
+multi_label,shuffled_anatomy_match,5,5,balanced,10.0,0.5,No Finding,auprc,0.2950059771537781,0.007115571956730816
+multi_label,shuffled_anatomy_match,5,5,balanced,10.0,0.5,No Finding,f1,0.4202584087848663,0.002726780108898447
+multi_label,shuffled_anatomy_match,5,5,balanced,10.0,0.5,No Finding,accuracy,0.33859999775886535,0.0035071450984240325
+multi_label,shuffled_anatomy_match,5,5,balanced,10.0,0.5,No Finding,nll,0.6994397282600403,0.00026085543469629317
+multi_label,shuffled_anatomy_match,5,5,balanced,10.0,0.5,No Finding,calibration_error,0.23833909034729003,0.0045234054113095735
+multi_label,shuffled_anatomy_match,5,5,balanced,10.0,0.5,Fracture,auroc,0.5734851241111756,0.00977386569475161
+multi_label,shuffled_anatomy_match,5,5,balanced,10.0,0.5,Fracture,auprc,0.22653894126415253,0.009123760252661001
+multi_label,shuffled_anatomy_match,5,5,balanced,10.0,0.5,Fracture,f1,0.3315614402294159,0.004932972119530434
+multi_label,shuffled_anatomy_match,5,5,balanced,10.0,0.5,Fracture,accuracy,0.30600000023841856,0.0062048317861706555
+multi_label,shuffled_anatomy_match,5,5,balanced,10.0,0.5,Fracture,nll,0.7009791254997253,0.00023943883706102422
+multi_label,shuffled_anatomy_match,5,5,balanced,10.0,0.5,Fracture,calibration_error,0.317256236076355,0.0005662550922793656
+multi_label,shuffled_anatomy_match,5,5,balanced,10.0,0.5,Cardiomegaly,auroc,0.5800629138946534,0.01316448246648059
+multi_label,shuffled_anatomy_match,5,5,balanced,10.0,0.5,Cardiomegaly,auprc,0.3810407638549805,0.010163522669536131
+multi_label,shuffled_anatomy_match,5,5,balanced,10.0,0.5,Cardiomegaly,f1,0.49264894127845765,0.010187794870718478
+multi_label,shuffled_anatomy_match,5,5,balanced,10.0,0.5,Cardiomegaly,accuracy,0.40233332514762876,0.011202679006726415
+multi_label,shuffled_anatomy_match,5,5,balanced,10.0,0.5,Cardiomegaly,nll,0.6965852499008178,0.00040238735550947194
+multi_label,shuffled_anatomy_match,5,5,balanced,10.0,0.5,Cardiomegaly,calibration_error,0.18355509042739868,0.004243752423477556
+multi_label,positive_prototype,5,20,abundant_controls,10.0,0.1,No Finding,auroc,0.5476437568664551,0.00673203640436363
+multi_label,positive_prototype,5,20,abundant_controls,10.0,0.1,No Finding,auprc,0.31396942138671874,0.011998096510986267
+multi_label,positive_prototype,5,20,abundant_controls,10.0,0.1,No Finding,f1,0.42377463579177854,0.005551589383679622
+multi_label,positive_prototype,5,20,abundant_controls,10.0,0.1,No Finding,accuracy,0.26886667013168336,0.004463433105394739
+multi_label,positive_prototype,5,20,abundant_controls,10.0,0.1,No Finding,nll,0.7146477818489074,0.00039639298433006003
+multi_label,positive_prototype,5,20,abundant_controls,10.0,0.1,No Finding,calibration_error,0.2534179091453552,0.004449036207249473
+multi_label,positive_prototype,5,20,abundant_controls,10.0,0.1,Fracture,auroc,0.580931544303894,0.01443058790494727
+multi_label,positive_prototype,5,20,abundant_controls,10.0,0.1,Fracture,auprc,0.21612618565559388,0.005481103916100624
+multi_label,positive_prototype,5,20,abundant_controls,10.0,0.1,Fracture,f1,0.31895069479942323,0.0008425406225350692
+multi_label,positive_prototype,5,20,abundant_controls,10.0,0.1,Fracture,accuracy,0.18973333537578582,0.0005962873907480687
+multi_label,positive_prototype,5,20,abundant_controls,10.0,0.1,Fracture,nll,0.7215412616729736,2.3104147357658476e-05
+multi_label,positive_prototype,5,20,abundant_controls,10.0,0.1,Fracture,calibration_error,0.3325151801109314,0.0005749990027679738
+multi_label,positive_prototype,5,20,abundant_controls,10.0,0.1,Cardiomegaly,auroc,0.5654186844825745,0.012157729625629327
+multi_label,positive_prototype,5,20,abundant_controls,10.0,0.1,Cardiomegaly,auprc,0.3668928503990173,0.012396442711185186
+multi_label,positive_prototype,5,20,abundant_controls,10.0,0.1,Cardiomegaly,f1,0.48849974274635316,0.004949313064876097
+multi_label,positive_prototype,5,20,abundant_controls,10.0,0.1,Cardiomegaly,accuracy,0.323199999332428,0.004330767117120813
+multi_label,positive_prototype,5,20,abundant_controls,10.0,0.1,Cardiomegaly,nll,0.7096247196197509,0.0003917719703537378
+multi_label,positive_prototype,5,20,abundant_controls,10.0,0.1,Cardiomegaly,calibration_error,0.19901124238967896,0.004310831173631929
+multi_label,global_negative_centroid,5,20,abundant_controls,10.0,0.5,No Finding,auroc,0.5433101892471314,0.007025837959389178
+multi_label,global_negative_centroid,5,20,abundant_controls,10.0,0.5,No Finding,auprc,0.30380983352661134,0.008155684791615004
+multi_label,global_negative_centroid,5,20,abundant_controls,10.0,0.5,No Finding,f1,0.40637835264205935,0.008004107316142142
+multi_label,global_negative_centroid,5,20,abundant_controls,10.0,0.5,No Finding,accuracy,0.44753333926200867,0.008275132100352115
+multi_label,global_negative_centroid,5,20,abundant_controls,10.0,0.5,No Finding,nll,0.6950361013412476,0.0001612282140687465
+multi_label,global_negative_centroid,5,20,abundant_controls,10.0,0.5,No Finding,calibration_error,0.23392280340194702,0.004411027185490676
+multi_label,global_negative_centroid,5,20,abundant_controls,10.0,0.5,Fracture,auroc,0.591315770149231,0.011348044535788677
+multi_label,global_negative_centroid,5,20,abundant_controls,10.0,0.5,Fracture,auprc,0.23214594423770904,0.00860487032627075
+multi_label,global_negative_centroid,5,20,abundant_controls,10.0,0.5,Fracture,f1,0.34040912985801697,0.007954296421277573
+multi_label,global_negative_centroid,5,20,abundant_controls,10.0,0.5,Fracture,accuracy,0.45926666259765625,0.0072663560254888375
+multi_label,global_negative_centroid,5,20,abundant_controls,10.0,0.5,Fracture,nll,0.695058012008667,0.00019659322649888037
+multi_label,global_negative_centroid,5,20,abundant_controls,10.0,0.5,Fracture,calibration_error,0.3128027319908142,0.0006478625734095447
+multi_label,global_negative_centroid,5,20,abundant_controls,10.0,0.5,Cardiomegaly,auroc,0.5922291040420532,0.013122052608528457
+multi_label,global_negative_centroid,5,20,abundant_controls,10.0,0.5,Cardiomegaly,auprc,0.39033570885658264,0.014172076808365712
+multi_label,global_negative_centroid,5,20,abundant_controls,10.0,0.5,Cardiomegaly,f1,0.4869005620479584,0.012242305155651409
+multi_label,global_negative_centroid,5,20,abundant_controls,10.0,0.5,Cardiomegaly,accuracy,0.5099333226680756,0.013294528483894067
+multi_label,global_negative_centroid,5,20,abundant_controls,10.0,0.5,Cardiomegaly,nll,0.6930342197418213,0.0004214071304260315
+multi_label,global_negative_centroid,5,20,abundant_controls,10.0,0.5,Cardiomegaly,calibration_error,0.1791396141052246,0.004257330531217146
+multi_label,random_residual,5,20,abundant_controls,10.0,0.5,No Finding,auroc,0.5027821719646454,0.00632459702647803
+multi_label,random_residual,5,20,abundant_controls,10.0,0.5,No Finding,auprc,0.27453737854957583,0.008160790379324663
+multi_label,random_residual,5,20,abundant_controls,10.0,0.5,No Finding,f1,0.39816264510154725,0.007565999530650282
+multi_label,random_residual,5,20,abundant_controls,10.0,0.5,No Finding,accuracy,0.38186666965484617,0.0087768628058742
+multi_label,random_residual,5,20,abundant_controls,10.0,0.5,No Finding,nll,0.6974376678466797,0.00024133718110070856
+multi_label,random_residual,5,20,abundant_controls,10.0,0.5,No Finding,calibration_error,0.23568836450576783,0.004514520179905542
+multi_label,random_residual,5,20,abundant_controls,10.0,0.5,Fracture,auroc,0.5807490587234497,0.013810505255967009
+multi_label,random_residual,5,20,abundant_controls,10.0,0.5,Fracture,auprc,0.23463267385959624,0.01044083452151114
+multi_label,random_residual,5,20,abundant_controls,10.0,0.5,Fracture,f1,0.33123048543930056,0.0045702069401364785
+multi_label,random_residual,5,20,abundant_controls,10.0,0.5,Fracture,accuracy,0.37519999146461486,0.006229861903869172
+multi_label,random_residual,5,20,abundant_controls,10.0,0.5,Fracture,nll,0.6976040363311767,0.00016478055538248155
+multi_label,random_residual,5,20,abundant_controls,10.0,0.5,Fracture,calibration_error,0.3146795392036438,0.0005701375707800041
+multi_label,random_residual,5,20,abundant_controls,10.0,0.5,Cardiomegaly,auroc,0.6171763181686402,0.011206729467525227
+multi_label,random_residual,5,20,abundant_controls,10.0,0.5,Cardiomegaly,auprc,0.41368680000305175,0.012206819076622733
+multi_label,random_residual,5,20,abundant_controls,10.0,0.5,Cardiomegaly,f1,0.5099077224731445,0.007530683105968081
+multi_label,random_residual,5,20,abundant_controls,10.0,0.5,Cardiomegaly,accuracy,0.4774666607379913,0.011996753806333688
+multi_label,random_residual,5,20,abundant_controls,10.0,0.5,Cardiomegaly,nll,0.6939618229866028,0.00037232287806377194
+multi_label,random_residual,5,20,abundant_controls,10.0,0.5,Cardiomegaly,calibration_error,0.181085205078125,0.004267597236776508
+multi_label,metadata_matched_residual,5,20,abundant_controls,10.0,0.5,No Finding,auroc,0.5418878555297851,0.0073604396607389495
+multi_label,metadata_matched_residual,5,20,abundant_controls,10.0,0.5,No Finding,auprc,0.3024339318275452,0.008819824287160594
+multi_label,metadata_matched_residual,5,20,abundant_controls,10.0,0.5,No Finding,f1,0.40722553730010985,0.006063332027589247
+multi_label,metadata_matched_residual,5,20,abundant_controls,10.0,0.5,No Finding,accuracy,0.4421333372592926,0.010874540002946135
+multi_label,metadata_matched_residual,5,20,abundant_controls,10.0,0.5,No Finding,nll,0.6951018452644349,0.00019334787352762568
+multi_label,metadata_matched_residual,5,20,abundant_controls,10.0,0.5,No Finding,calibration_error,0.23392210006713868,0.004419353088815481
+multi_label,metadata_matched_residual,5,20,abundant_controls,10.0,0.5,Fracture,auroc,0.5453885078430176,0.015031956987013208
+multi_label,metadata_matched_residual,5,20,abundant_controls,10.0,0.5,Fracture,auprc,0.20885997116565705,0.010372192130335228
+multi_label,metadata_matched_residual,5,20,abundant_controls,10.0,0.5,Fracture,f1,0.32123122811317445,0.009664450356307674
+multi_label,metadata_matched_residual,5,20,abundant_controls,10.0,0.5,Fracture,accuracy,0.4271333336830139,0.011896780340223198
+multi_label,metadata_matched_residual,5,20,abundant_controls,10.0,0.5,Fracture,nll,0.695833945274353,0.00023411644367275403
+multi_label,metadata_matched_residual,5,20,abundant_controls,10.0,0.5,Fracture,calibration_error,0.312829864025116,0.0006249456028788881
+multi_label,metadata_matched_residual,5,20,abundant_controls,10.0,0.5,Cardiomegaly,auroc,0.5727005124092102,0.019653088516043467
+multi_label,metadata_matched_residual,5,20,abundant_controls,10.0,0.5,Cardiomegaly,auprc,0.37290005683898925,0.017056608852924617
+multi_label,metadata_matched_residual,5,20,abundant_controls,10.0,0.5,Cardiomegaly,f1,0.47799019813537597,0.01597331760420364
+multi_label,metadata_matched_residual,5,20,abundant_controls,10.0,0.5,Cardiomegaly,accuracy,0.49106666445732117,0.018194021740690052
+multi_label,metadata_matched_residual,5,20,abundant_controls,10.0,0.5,Cardiomegaly,nll,0.6935995936393737,0.00044908837166370865
+multi_label,metadata_matched_residual,5,20,abundant_controls,10.0,0.5,Cardiomegaly,calibration_error,0.17921003103256225,0.0042694381513644075
+multi_label,full_embedding_matched_residual,5,20,abundant_controls,10.0,0.5,No Finding,auroc,0.5390543341636658,0.008785497386359994
+multi_label,full_embedding_matched_residual,5,20,abundant_controls,10.0,0.5,No Finding,auprc,0.299543958902359,0.011045278401957835
+multi_label,full_embedding_matched_residual,5,20,abundant_controls,10.0,0.5,No Finding,f1,0.4050628006458282,0.011153612226006778
+multi_label,full_embedding_matched_residual,5,20,abundant_controls,10.0,0.5,No Finding,accuracy,0.4393999993801117,0.004238711117286667
+multi_label,full_embedding_matched_residual,5,20,abundant_controls,10.0,0.5,No Finding,nll,0.6950675964355468,0.0001639705599445235
+multi_label,full_embedding_matched_residual,5,20,abundant_controls,10.0,0.5,No Finding,calibration_error,0.2338130831718445,0.004404085974146894
+multi_label,full_embedding_matched_residual,5,20,abundant_controls,10.0,0.5,Fracture,auroc,0.5732992172241211,0.012689342916729752
+multi_label,full_embedding_matched_residual,5,20,abundant_controls,10.0,0.5,Fracture,auprc,0.22308683395385742,0.009204561839809654
+multi_label,full_embedding_matched_residual,5,20,abundant_controls,10.0,0.5,Fracture,f1,0.3340543270111084,0.005032352926414588
+multi_label,full_embedding_matched_residual,5,20,abundant_controls,10.0,0.5,Fracture,accuracy,0.44000000357627866,0.00439064458630652
+multi_label,full_embedding_matched_residual,5,20,abundant_controls,10.0,0.5,Fracture,nll,0.6954459547996521,0.00017880421850511983
+multi_label,full_embedding_matched_residual,5,20,abundant_controls,10.0,0.5,Fracture,calibration_error,0.312793505191803,0.0006463413826231191
+multi_label,full_embedding_matched_residual,5,20,abundant_controls,10.0,0.5,Cardiomegaly,auroc,0.5846635341644287,0.014162400162043889
+multi_label,full_embedding_matched_residual,5,20,abundant_controls,10.0,0.5,Cardiomegaly,auprc,0.3844137191772461,0.014102211015108033
+multi_label,full_embedding_matched_residual,5,20,abundant_controls,10.0,0.5,Cardiomegaly,f1,0.4837300777435303,0.011244269442972922
+multi_label,full_embedding_matched_residual,5,20,abundant_controls,10.0,0.5,Cardiomegaly,accuracy,0.49759999513626096,0.012912951403957807
+multi_label,full_embedding_matched_residual,5,20,abundant_controls,10.0,0.5,Cardiomegaly,nll,0.6934299111366272,0.00039050417922737433
+multi_label,full_embedding_matched_residual,5,20,abundant_controls,10.0,0.5,Cardiomegaly,calibration_error,0.17921231985092162,0.004266163412824721
+multi_label,anatomy_matched_residual,5,20,abundant_controls,10.0,0.5,No Finding,auroc,0.5397819519042969,0.008164431870002173
+multi_label,anatomy_matched_residual,5,20,abundant_controls,10.0,0.5,No Finding,auprc,0.3012945532798767,0.010263187981132309
+multi_label,anatomy_matched_residual,5,20,abundant_controls,10.0,0.5,No Finding,f1,0.4059930145740509,0.00944636787539043
+multi_label,anatomy_matched_residual,5,20,abundant_controls,10.0,0.5,No Finding,accuracy,0.44480000138282777,0.005635200022256559
+multi_label,anatomy_matched_residual,5,20,abundant_controls,10.0,0.5,No Finding,nll,0.6951481938362122,0.000172780189930308
+multi_label,anatomy_matched_residual,5,20,abundant_controls,10.0,0.5,No Finding,calibration_error,0.23397998809814452,0.004398034446777362
+multi_label,anatomy_matched_residual,5,20,abundant_controls,10.0,0.5,Fracture,auroc,0.5820388674736023,0.01184226009410126
+multi_label,anatomy_matched_residual,5,20,abundant_controls,10.0,0.5,Fracture,auprc,0.22794697880744935,0.008860101397322488
+multi_label,anatomy_matched_residual,5,20,abundant_controls,10.0,0.5,Fracture,f1,0.3372864782810211,0.0057657148777023794
+multi_label,anatomy_matched_residual,5,20,abundant_controls,10.0,0.5,Fracture,accuracy,0.4506666660308838,0.005011097383961722
+multi_label,anatomy_matched_residual,5,20,abundant_controls,10.0,0.5,Fracture,nll,0.695369029045105,0.00019813452511097219
+multi_label,anatomy_matched_residual,5,20,abundant_controls,10.0,0.5,Fracture,calibration_error,0.31293312311172483,0.0006458983431271107
+multi_label,anatomy_matched_residual,5,20,abundant_controls,10.0,0.5,Cardiomegaly,auroc,0.5891641020774842,0.013775921544210794
+multi_label,anatomy_matched_residual,5,20,abundant_controls,10.0,0.5,Cardiomegaly,auprc,0.3879391074180603,0.013660238360237283
+multi_label,anatomy_matched_residual,5,20,abundant_controls,10.0,0.5,Cardiomegaly,f1,0.4853581666946411,0.011418116021749681
+multi_label,anatomy_matched_residual,5,20,abundant_controls,10.0,0.5,Cardiomegaly,accuracy,0.5052666783332824,0.012789761259713409
+multi_label,anatomy_matched_residual,5,20,abundant_controls,10.0,0.5,Cardiomegaly,nll,0.6932100176811218,0.0004302387194970307
+multi_label,anatomy_matched_residual,5,20,abundant_controls,10.0,0.5,Cardiomegaly,calibration_error,0.17929335832595825,0.004254251175728784
+multi_label,shuffled_anatomy_match,5,20,abundant_controls,10.0,0.5,No Finding,auroc,0.5427074313163758,0.0069728938109376495
+multi_label,shuffled_anatomy_match,5,20,abundant_controls,10.0,0.5,No Finding,auprc,0.30280253291130066,0.007276303412918649
+multi_label,shuffled_anatomy_match,5,20,abundant_controls,10.0,0.5,No Finding,f1,0.40673574805259705,0.0076690903000214885
+multi_label,shuffled_anatomy_match,5,20,abundant_controls,10.0,0.5,No Finding,accuracy,0.445466673374176,0.004432203407173955
+multi_label,shuffled_anatomy_match,5,20,abundant_controls,10.0,0.5,No Finding,nll,0.6951632857322693,0.0001648835866643046
+multi_label,shuffled_anatomy_match,5,20,abundant_controls,10.0,0.5,No Finding,calibration_error,0.23404759168624878,0.004422040675251938
+multi_label,shuffled_anatomy_match,5,20,abundant_controls,10.0,0.5,Fracture,auroc,0.5910823702812195,0.011798871389435476
+multi_label,shuffled_anatomy_match,5,20,abundant_controls,10.0,0.5,Fracture,auprc,0.2323254942893982,0.008696307592908995
+multi_label,shuffled_anatomy_match,5,20,abundant_controls,10.0,0.5,Fracture,f1,0.3393319845199585,0.006726277831944832
+multi_label,shuffled_anatomy_match,5,20,abundant_controls,10.0,0.5,Fracture,accuracy,0.45559999346733093,0.007956129541557966
+multi_label,shuffled_anatomy_match,5,20,abundant_controls,10.0,0.5,Fracture,nll,0.6951830744743347,0.0001966912755043034
+multi_label,shuffled_anatomy_match,5,20,abundant_controls,10.0,0.5,Fracture,calibration_error,0.31289894580841066,0.0006537300302145441
+multi_label,shuffled_anatomy_match,5,20,abundant_controls,10.0,0.5,Cardiomegaly,auroc,0.591915762424469,0.01328500328900616
+multi_label,shuffled_anatomy_match,5,20,abundant_controls,10.0,0.5,Cardiomegaly,auprc,0.39025919437408446,0.014005076742644422
+multi_label,shuffled_anatomy_match,5,20,abundant_controls,10.0,0.5,Cardiomegaly,f1,0.4875262498855591,0.011520003939758825
+multi_label,shuffled_anatomy_match,5,20,abundant_controls,10.0,0.5,Cardiomegaly,accuracy,0.506933331489563,0.014174317166166014
+multi_label,shuffled_anatomy_match,5,20,abundant_controls,10.0,0.5,Cardiomegaly,nll,0.6931231856346131,0.00042601982479212
+multi_label,shuffled_anatomy_match,5,20,abundant_controls,10.0,0.5,Cardiomegaly,calibration_error,0.17925106287002562,0.004256340891055187
