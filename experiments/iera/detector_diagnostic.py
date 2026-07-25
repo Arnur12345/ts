@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import argparse
 import csv
+import gc
 import json
 import math
 import statistics
@@ -331,18 +332,6 @@ def main() -> None:
         raise ValueError(
             "Pneumothorax/Support Devices lacks the requested patients per stratum"
         )
-    cache_entries = []
-    for name, path in args.cache:
-        patches, metadata = load_patch_cache(
-            path, data.manifest_sha256, expected_model=None
-        )
-        for grid in args.grids:
-            if grid > int(metadata["pool_grid"]):
-                raise ValueError(
-                    f"cache {name!r} cannot supply retained grid {grid}; "
-                    f"source grid is {metadata['pool_grid']}"
-                )
-        cache_entries.append((name, patches, metadata))
     args.output_dir.mkdir(parents=True, exist_ok=True)
     episode_sets = {}
     max_shot = max(args.shots)
@@ -360,7 +349,20 @@ def main() -> None:
                 args.output_dir / f"episodes_{partition}_seed_{seed:03d}.pt",
             )
     rows = []
-    for cache_name, patches, metadata in cache_entries:
+    cache_metadata = []
+    # The 14x14 caches are about 50 GB each. Map and score only one backbone
+    # at a time so two private memory maps never coexist in the process.
+    for cache_name, cache_path in args.cache:
+        patches, metadata = load_patch_cache(
+            cache_path, data.manifest_sha256, expected_model=None
+        )
+        cache_metadata.append({"name": cache_name, **metadata})
+        for grid in args.grids:
+            if grid > int(metadata["pool_grid"]):
+                raise ValueError(
+                    f"cache {cache_name!r} cannot supply retained grid {grid}; "
+                    f"source grid is {metadata['pool_grid']}"
+                )
         for grid in args.grids:
             for partition in partitions:
                 for seed in args.seeds:
@@ -396,6 +398,10 @@ def main() -> None:
                         f"{partition}, seed {seed}",
                         flush=True,
                     )
+        del patches
+        gc.collect()
+        if device.type == "cuda":
+            torch.cuda.empty_cache()
     summary = _summaries(rows)
     paired = _paired_deltas(rows)
     decision = _decision(summary, args.primary_shot)
@@ -423,10 +429,7 @@ def main() -> None:
                     }
                     for partition, partition_counts in counts.items()
                 },
-                "caches": [
-                    {"name": name, **metadata}
-                    for name, _patches, metadata in cache_entries
-                ],
+                "caches": cache_metadata,
                 "classifier": (
                     "cos(q,p+) versus cos(q,p+)-cos(q,p-); no learned "
                     "projection, IERA, SMS loss, or calibration"
