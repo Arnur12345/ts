@@ -301,6 +301,11 @@ class IERATest(unittest.TestCase):
             (root / "patch_cache.json").write_text(json.dumps(metadata), encoding="utf-8")
             tokens, _ = load_patch_cache(root, "manifest", expected_pool_grid=2)
             self.assertEqual(tuple(tokens.shape), shape)
+            streamed, _ = load_patch_cache(
+                root, "manifest", expected_pool_grid=2, access_mode="stream"
+            )
+            self.assertEqual(tuple(streamed[torch.tensor([1, 0])].shape), shape)
+            streamed.close()
 
     def test_sms_is_independent_of_calibration_temperature(self) -> None:
         logits = torch.tensor([-1.0, -0.5, 0.5, 1.0])

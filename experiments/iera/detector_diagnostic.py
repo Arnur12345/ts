@@ -278,9 +278,29 @@ def _score_cache_worker(
 ) -> None:
     """Score one large mmap in an isolated process, then exit to unmap it."""
     device = torch.device(device_name)
-    patches, metadata = load_patch_cache(
-        cache_path, manifest_hash, expected_model=None
-    )
+    access_mode = "shared"
+    try:
+        patches, metadata = load_patch_cache(
+            cache_path,
+            manifest_hash,
+            expected_model=None,
+            access_mode=access_mode,
+        )
+    except RuntimeError as error:
+        if "unable to mmap" not in str(error):
+            raise
+        access_mode = "stream"
+        print(
+            f"shared mmap unavailable for {cache_name}; "
+            "falling back to bounded-memory disk streaming",
+            flush=True,
+        )
+        patches, metadata = load_patch_cache(
+            cache_path,
+            manifest_hash,
+            expected_model=None,
+            access_mode=access_mode,
+        )
     for grid in grids:
         if grid > int(metadata["pool_grid"]):
             raise ValueError(
@@ -328,7 +348,14 @@ def _score_cache_worker(
     temporary_path = checkpoint_path.with_suffix(".tmp")
     temporary_path.write_text(
         json.dumps(
-            {"metadata": {"name": cache_name, **metadata}, "rows": rows}
+            {
+                "metadata": {
+                    "name": cache_name,
+                    "diagnostic_access_mode": access_mode,
+                    **metadata,
+                },
+                "rows": rows,
+            }
         )
         + "\n",
         encoding="utf-8",

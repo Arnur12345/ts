@@ -8,11 +8,63 @@ import gzip
 import hashlib
 import json
 import math
+import os
 from pathlib import Path
 
 
 MODEL = "hf-hub:microsoft/BiomedCLIP-PubMedBERT_256-vit_base_patch16_224"
 RAD_DINO_MODEL = "microsoft/rad-dino"
+
+
+class StreamingPatchCache:
+    """Tensor-like row reader that never maps the complete token file."""
+
+    def __init__(self, path: Path, shape: tuple[int, int, int]) -> None:
+        import numpy as np
+
+        self.path = path
+        self.shape = shape
+        self._np = np
+        self._row_values = math.prod(shape[1:])
+        self._row_bytes = self._row_values * np.dtype(np.float16).itemsize
+        self._fd = os.open(path, os.O_RDONLY)
+
+    def __getitem__(self, indices):
+        import torch
+
+        index_tensor = torch.as_tensor(indices, dtype=torch.long).cpu()
+        flat = index_tensor.numpy().reshape(-1)
+        if len(flat) == 0:
+            return torch.empty(
+                (*index_tensor.shape, *self.shape[1:]), dtype=torch.float16
+            )
+        if flat.min() < 0 or flat.max() >= self.shape[0]:
+            raise IndexError("patch-cache row index is out of bounds")
+        unique, inverse = self._np.unique(flat, return_inverse=True)
+        rows = self._np.empty(
+            (len(unique), *self.shape[1:]), dtype=self._np.float16
+        )
+        for output_index, row_index in enumerate(unique):
+            raw = os.pread(
+                self._fd, self._row_bytes, int(row_index) * self._row_bytes
+            )
+            if len(raw) != self._row_bytes:
+                raise OSError(f"short read for patch-cache row {row_index}")
+            rows[output_index] = self._np.frombuffer(
+                raw, dtype=self._np.float16, count=self._row_values
+            ).reshape(self.shape[1:])
+        selected = rows[inverse].reshape(
+            *index_tensor.shape, *self.shape[1:]
+        )
+        return torch.from_numpy(selected)
+
+    def close(self) -> None:
+        if getattr(self, "_fd", None) is not None:
+            os.close(self._fd)
+            self._fd = None
+
+    def __del__(self) -> None:
+        self.close()
 
 
 def _open_csv(path: Path):
@@ -200,6 +252,7 @@ def load_patch_cache(
     manifest_hash: str,
     expected_model: str | None = MODEL,
     expected_pool_grid: int | None = None,
+    access_mode: str = "private",
 ):
     import torch
 
@@ -222,7 +275,16 @@ def load_patch_cache(
     expected_bytes = math.prod(shape) * torch.tensor([], dtype=torch.float16).element_size()
     if not token_path.is_file() or token_path.stat().st_size != expected_bytes:
         raise ValueError("patch cache file size does not match its metadata")
-    tokens = torch.from_file(str(token_path), shared=False, size=math.prod(shape), dtype=torch.float16)
+    if access_mode == "stream":
+        return StreamingPatchCache(token_path, shape), metadata
+    if access_mode not in {"private", "shared"}:
+        raise ValueError("access_mode must be private, shared, or stream")
+    tokens = torch.from_file(
+        str(token_path),
+        shared=access_mode == "shared",
+        size=math.prod(shape),
+        dtype=torch.float16,
+    )
     return tokens.reshape(shape), metadata
 
 
