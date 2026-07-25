@@ -10,9 +10,15 @@ from types import SimpleNamespace
 import torch
 import torch.nn as nn
 
+from experiments.iera.detector_diagnostic import _detector_logits, _pool
 from experiments.iera.episodes import generate_pair_episodes, validate_pair_episodes
 from experiments.iera.model import IERA, METHODS
-from experiments.iera.patch_cache import MODEL, extract_patch_tokens, load_patch_cache
+from experiments.iera.patch_cache import (
+    MODEL,
+    extract_patch_tokens,
+    extract_rad_dino_patch_tokens,
+    load_patch_cache,
+)
 from experiments.iera.run import (
     _checkpoint_key,
     _configure_optimizer,
@@ -63,10 +69,27 @@ class _Model(nn.Module):
         self.visual = _Visual()
 
 
+class _RadModel(nn.Module):
+    def forward(self, pixel_values):
+        batch = len(pixel_values)
+        # One CLS token plus a native 4x4 patch grid.
+        hidden = torch.arange(
+            batch * 17 * 8, dtype=torch.float32
+        ).reshape(batch, 17, 8)
+        return SimpleNamespace(last_hidden_state=hidden)
+
+
 class IERATest(unittest.TestCase):
     def test_patch_extraction_removes_prefix_and_pools(self) -> None:
         tokens = extract_patch_tokens(_Model(), torch.randn(2, 3, 224, 224), pool_grid=7)
         self.assertEqual(tuple(tokens.shape), (2, 49, 8))
+        self.assertTrue(torch.isfinite(tokens).all())
+
+    def test_rad_dino_patch_extraction_removes_cls_and_pools(self) -> None:
+        tokens = extract_rad_dino_patch_tokens(
+            _RadModel(), torch.randn(2, 3, 8, 8), pool_grid=2
+        )
+        self.assertEqual(tuple(tokens.shape), (2, 4, 8))
         self.assertTrue(torch.isfinite(tokens).all())
 
     def test_four_stratum_episodes_are_patient_disjoint(self) -> None:
@@ -118,6 +141,37 @@ class IERATest(unittest.TestCase):
             model.raw_gamma.fill_(20)
         after = model(positive, negative, query, "frozen_protonet")
         torch.testing.assert_close(before, after)
+
+    def test_binary_heads_use_negative_supports(self) -> None:
+        generator = torch.Generator().manual_seed(13)
+        positive = torch.randn(1, 2, 2, 4, 6, generator=generator)
+        negative = torch.randn(1, 2, 2, 4, 6, generator=generator)
+        changed_negative = -negative
+        query = torch.randn(1, 3, 4, 6, generator=generator)
+        model = IERA(6, 4)
+        for method in ("frozen_protonet", "learned_uniform"):
+            before = model(positive, negative, query, method)
+            after = model(positive, changed_negative, query, method)
+            self.assertFalse(torch.allclose(before, after))
+
+    def test_detector_binary_score_subtracts_negative_prototype(self) -> None:
+        positive = torch.tensor([[[[[1.0, 0.0]]]]])
+        negative = torch.tensor([[[[[0.0, 1.0]]]]])
+        query = torch.tensor([[[[1.0, 0.0]], [[0.0, 1.0]]]])
+        positive_only = _detector_logits(
+            positive, negative, query, "positive_only"
+        )
+        binary = _detector_logits(
+            positive, negative, query, "binary_protonet"
+        )
+        torch.testing.assert_close(positive_only, torch.tensor([[1.0, 0.0]]))
+        torch.testing.assert_close(binary, torch.tensor([[1.0, -1.0]]))
+
+    def test_detector_can_pool_native_tokens_to_factorial_grid(self) -> None:
+        tokens = torch.arange(16.0).reshape(1, 16, 1)
+        pooled = _pool(tokens, source_grid=4, retained_grid=2)
+        self.assertEqual(tuple(pooled.shape), (1, 4, 1))
+        torch.testing.assert_close(pooled.norm(dim=-1), torch.ones(1, 4))
 
     def test_anchor_weight_is_support_dependent_and_bounded(self) -> None:
         generator = torch.Generator().manual_seed(21)

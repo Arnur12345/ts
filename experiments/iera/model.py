@@ -159,14 +159,24 @@ class IERA(nn.Module):
         negative = self._adapt_support(self._project(negative_tokens))
         return self._anchored_prototype(positive, negative)[1]
 
-    def _local_logits(self, query: torch.Tensor, prototype: torch.Tensor) -> torch.Tensor:
+    def _local_score(self, query: torch.Tensor, prototype: torch.Tensor) -> torch.Tensor:
         patch_similarity = torch.einsum("bnpd,bd->bnp", query, prototype)
         tau_query = self._positive(self.raw_tau_query)
-        local_score = tau_query * (
+        return tau_query * (
             torch.logsumexp(patch_similarity / tau_query, dim=-1)
             - math.log(patch_similarity.shape[-1])
         )
-        return self._positive(self.raw_gamma) * local_score
+
+    def _binary_local_logits(
+        self,
+        query: torch.Tensor,
+        positive_prototype: torch.Tensor,
+        negative_prototype: torch.Tensor,
+    ) -> torch.Tensor:
+        return self._positive(self.raw_gamma) * (
+            self._local_score(query, positive_prototype)
+            - self._local_score(query, negative_prototype)
+        )
 
     def forward(self, positive_tokens: torch.Tensor, negative_tokens: torch.Tensor, query_tokens: torch.Tensor, method: str = "iera") -> torch.Tensor:
         if method not in METHODS:
@@ -175,25 +185,35 @@ class IERA(nn.Module):
             # A fair frozen-space ProtoNet baseline: it does not inherit the
             # projection or scale learned with an IERA objective.
             positive = F.normalize(positive_tokens.float(), dim=-1)
+            negative = F.normalize(negative_tokens.float(), dim=-1)
             query = F.normalize(query_tokens.float(), dim=-1)
-            prototype = F.normalize(positive.mean(dim=(1, 2, 3)), dim=-1)
+            positive_prototype = self._uniform_prototype(positive)
+            negative_prototype = self._uniform_prototype(negative)
             query_representation = F.normalize(query.mean(2), dim=-1)
-            return torch.einsum("bnd,bd->bn", query_representation, prototype)
+            return (
+                torch.einsum("bnd,bd->bn", query_representation, positive_prototype)
+                - torch.einsum("bnd,bd->bn", query_representation, negative_prototype)
+            )
 
         positive = self._project(positive_tokens)
         negative = self._project(negative_tokens)
         query = self._project(query_tokens)
         if method == "learned_uniform":
-            prototype = self._uniform_prototype(positive)
+            positive_prototype = self._uniform_prototype(positive)
+            negative_prototype = self._uniform_prototype(negative)
         elif method == "iera":
-            prototype = self._evidence_prototype(positive, negative)
+            positive_prototype = self._evidence_prototype(positive, negative)
+            negative_prototype = self._uniform_prototype(negative)
         else:
             # Only Anchored IERA may adapt support representations. Query tokens
             # always remain in the frozen learned-uniform projection space.
             positive = self._adapt_support(positive)
             negative = self._adapt_support(negative)
-            prototype, _ = self._anchored_prototype(positive, negative)
-        return self._local_logits(query, prototype)
+            positive_prototype, _ = self._anchored_prototype(positive, negative)
+            negative_prototype = self._uniform_prototype(negative)
+        return self._binary_local_logits(
+            query, positive_prototype, negative_prototype
+        )
 
     def swapped_logits(self, positive: torch.Tensor, negative: torch.Tensor, query: torch.Tensor, method: str) -> tuple[torch.Tensor, torch.Tensor]:
         """Score identical queries using d=0-only versus d=1-only support panels."""

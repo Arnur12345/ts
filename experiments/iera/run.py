@@ -879,7 +879,12 @@ def main() -> None:
                 "base_validation_constraint_feasible": base_validation_feasible,
                 "eligible_pairs": [item["pair"] for item in eligibility if item["eligible"]],
                 "elapsed_seconds": time.perf_counter() - started,
-                "readout_note": "Evidence weights only positive support patches; queries use support-independent prototype-to-patch local matching.",
+                "readout_note": (
+                    "Binary readout subtracts the negative-support prototype "
+                    "score from the positive-support prototype score. Evidence "
+                    "weights only positive support patches; queries use "
+                    "support-independent prototype-to-patch local matching."
+                ),
                 "sms_policy": "uncalibrated raw and within-method normalized logit shift; calibration is not used for SMS",
             },
             indent=2,

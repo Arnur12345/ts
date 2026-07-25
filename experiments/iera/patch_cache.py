@@ -1,4 +1,4 @@
-"""Build memory-mapped BioMedCLIP patch tokens aligned to a residual manifest."""
+"""Build memory-mapped CXR patch tokens aligned to a residual manifest."""
 
 from __future__ import annotations
 
@@ -12,6 +12,7 @@ from pathlib import Path
 
 
 MODEL = "hf-hub:microsoft/BiomedCLIP-PubMedBERT_256-vit_base_patch16_224"
+RAD_DINO_MODEL = "microsoft/rad-dino"
 
 
 def _open_csv(path: Path):
@@ -60,11 +61,24 @@ def extract_patch_tokens(model, images, pool_grid: int):
     return F.normalize(spatial.flatten(2).transpose(1, 2).float(), dim=-1)
 
 
+def extract_rad_dino_patch_tokens(model, images, pool_grid: int):
+    """Return normalized patch tokens from a Hugging Face RAD-DINO model."""
+    import torch.nn.functional as F
+
+    tokens = model(pixel_values=images).last_hidden_state[:, 1:]
+    side = math.isqrt(tokens.shape[1])
+    if side * side != tokens.shape[1]:
+        raise RuntimeError(f"RAD-DINO patch count {tokens.shape[1]} is not square")
+    spatial = tokens.transpose(1, 2).reshape(len(tokens), tokens.shape[2], side, side)
+    if pool_grid != side:
+        spatial = F.adaptive_avg_pool2d(spatial, (pool_grid, pool_grid))
+    return F.normalize(spatial.flatten(2).transpose(1, 2).float(), dim=-1)
+
+
 def build(args: argparse.Namespace) -> None:
     try:
         import numpy as np
         import torch
-        from open_clip import create_model_from_pretrained
         from PIL import Image
         from torch.utils.data import DataLoader, Dataset
     except ImportError as error:
@@ -94,7 +108,36 @@ def build(args: argparse.Namespace) -> None:
         print(f"resuming patch cache at row {offset:,}", flush=True)
 
     device = torch.device("cuda" if args.device == "auto" and torch.cuda.is_available() else args.device if args.device != "auto" else "cpu")
-    model, preprocess = create_model_from_pretrained(args.model)
+    if args.encoder == "biomedclip":
+        from open_clip import create_model_from_pretrained
+
+        model, preprocess = create_model_from_pretrained(args.model)
+
+        def prepare(image):
+            return preprocess(image)
+
+        extract = extract_patch_tokens
+        grid_size = getattr(
+            getattr(model.visual.trunk, "patch_embed", None), "grid_size", 14
+        )
+        native_grid = int(grid_size[0] if isinstance(grid_size, tuple) else grid_size)
+    else:
+        from transformers import AutoImageProcessor, AutoModel
+
+        processor = AutoImageProcessor.from_pretrained(args.model)
+        model = AutoModel.from_pretrained(args.model)
+
+        def prepare(image):
+            return processor(
+                images=image, return_tensors="pt"
+            ).pixel_values[0]
+
+        extract = extract_rad_dino_patch_tokens
+        crop_size = processor.crop_size
+        input_size = int(
+            crop_size["height"] if isinstance(crop_size, dict) else crop_size.height
+        )
+        native_grid = input_size // int(model.config.patch_size)
     model.to(device).eval().requires_grad_(False)
     start_offset = offset
 
@@ -105,7 +148,7 @@ def build(args: argparse.Namespace) -> None:
         def __getitem__(self, index):
             actual = start_offset + index
             with Image.open(data_root / rows[actual]["relative_path"]) as image:
-                return preprocess(image.convert("RGB")), actual
+                return prepare(image.convert("RGB")), actual
 
     loader = DataLoader(Images(), batch_size=args.batch_size, shuffle=False, num_workers=args.workers, pin_memory=device.type == "cuda")
     def write_progress(complete: bool) -> None:
@@ -117,8 +160,10 @@ def build(args: argparse.Namespace) -> None:
                     "shape": list(mmap.shape),
                     "dtype": "float16",
                     "pool_grid": args.pool_grid,
+                    "native_grid": native_grid,
                     "manifest_sha256": manifest_hash,
                     "model": args.model,
+                    "encoder": args.encoder,
                     "completed": offset,
                     "complete": complete,
                 },
@@ -132,7 +177,7 @@ def build(args: argparse.Namespace) -> None:
         for images, _ in loader:
             images = images.to(device, non_blocking=True)
             with torch.autocast(device_type="cuda", dtype=torch.float16, enabled=device.type == "cuda"):
-                tokens = extract_patch_tokens(model, images, args.pool_grid)
+                tokens = extract(model, images, args.pool_grid)
             if mmap is None:
                 shape = (len(rows), tokens.shape[1], tokens.shape[2])
                 mmap = np.memmap(token_path, dtype=np.float16, mode="w+", shape=shape)
@@ -153,7 +198,7 @@ def build(args: argparse.Namespace) -> None:
 def load_patch_cache(
     cache_dir: Path,
     manifest_hash: str,
-    expected_model: str = MODEL,
+    expected_model: str | None = MODEL,
     expected_pool_grid: int | None = None,
 ):
     import torch
@@ -165,7 +210,7 @@ def load_patch_cache(
         raise ValueError("patch cache is incomplete; rerun the cache command to resume it")
     if metadata.get("dtype") != "float16":
         raise ValueError(f"unsupported patch cache dtype {metadata.get('dtype')!r}")
-    if metadata.get("model") != expected_model:
+    if expected_model is not None and metadata.get("model") != expected_model:
         raise ValueError("patch cache was produced by a different visual encoder")
     pool_grid = int(metadata.get("pool_grid", 0))
     if pool_grid <= 0 or (expected_pool_grid is not None and pool_grid != expected_pool_grid):
@@ -186,12 +231,17 @@ def main() -> None:
     parser.add_argument("--data-root", type=Path, required=True)
     parser.add_argument("--manifest", type=Path, required=True)
     parser.add_argument("--output-dir", type=Path, default=Path("outputs/iera/patch_cache"))
-    parser.add_argument("--model", default=MODEL)
+    parser.add_argument(
+        "--encoder", choices=("biomedclip", "rad-dino"), default="biomedclip"
+    )
+    parser.add_argument("--model")
     parser.add_argument("--pool-grid", type=int, default=7)
     parser.add_argument("--batch-size", type=int, default=128)
     parser.add_argument("--workers", type=int, default=8)
     parser.add_argument("--device", default="auto")
     args = parser.parse_args()
+    if args.model is None:
+        args.model = MODEL if args.encoder == "biomedclip" else RAD_DINO_MODEL
     if args.pool_grid <= 0:
         parser.error("pool-grid must be positive")
     build(args)
