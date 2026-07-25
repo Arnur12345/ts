@@ -10,7 +10,11 @@ from types import SimpleNamespace
 import torch
 import torch.nn as nn
 
-from experiments.iera.detector_diagnostic import _detector_logits, _pool
+from experiments.iera.detector_diagnostic import (
+    _decision as _detector_decision,
+    _detector_logits,
+    _pool,
+)
 from experiments.iera.episodes import generate_pair_episodes, validate_pair_episodes
 from experiments.iera.model import IERA, METHODS
 from experiments.iera.patch_cache import (
@@ -172,6 +176,32 @@ class IERATest(unittest.TestCase):
         pooled = _pool(tokens, source_grid=4, retained_grid=2)
         self.assertEqual(tuple(pooled.shape), (1, 4, 1))
         torch.testing.assert_close(pooled.norm(dim=-1), torch.ones(1, 4))
+
+    def test_detector_decision_selects_on_validate_partition(self) -> None:
+        rows = []
+        for partition, mean, low, high in (
+            ("validate", 0.70, 0.65, 0.75),
+            ("test", 0.68, 0.60, 0.76),
+        ):
+            rows.append(
+                {
+                    "partition": partition,
+                    "cache": "biomedclip",
+                    "model": "model",
+                    "source_grid": 14,
+                    "retained_grid": 14,
+                    "head": "binary_protonet",
+                    "shot": 3,
+                    "metric": "auroc",
+                    "mean": mean,
+                    "ci95_low": low,
+                    "ci95_high": high,
+                }
+            )
+        decision = _detector_decision(rows, primary_shot=3)
+        self.assertEqual(
+            decision["status"], "credible_pneumothorax_detector"
+        )
 
     def test_anchor_weight_is_support_dependent_and_bounded(self) -> None:
         generator = torch.Generator().manual_seed(21)

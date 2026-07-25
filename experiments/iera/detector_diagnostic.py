@@ -224,7 +224,7 @@ def _paired_deltas(rows: list[dict]) -> list[dict]:
 def _decision(summary: list[dict], primary_shot: int) -> dict:
     candidates = [
         row for row in summary
-        if row["partition"] == "validation"
+        if row["partition"] == "validate"
         and row["head"] == "binary_protonet"
         and int(row["shot"]) == primary_shot
         and row["metric"] == "auroc"
