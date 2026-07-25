@@ -9,9 +9,9 @@ from __future__ import annotations
 
 import argparse
 import csv
-import gc
 import json
 import math
+import multiprocessing as mp
 import statistics
 import time
 from collections import defaultdict
@@ -265,6 +265,77 @@ def _decision(summary: list[dict], primary_shot: int) -> dict:
     }
 
 
+def _score_cache_worker(
+    cache_name: str,
+    cache_path: Path,
+    manifest_hash: str,
+    episode_sets: dict,
+    grids: list[int],
+    shots: list[int],
+    batch_size: int,
+    device_name: str,
+    checkpoint_path: Path,
+) -> None:
+    """Score one large mmap in an isolated process, then exit to unmap it."""
+    device = torch.device(device_name)
+    patches, metadata = load_patch_cache(
+        cache_path, manifest_hash, expected_model=None
+    )
+    for grid in grids:
+        if grid > int(metadata["pool_grid"]):
+            raise ValueError(
+                f"cache {cache_name!r} cannot supply retained grid {grid}; "
+                f"source grid is {metadata['pool_grid']}"
+            )
+    rows = []
+    partitions = sorted({partition for partition, _seed in episode_sets})
+    seeds = sorted({seed for _partition, seed in episode_sets})
+    for grid in grids:
+        for partition in partitions:
+            for seed in seeds:
+                generated = episode_sets[(partition, seed)]
+                targets = generated["targets"].flatten()
+                nuisance = generated["nuisance"].flatten()
+                logits_by_factor = _score_factorial(
+                    patches, metadata, generated, grid, shots,
+                    batch_size, device,
+                )
+                for shot in shots:
+                    for head in HEADS:
+                        logits = logits_by_factor[(shot, head)]
+                        for metric, value in _metrics(
+                            logits, targets, nuisance
+                        ).items():
+                            rows.append(
+                                {
+                                    "partition": partition,
+                                    "cache": cache_name,
+                                    "model": metadata["model"],
+                                    "source_grid": metadata["pool_grid"],
+                                    "retained_grid": grid,
+                                    "head": head,
+                                    "shot": shot,
+                                    "seed": seed,
+                                    "metric": metric,
+                                    "value": value,
+                                }
+                            )
+                print(
+                    f"finished {cache_name}, {grid}x{grid}, "
+                    f"{partition}, seed {seed}",
+                    flush=True,
+                )
+    temporary_path = checkpoint_path.with_suffix(".tmp")
+    temporary_path.write_text(
+        json.dumps(
+            {"metadata": {"name": cache_name, **metadata}, "rows": rows}
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+    temporary_path.replace(checkpoint_path)
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--embeddings", type=Path, required=True)
@@ -350,58 +421,43 @@ def main() -> None:
             )
     rows = []
     cache_metadata = []
-    # The 14x14 caches are about 50 GB each. Map and score only one backbone
-    # at a time so two private memory maps never coexist in the process.
+    # torch.from_file keeps a very large private mmap alive longer than the
+    # tensor's Python reference. Score each backbone in a spawned process so
+    # process exit guarantees unmapping before the next ~50 GB cache is opened.
+    context = mp.get_context("spawn")
     for cache_name, cache_path in args.cache:
-        patches, metadata = load_patch_cache(
-            cache_path, data.manifest_sha256, expected_model=None
+        safe_name = "".join(
+            character if character.isalnum() or character in "-_" else "_"
+            for character in cache_name
         )
-        cache_metadata.append({"name": cache_name, **metadata})
-        for grid in args.grids:
-            if grid > int(metadata["pool_grid"]):
-                raise ValueError(
-                    f"cache {cache_name!r} cannot supply retained grid {grid}; "
-                    f"source grid is {metadata['pool_grid']}"
+        checkpoint_path = args.output_dir / f"cache_rows_{safe_name}.json"
+        if not checkpoint_path.exists():
+            process = context.Process(
+                target=_score_cache_worker,
+                args=(
+                    cache_name,
+                    cache_path,
+                    data.manifest_sha256,
+                    episode_sets,
+                    list(args.grids),
+                    list(args.shots),
+                    args.episode_batch_size,
+                    str(device),
+                    checkpoint_path,
+                ),
+            )
+            process.start()
+            process.join()
+            if process.exitcode != 0:
+                raise RuntimeError(
+                    f"cache worker {cache_name!r} failed with exit code "
+                    f"{process.exitcode}"
                 )
-        for grid in args.grids:
-            for partition in partitions:
-                for seed in args.seeds:
-                    generated = episode_sets[(partition, seed)]
-                    targets = generated["targets"].flatten()
-                    nuisance = generated["nuisance"].flatten()
-                    logits_by_factor = _score_factorial(
-                        patches, metadata, generated, grid, args.shots,
-                        args.episode_batch_size, device,
-                    )
-                    for shot in args.shots:
-                        for head in HEADS:
-                            logits = logits_by_factor[(shot, head)]
-                            for metric, value in _metrics(
-                                logits, targets, nuisance
-                            ).items():
-                                rows.append(
-                                    {
-                                        "partition": partition,
-                                        "cache": cache_name,
-                                        "model": metadata["model"],
-                                        "source_grid": metadata["pool_grid"],
-                                        "retained_grid": grid,
-                                        "head": head,
-                                        "shot": shot,
-                                        "seed": seed,
-                                        "metric": metric,
-                                        "value": value,
-                                    }
-                                )
-                    print(
-                        f"finished {cache_name}, {grid}x{grid}, "
-                        f"{partition}, seed {seed}",
-                        flush=True,
-                    )
-        del patches
-        gc.collect()
-        if device.type == "cuda":
-            torch.cuda.empty_cache()
+        else:
+            print(f"reusing completed cache rows for {cache_name}", flush=True)
+        completed = json.loads(checkpoint_path.read_text(encoding="utf-8"))
+        cache_metadata.append(completed["metadata"])
+        rows.extend(completed["rows"])
     summary = _summaries(rows)
     paired = _paired_deltas(rows)
     decision = _decision(summary, args.primary_shot)
