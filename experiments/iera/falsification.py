@@ -917,10 +917,7 @@ def _model_rows(
 def _learned_worker(
     cache_path: Path,
     manifest_hash: str,
-    training_banks: dict,
-    training_pairs: dict,
-    episode_sets: dict,
-    pair_names: dict,
+    payload_path: Path,
     args,
     methods: tuple[str, ...],
     rhos: list[float],
@@ -928,6 +925,13 @@ def _learned_worker(
     device_name: str,
 ) -> None:
     device = torch.device(device_name)
+    payload = torch.load(
+        payload_path, map_location="cpu", weights_only=False
+    )
+    training_banks = payload["training_banks"]
+    training_pairs = payload["training_pairs"]
+    episode_sets = payload["episode_sets"]
+    pair_names = payload["pair_names"]
     try:
         patches, metadata = load_patch_cache(
             cache_path, manifest_hash, expected_model=RAD_DINO_MODEL,
@@ -1404,13 +1408,22 @@ def main() -> None:
             LEARNED_METHODS if args.stage == "learned"
             else CONSTRAINED_METHODS
         )
+        payload_path = stage_dir / "worker_payload.pt"
+        torch.save(
+            {
+                "training_banks": training_banks,
+                "training_pairs": training_pairs,
+                "episode_sets": episode_sets,
+                "pair_names": pair_names,
+            },
+            payload_path,
+        )
         context = mp.get_context("spawn")
         process = context.Process(
             target=_learned_worker,
             args=(
-                args.rad_cache, data.manifest_sha256, training_banks,
-                training_pairs, episode_sets, pair_names, args, methods,
-                list(args.rhos), stage_dir, str(device),
+                args.rad_cache, data.manifest_sha256, payload_path, args,
+                methods, list(args.rhos), stage_dir, str(device),
             ),
         )
         process.start()
