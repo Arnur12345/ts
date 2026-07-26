@@ -332,8 +332,11 @@ def project_direction(
     tokens: torch.Tensor, direction: torch.Tensor
 ) -> torch.Tensor:
     direction = F.normalize(direction.float(), dim=-1)
-    while direction.ndim < tokens.ndim:
-        direction = direction.unsqueeze(1)
+    if direction.ndim != 1 or direction.shape[0] != tokens.shape[-1]:
+        raise ValueError("direction width must match the token width")
+    direction = direction.reshape(
+        *((1,) * (tokens.ndim - 1)), tokens.shape[-1]
+    )
     return F.normalize(
         tokens.float()
         - torch.einsum("...d,...d->...", tokens.float(), direction)[..., None]

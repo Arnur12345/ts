@@ -37,7 +37,7 @@ from experiments.iera.robust_metrics import (
     normalized_sms as fixed_reference_sms,
     ranking_disagreement,
 )
-from experiments.iera.robust_model import RobustBinaryModel
+from experiments.iera.robust_model import RobustBinaryModel, project_direction
 from experiments.iera.robust_support import (
     balanced_choices,
     environment_choices,
@@ -128,6 +128,15 @@ class IERATest(unittest.TestCase):
         logits = model(positive, negative, query, "full_iera")
         self.assertEqual(tuple(logits.shape), (1, 4))
         self.assertTrue(torch.isfinite(logits).all())
+
+    def test_direction_projection_broadcasts_over_episode_tokens(self) -> None:
+        tokens = torch.randn(2, 2, 3, 4, 8)
+        direction = torch.randn(8)
+        projected = project_direction(tokens, direction)
+        self.assertEqual(projected.shape, tokens.shape)
+        normalized = torch.nn.functional.normalize(direction, dim=0)
+        residual = torch.einsum("...d,d->...", projected, normalized)
+        torch.testing.assert_close(residual, torch.zeros_like(residual))
 
     def test_robust_support_mask_ignores_padding(self) -> None:
         panels = torch.arange(2 * 4 * 2.0).reshape(1, 2, 4, 1, 2)
