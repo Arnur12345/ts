@@ -93,19 +93,106 @@ Outputs are `per_seed_metrics.csv`, `summary_metrics.csv`,
 `paired_head_deltas.csv`, `decision.json`, `experiment.json`, and the exact
 episode indices.
 
-## Later experiments
+## Experiments 2 and 3: falsification and SMS sweep
 
-Only if Experiment 1 establishes a credible detector:
+`falsification.py` uses the repaired positive-minus-negative detector for every
+method. RAD-DINO is retained at 14x14 and the query readout is frozen and
+localized. IERA's quadratic support-evidence proposal is explicitly pooled to
+4x4 by default, but its anchored prototype and the detector's query readout
+remain in the unprojected 14x14 RAD-DINO space. The text baseline is the only
+exception to the backbone: it must use
+BioMedCLIP because a BioMedCLIP text vector is not geometrically meaningful in
+RAD-DINO space. It still uses the exact same episode indices and seeds.
 
-1. run the cheap falsification baselines and component ablations from
-   `addition.md`, especially constrained adapter without IERA;
-2. sweep the SMS constraint to produce the AUROC-SMS Pareto frontier;
-3. report raw SMS, learned-uniform-reference-normalized SMS, ranking
-   instability, and threshold flip rate;
-4. run explicit-negative versus blank-as-negative sensitivity analysis and
-   external validation.
+All three commands below use one output root. The first command creates
+`episodes.pt`; later stages refuse to proceed if their episode arguments differ.
+Each learned run is checkpointed after a method/rho/seed combination, so
+rerunning the same command resumes completed work.
 
-The previous adaptive Anchored-IERA implementation remains in `run.py` for this
-later stage. It uses exact evaluated normalized SMS during training, adaptive
-dual ascent, a support-only residual adapter, frozen query projection, at least
-25 base-validation episodes per pair, and constrained checkpoint selection.
+### Build the fixed BioMedCLIP device direction
+
+```bash
+PYTHONPATH=. python3 -m experiments.iera.text_direction \
+  --output outputs/iera/biomedclip_device_text_direction.pt \
+  --device cuda
+```
+
+### 1. Cheap baselines
+
+This runs random binary ProtoNet, nuisance-balanced oracle sampling,
+mean-difference projection, and text-direction orthogonalization.
+
+```bash
+PYTHONPATH=. python3 -m experiments.iera.falsification \
+  --stage cheap \
+  --embeddings outputs/residuals/biomedclip_multilabel.pt \
+  --manifest outputs/residuals/multilabel_manifest.csv \
+  --raw-labels ~/data/mimic-cxr-jpg-2.1.0/mimic-cxr-2.0.0-chexpert.csv.gz \
+  --rad-cache outputs/iera/patch_cache_rad_dino_14x14 \
+  --biomed-cache outputs/iera/patch_cache_biomedclip_14x14 \
+  --text-direction outputs/iera/biomedclip_device_text_direction.pt \
+  --output-dir outputs/iera/falsification_v1 \
+  --retained-grid 14 \
+  --proposal-grid 4 \
+  --shots 1 3 5 10 \
+  --episodes 100 \
+  --seeds 0 1 2 3 4 5 6 7 8 9 \
+  --episode-batch-size 8 \
+  --device cuda
+```
+
+### 2. Learned ablations at rho=0.7
+
+This runs REx, constrained adapter only, bounded anchor only, and full Anchored
+IERA. REx has no SMS loss. The other three use adaptive dual ascent and select
+the highest worst-nuisance base-validation AUROC satisfying the SMS constraint.
+
+```bash
+PYTHONPATH=. python3 -m experiments.iera.falsification \
+  --stage learned \
+  --embeddings outputs/residuals/biomedclip_multilabel.pt \
+  --manifest outputs/residuals/multilabel_manifest.csv \
+  --raw-labels ~/data/mimic-cxr-jpg-2.1.0/mimic-cxr-2.0.0-chexpert.csv.gz \
+  --rad-cache outputs/iera/patch_cache_rad_dino_14x14 \
+  --output-dir outputs/iera/falsification_v1 \
+  --retained-grid 14 \
+  --proposal-grid 4 \
+  --shots 1 3 5 10 \
+  --rhos 0.7 \
+  --episodes 100 \
+  --seeds 0 1 2 3 4 5 6 7 8 9 \
+  --train-shot 3 \
+  --base-validation-episodes 25 \
+  --max-train-steps 300 \
+  --episode-batch-size 4 \
+  --device cuda
+```
+
+### 3. SMS-budget sweep
+
+```bash
+PYTHONPATH=. python3 -m experiments.iera.falsification \
+  --stage sweep \
+  --embeddings outputs/residuals/biomedclip_multilabel.pt \
+  --manifest outputs/residuals/multilabel_manifest.csv \
+  --raw-labels ~/data/mimic-cxr-jpg-2.1.0/mimic-cxr-2.0.0-chexpert.csv.gz \
+  --rad-cache outputs/iera/patch_cache_rad_dino_14x14 \
+  --output-dir outputs/iera/falsification_v1 \
+  --retained-grid 14 \
+  --proposal-grid 4 \
+  --shots 1 3 5 10 \
+  --rhos 0.9 0.8 0.7 0.5 0.3 \
+  --episodes 100 \
+  --seeds 0 1 2 3 4 5 6 7 8 9 \
+  --train-shot 3 \
+  --base-validation-episodes 25 \
+  --max-train-steps 300 \
+  --episode-batch-size 4 \
+  --device cuda
+```
+
+Each stage writes per-seed and summary metrics in its own subdirectory. Learned
+stages additionally write model checkpoints, training progress, `pareto.csv`,
+and `decision.json`. The primary decision retains IERA only when full IERA has
+a positive paired AUROC 95% interval versus adapter-only at no larger mean
+fixed-reference SMS; otherwise it selects the simpler constrained adapter.

@@ -33,6 +33,16 @@ from experiments.iera.run import (
     _objective,
     _update_lagrange,
 )
+from experiments.iera.robust_metrics import (
+    normalized_sms as fixed_reference_sms,
+    ranking_disagreement,
+)
+from experiments.iera.robust_model import RobustBinaryModel
+from experiments.iera.robust_support import (
+    balanced_choices,
+    environment_choices,
+    select_supports,
+)
 from experiments.residuals.data import ResidualDataset
 
 
@@ -84,6 +94,101 @@ class _RadModel(nn.Module):
 
 
 class IERATest(unittest.TestCase):
+    def test_robust_methods_share_binary_localized_detector(self) -> None:
+        generator = torch.Generator().manual_seed(101)
+        positive = torch.randn(2, 2, 3, 9, 8, generator=generator)
+        negative = torch.randn(2, 2, 3, 9, 8, generator=generator)
+        query = torch.randn(2, 4, 9, 8, generator=generator)
+        model = RobustBinaryModel(8, adapter_dim=4)
+        for method in (
+            "uniform", "rex", "adapter_only", "anchor_only", "full_iera"
+        ):
+            logits = model(positive, negative, query, method)
+            self.assertEqual(tuple(logits.shape), (2, 4))
+            self.assertTrue(torch.isfinite(logits).all())
+        changed = model(
+            positive, -negative, query, "full_iera"
+        )
+        self.assertFalse(
+            torch.allclose(
+                model(positive, negative, query, "full_iera"), changed
+            )
+        )
+
+    def test_iera_proposal_pooling_preserves_full_query_grid(self) -> None:
+        generator = torch.Generator().manual_seed(102)
+        positive = torch.randn(1, 2, 2, 196, 8, generator=generator)
+        negative = torch.randn(1, 2, 2, 196, 8, generator=generator)
+        query = torch.randn(1, 4, 196, 8, generator=generator)
+        model = RobustBinaryModel(8, adapter_dim=4, proposal_grid=4)
+        self.assertEqual(
+            tuple(model._proposal_tokens(positive).shape),
+            (1, 2, 2, 16, 8),
+        )
+        logits = model(positive, negative, query, "full_iera")
+        self.assertEqual(tuple(logits.shape), (1, 4))
+        self.assertTrue(torch.isfinite(logits).all())
+
+    def test_robust_support_mask_ignores_padding(self) -> None:
+        panels = torch.arange(2 * 4 * 2.0).reshape(1, 2, 4, 1, 2)
+        choices = torch.tensor([[0, 0, 1, 0]])
+        selected, mask = select_supports(panels, choices, 4)
+        model = RobustBinaryModel(2)
+        prototype = model._prototype(selected, mask)
+        valid = selected[mask].reshape(-1, 2).mean(0)
+        torch.testing.assert_close(
+            prototype,
+            torch.nn.functional.normalize(valid, dim=0).unsqueeze(0),
+        )
+        self.assertEqual(mask.sum(dim=2).tolist(), [[3, 1]])
+
+    def test_balanced_and_empirical_support_choices_are_deterministic(self) -> None:
+        empirical = environment_choices(1000, 6, 0.8, 7)
+        self.assertGreater(float(empirical.float().mean()), 0.75)
+        torch.testing.assert_close(
+            empirical, environment_choices(1000, 6, 0.8, 7)
+        )
+        balanced = balanced_choices(5, 6, 9)
+        self.assertTrue(balanced.sum(dim=1).eq(3).all())
+
+    def test_fixed_reference_sms_keeps_the_reference_denominator_fixed(self) -> None:
+        zero = torch.tensor([-1.0, 0.0, 1.0])
+        one = zero + 0.5
+        reference_zero = torch.tensor([-2.0, 0.0, 2.0])
+        reference_one = reference_zero + 1.0
+        base = fixed_reference_sms(
+            zero, one, reference_zero, reference_one
+        )
+        rescaled_method = fixed_reference_sms(
+            zero * 0.1, one * 0.1, reference_zero, reference_one
+        )
+        self.assertAlmostEqual(float(rescaled_method), float(base) * 0.1)
+        self.assertEqual(
+            ranking_disagreement(zero, torch.flip(zero, dims=(0,))), 1.0
+        )
+
+    def test_component_ablation_trainable_parameters_are_disjoint(self) -> None:
+        model = RobustBinaryModel(8, adapter_dim=4)
+        selected = {
+            id(parameter)
+            for parameter in model.configure_trainable("adapter_only")
+        }
+        adapter = {
+            name for name, parameter in model.named_parameters()
+            if id(parameter) in selected
+        }
+        selected = {
+            id(parameter)
+            for parameter in model.configure_trainable("anchor_only")
+        }
+        anchor = {
+            name for name, parameter in model.named_parameters()
+            if id(parameter) in selected
+        }
+        self.assertTrue(all(name.startswith("support_") for name in adapter))
+        self.assertTrue(all(not name.startswith("support_") for name in anchor))
+        self.assertFalse(adapter & anchor)
+
     def test_patch_extraction_removes_prefix_and_pools(self) -> None:
         tokens = extract_patch_tokens(_Model(), torch.randn(2, 3, 224, 224), pool_grid=7)
         self.assertEqual(tuple(tokens.shape), (2, 49, 8))

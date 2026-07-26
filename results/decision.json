@@ -1,0 +1,18 @@
+{
+  "status": "credible_pneumothorax_detector",
+  "rule": "Select on validation AUROC; require test AUROC 95% CI above 0.5.",
+  "primary_shot": 3,
+  "selected_configuration": {
+    "cache": "rad_dino",
+    "model": "microsoft/rad-dino",
+    "retained_grid": 4,
+    "validation_auroc": 0.563028758764267,
+    "test_auroc": 0.5685800015926361,
+    "test_auroc_ci95": [
+      0.5550659275808537,
+      0.5820940756044185
+    ]
+  },
+  "proceed_to_falsification_baselines": true,
+  "iera_or_sms_used": false
+}
