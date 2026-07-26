@@ -21,6 +21,15 @@ from experiments.iera.dual_head import (
     selected_local_prototypes,
     support_adapter,
 )
+from experiments.iera.evidence_field import (
+    evidence_field_grid,
+    evidence_field_score,
+    image_match,
+)
+from experiments.iera.evidence_field_diagnostic import (
+    _compact as _compact_evidence_supports,
+    _decision as _evidence_field_decision,
+)
 from experiments.iera.episodes import generate_pair_episodes, validate_pair_episodes
 from experiments.iera.model import IERA, METHODS
 from experiments.iera.patch_cache import (
@@ -100,6 +109,129 @@ class _RadModel(nn.Module):
 
 
 class IERATest(unittest.TestCase):
+    def test_image_match_is_log_mean_exp_per_support_image(self) -> None:
+        query = torch.nn.functional.normalize(
+            torch.tensor([[[[1.0, 0.0], [0.0, 1.0]]]]), dim=-1
+        )
+        support = torch.nn.functional.normalize(
+            torch.tensor([[[[[1.0, 0.0], [0.0, 1.0]]]]]), dim=-1
+        )
+        observed = image_match(query, support, tau=0.1)
+        similarity = torch.einsum(
+            "bqtd,bikpd->bqtikp", query, support
+        )
+        expected = 0.1 * (
+            torch.logsumexp(similarity / 0.1, dim=-1) - math.log(2)
+        )
+        torch.testing.assert_close(observed, expected)
+        self.assertEqual(tuple(observed.shape), (1, 1, 2, 1, 1))
+
+    def test_evidence_field_grid_matches_single_scores_and_chunks(self) -> None:
+        generator = torch.Generator().manual_seed(103)
+        positive = torch.randn(2, 2, 3, 4, 6, generator=generator)
+        negative = torch.randn(2, 2, 3, 4, 6, generator=generator)
+        query = torch.randn(2, 5, 4, 6, generator=generator)
+        mask = torch.tensor(
+            [
+                [[True, True, False], [True, False, False]],
+                [[True, False, False], [True, True, False]],
+            ]
+        )
+        grid = evidence_field_grid(
+            positive,
+            negative,
+            query,
+            mask,
+            mask,
+            (0.05, 0.1),
+            (0.1, 0.2),
+            pooling_modes=("image_balanced", "dense"),
+            query_chunk_size=2,
+        )
+        for mode in ("image_balanced", "dense"):
+            observed = grid[(mode, 0.1, 0.2)]
+            expected = evidence_field_score(
+                positive,
+                negative,
+                query,
+                mask,
+                mask,
+                0.1,
+                0.2,
+                image_balanced=mode == "image_balanced",
+                query_chunk_size=5,
+            )
+            torch.testing.assert_close(observed[0], expected[0])
+            torch.testing.assert_close(observed[1], expected[1])
+            self.assertEqual(tuple(observed[1].shape), (2, 5, 4))
+
+    def test_evidence_field_support_adapter_is_differentiable(self) -> None:
+        generator = torch.Generator().manual_seed(104)
+        positive = torch.randn(1, 1, 2, 4, 6, generator=generator)
+        negative = torch.randn(1, 1, 2, 4, 6, generator=generator)
+        query = torch.randn(1, 3, 4, 6, generator=generator)
+        mask = torch.ones(1, 1, 2, dtype=torch.bool)
+        model = RobustBinaryModel(6, adapter_dim=3)
+        with torch.no_grad():
+            model.support_up.weight.normal_()
+        logits, field = evidence_field_score(
+            positive,
+            negative,
+            query,
+            mask,
+            mask,
+            0.1,
+            0.1,
+            adapter=model,
+            query_chunk_size=1,
+        )
+        self.assertEqual(tuple(logits.shape), (1, 3))
+        self.assertEqual(tuple(field.shape), (1, 3, 4))
+        logits.sum().backward()
+        self.assertIsNotNone(model.support_up.weight.grad)
+
+    def test_evidence_support_compaction_removes_only_padding(self) -> None:
+        tokens = torch.arange(1 * 2 * 3 * 2 * 2.0).reshape(1, 2, 3, 2, 2)
+        mask = torch.tensor([[[True, False, True], [False, True, False]]])
+        compact, compact_mask = _compact_evidence_supports(tokens, mask)
+        self.assertEqual(tuple(compact.shape), (1, 1, 3, 2, 2))
+        self.assertTrue(compact_mask.all())
+        torch.testing.assert_close(
+            compact.flatten(0, 2),
+            tokens.flatten(1, 2)[0, mask.flatten()].reshape(3, 2, 2),
+        )
+
+    def test_evidence_field_gate_blocks_training_until_visual_review(self) -> None:
+        rows = []
+        for seed in range(5):
+            for method, auroc, sms, worst in (
+                ("current_adapter", 0.55, 1.0, 0.50),
+                ("evidence_field_frozen_adapter", 0.58, 1.1, 0.50),
+            ):
+                for metric, value in (
+                    ("auroc", auroc),
+                    ("sms_fixed_reference", sms),
+                    ("worst_nuisance_auroc", worst),
+                ):
+                    rows.append(
+                        {
+                            "partition": "test",
+                            "pair": "Pneumothorax__Support Devices",
+                            "method": method,
+                            "shot": 3,
+                            "seed": seed,
+                            "metric": metric,
+                            "value": value,
+                        }
+                    )
+        pending = _evidence_field_decision(rows, 3, 14, 37, "pending")
+        self.assertEqual(pending["status"], "await_evidence_map_review")
+        passed = _evidence_field_decision(rows, 3, 14, 37, "pass")
+        self.assertEqual(
+            passed["status"], "proceed_to_counterfactual_field_training"
+        )
+        self.assertFalse(passed["stage_two_training_started"])
+
     def test_dual_head_fusion_has_exact_endpoints(self) -> None:
         global_score = torch.tensor([[-1.0, 2.0]])
         local_score = torch.tensor([[3.0, 0.5]])

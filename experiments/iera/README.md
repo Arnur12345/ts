@@ -245,3 +245,69 @@ global/current-local fusion, and validation-selected global/selected-local
 fusion. Continue to constrained dual-head training only when `decision.json`
 reports `proceed_to_constrained_dual_head`; otherwise revise or stop without
 changing resolution or retraining the adapter.
+
+## Evidence-field scoring-only gate
+
+This is a separate prototype-free diagnostic. It reuses the identical saved
+episodes, fixed 14x14 Rad-DINO tokens, and the adapter-only checkpoints already
+selected on base validation. It compares the current constrained prototype
+head, a naive dense matcher with the frozen adapter, and image-balanced evidence
+fields with and without that adapter. All nine fixed
+`(tau_support, tau_query)` combinations are saved. Three-shot validation AUROC
+selects each field method, with candidates within 0.005 AUROC broken by lower
+fixed-reference SMS.
+
+```bash
+PYTHONPATH=. python3 -m experiments.iera.evidence_field_diagnostic \
+  --episodes outputs/iera/falsification_v1/episodes.pt \
+  --rad-cache outputs/iera/patch_cache_rad_dino_14x14 \
+  --adapter-dir outputs/iera/falsification_v1/learned \
+  --adapter-rho 0.7 \
+  --manifest outputs/residuals/multilabel_manifest.csv \
+  --data-root ~/data/mimic-cxr-jpg-2.1.0 \
+  --output-dir outputs/iera/evidence_field_pilot_v1 \
+  --retained-grid 14 \
+  --shots 1 3 5 10 \
+  --primary-shot 3 \
+  --seeds 0 1 2 3 4 \
+  --episodes-per-seed 100 \
+  --tau-supports 0.05 0.1 0.2 \
+  --tau-queries 0.05 0.1 0.2 \
+  --episode-batch-size 4 \
+  --query-chunk-size 1 \
+  --device cuda
+```
+
+The runner is resumable per seed and writes `candidate_metrics.csv`,
+`per_seed_metrics.csv`, `summary_metrics.csv`, `selection.json`, and
+`decision.json`. It also writes `evidence_maps.png` and `evidence_maps.pt`.
+Inspect the overlay before allowing stage-two training, then update the gate
+without recomputing scores:
+
+```bash
+PYTHONPATH=. python3 -m experiments.iera.evidence_field_diagnostic \
+  --episodes outputs/iera/falsification_v1/episodes.pt \
+  --rad-cache outputs/iera/patch_cache_rad_dino_14x14 \
+  --adapter-dir outputs/iera/falsification_v1/learned \
+  --adapter-rho 0.7 \
+  --manifest outputs/residuals/multilabel_manifest.csv \
+  --data-root ~/data/mimic-cxr-jpg-2.1.0 \
+  --output-dir outputs/iera/evidence_field_pilot_v1 \
+  --retained-grid 14 \
+  --shots 1 3 5 10 \
+  --primary-shot 3 \
+  --seeds 0 1 2 3 4 \
+  --episodes-per-seed 100 \
+  --tau-supports 0.05 0.1 0.2 \
+  --tau-queries 0.05 0.1 0.2 \
+  --episode-batch-size 4 \
+  --query-chunk-size 1 \
+  --visual-review pass \
+  --device cuda
+```
+
+Use `--visual-review fail` if the field primarily follows chest tubes. No
+counterfactual field training is implemented or started unless this scoring
+gate passes. If the 14x14 quantitative gate fails, build one native-resolution
+Rad-DINO cache and rerun this same diagnostic once with its native retained
+grid.
