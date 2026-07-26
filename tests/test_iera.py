@@ -15,6 +15,12 @@ from experiments.iera.detector_diagnostic import (
     _detector_logits,
     _pool,
 )
+from experiments.iera.dual_head import (
+    dual_scores,
+    fused_score,
+    selected_local_prototypes,
+    support_adapter,
+)
 from experiments.iera.episodes import generate_pair_episodes, validate_pair_episodes
 from experiments.iera.model import IERA, METHODS
 from experiments.iera.patch_cache import (
@@ -94,6 +100,51 @@ class _RadModel(nn.Module):
 
 
 class IERATest(unittest.TestCase):
+    def test_dual_head_fusion_has_exact_endpoints(self) -> None:
+        global_score = torch.tensor([[-1.0, 2.0]])
+        local_score = torch.tensor([[3.0, 0.5]])
+        torch.testing.assert_close(
+            fused_score(global_score, local_score, 0.0), global_score
+        )
+        torch.testing.assert_close(
+            fused_score(global_score, local_score, 1.0), local_score
+        )
+
+    def test_selected_local_prototypes_follow_binary_direction(self) -> None:
+        positive = torch.tensor(
+            [[[[[1.0, 0.0], [0.0, 1.0], [1.0, 0.0]]]]]
+        )
+        negative = torch.tensor(
+            [[[[[-1.0, 0.0], [0.0, 1.0], [-1.0, 0.0]]]]]
+        )
+        mask = torch.ones(1, 1, 1, dtype=torch.bool)
+        positive_local, negative_local = selected_local_prototypes(
+            positive, negative, mask, mask, temperature=0.05
+        )
+        self.assertGreater(float(positive_local[0, 0]), 0.99)
+        self.assertLess(float(negative_local[0, 0]), -0.99)
+
+    def test_dual_head_uses_frozen_support_adapter_and_binary_scores(self) -> None:
+        model = RobustBinaryModel(2, adapter_dim=1)
+        positive = torch.tensor([[[[[1.0, 0.0]]]]])
+        negative = torch.tensor([[[[[0.0, 1.0]]]]])
+        query = torch.tensor([[[[1.0, 0.0]], [[0.0, 1.0]]]])
+        mask = torch.ones(1, 1, 1, dtype=torch.bool)
+        adapted_positive = support_adapter(positive, model)
+        adapted_negative = support_adapter(negative, model)
+        scores = dual_scores(
+            adapted_positive,
+            adapted_negative,
+            query,
+            mask,
+            mask,
+            patch_temperature=0.1,
+        )
+        torch.testing.assert_close(
+            scores["global"], torch.tensor([[1.0, -1.0]])
+        )
+        self.assertTrue(torch.isfinite(scores["selected_local"]).all())
+
     def test_robust_methods_share_binary_localized_detector(self) -> None:
         generator = torch.Generator().manual_seed(101)
         positive = torch.randn(2, 2, 3, 9, 8, generator=generator)

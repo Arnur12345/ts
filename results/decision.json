@@ -1,0 +1,173 @@
+{
+  "primary_test": "adapter_only_vs_full_iera",
+  "primary_shot": 3,
+  "status": "prefer_simpler_constrained_adapter",
+  "rule": "retain IERA only if it has at least one clear paired AUROC improvement and has lower SMS at equal-or-better mean AUROC at every evaluated frontier point",
+  "consistent_full_frontier": false,
+  "pneumothorax_credible": true,
+  "pneumothorax_runs": [
+    {
+      "method": "adapter_only",
+      "rho": "0.3",
+      "mean_auroc": 0.5411550164222717,
+      "ci95_low": 0.5254933499436374,
+      "credible_above_chance": true
+    },
+    {
+      "method": "adapter_only",
+      "rho": "0.5",
+      "mean_auroc": 0.539442491531372,
+      "ci95_low": 0.5222282352852469,
+      "credible_above_chance": true
+    },
+    {
+      "method": "adapter_only",
+      "rho": "0.7",
+      "mean_auroc": 0.5354774951934814,
+      "ci95_low": 0.517926526554626,
+      "credible_above_chance": true
+    },
+    {
+      "method": "adapter_only",
+      "rho": "0.8",
+      "mean_auroc": 0.5321974873542785,
+      "ci95_low": 0.5130673180534235,
+      "credible_above_chance": true
+    },
+    {
+      "method": "adapter_only",
+      "rho": "0.9",
+      "mean_auroc": 0.5307825207710266,
+      "ci95_low": 0.5115592641851028,
+      "credible_above_chance": true
+    },
+    {
+      "method": "full_iera",
+      "rho": "0.3",
+      "mean_auroc": 0.5379024982452393,
+      "ci95_low": 0.5217584812145452,
+      "credible_above_chance": true
+    },
+    {
+      "method": "full_iera",
+      "rho": "0.5",
+      "mean_auroc": 0.5390549898147583,
+      "ci95_low": 0.5203469808287795,
+      "credible_above_chance": true
+    },
+    {
+      "method": "full_iera",
+      "rho": "0.7",
+      "mean_auroc": 0.5402399897575378,
+      "ci95_low": 0.5221831912683583,
+      "credible_above_chance": true
+    },
+    {
+      "method": "full_iera",
+      "rho": "0.8",
+      "mean_auroc": 0.5371399879455566,
+      "ci95_low": 0.5150456623411244,
+      "credible_above_chance": true
+    },
+    {
+      "method": "full_iera",
+      "rho": "0.9",
+      "mean_auroc": 0.5329549908638,
+      "ci95_low": 0.5131080291189842,
+      "credible_above_chance": true
+    }
+  ],
+  "comparisons": [
+    {
+      "pair": "Edema__Cardiomegaly",
+      "rho": "0.3",
+      "n_seeds": 5,
+      "full_minus_adapter_auroc": -0.0014699935913085938,
+      "auroc_delta_ci95_low": -0.007752746898143788,
+      "full_minus_adapter_sms": -0.0058460325002670285,
+      "clear_full_improvement": false
+    },
+    {
+      "pair": "Edema__Cardiomegaly",
+      "rho": "0.5",
+      "n_seeds": 5,
+      "full_minus_adapter_auroc": -0.009400010108947754,
+      "auroc_delta_ci95_low": -0.018636522414570488,
+      "full_minus_adapter_sms": -0.0011149287223815919,
+      "clear_full_improvement": false
+    },
+    {
+      "pair": "Edema__Cardiomegaly",
+      "rho": "0.7",
+      "n_seeds": 5,
+      "full_minus_adapter_auroc": 0.0017149925231933593,
+      "auroc_delta_ci95_low": -0.013229161156381583,
+      "full_minus_adapter_sms": -0.113860821723938,
+      "clear_full_improvement": false
+    },
+    {
+      "pair": "Edema__Cardiomegaly",
+      "rho": "0.8",
+      "n_seeds": 5,
+      "full_minus_adapter_auroc": -0.003580009937286377,
+      "auroc_delta_ci95_low": -0.011301150255000936,
+      "full_minus_adapter_sms": -0.04914552569389343,
+      "clear_full_improvement": false
+    },
+    {
+      "pair": "Edema__Cardiomegaly",
+      "rho": "0.9",
+      "n_seeds": 5,
+      "full_minus_adapter_auroc": -0.0021649956703186034,
+      "auroc_delta_ci95_low": -0.011272394710229805,
+      "full_minus_adapter_sms": -0.06354818344116211,
+      "clear_full_improvement": false
+    },
+    {
+      "pair": "Pneumothorax__Support Devices",
+      "rho": "0.3",
+      "n_seeds": 5,
+      "full_minus_adapter_auroc": -0.0032525181770324705,
+      "auroc_delta_ci95_low": -0.007881545330860842,
+      "full_minus_adapter_sms": -0.0068860679864883425,
+      "clear_full_improvement": false
+    },
+    {
+      "pair": "Pneumothorax__Support Devices",
+      "rho": "0.5",
+      "n_seeds": 5,
+      "full_minus_adapter_auroc": -0.0003875017166137695,
+      "auroc_delta_ci95_low": -0.003936753462073803,
+      "full_minus_adapter_sms": -0.008614283800125123,
+      "clear_full_improvement": false
+    },
+    {
+      "pair": "Pneumothorax__Support Devices",
+      "rho": "0.7",
+      "n_seeds": 5,
+      "full_minus_adapter_auroc": 0.004762494564056396,
+      "auroc_delta_ci95_low": -0.0011268095243311405,
+      "full_minus_adapter_sms": -0.11812981367111205,
+      "clear_full_improvement": false
+    },
+    {
+      "pair": "Pneumothorax__Support Devices",
+      "rho": "0.8",
+      "n_seeds": 5,
+      "full_minus_adapter_auroc": 0.004942500591278076,
+      "auroc_delta_ci95_low": -0.00029883180668278594,
+      "full_minus_adapter_sms": -0.041359704732894895,
+      "clear_full_improvement": false
+    },
+    {
+      "pair": "Pneumothorax__Support Devices",
+      "rho": "0.9",
+      "n_seeds": 5,
+      "full_minus_adapter_auroc": 0.0021724700927734375,
+      "auroc_delta_ci95_low": -0.0012276631697522465,
+      "full_minus_adapter_sms": -0.031179940700531004,
+      "clear_full_improvement": false
+    }
+  ],
+  "base_validation_all_feasible": true
+}

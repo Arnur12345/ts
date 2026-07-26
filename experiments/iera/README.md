@@ -211,3 +211,37 @@ stages additionally write model checkpoints, training progress, `pareto.csv`,
 and `decision.json`. The primary decision retains IERA only when full IERA has
 a positive paired AUROC 95% interval versus adapter-only at no larger mean
 fixed-reference SMS; otherwise it selects the simpler constrained adapter.
+
+## Dual-head scoring-only gate
+
+Before training a dual evidence head, isolate the scoring change. This pilot
+loads the already trained rho=0.7 adapter for each seed and freezes it. Query
+features, Rad-DINO, the 14x14 cache, support choices, and all validation/test
+episodes remain unchanged. Validation three-shot episodes choose lambda from
+`0, 0.25, 0.5, 0.75, 1` and support-patch temperature from
+`0.05, 0.1, 0.2`; test episodes are never used for selection.
+
+```bash
+PYTHONPATH=. python3 -m experiments.iera.dual_head_diagnostic \
+  --episodes outputs/iera/falsification_v1/episodes.pt \
+  --rad-cache outputs/iera/patch_cache_rad_dino_14x14 \
+  --adapter-dir outputs/iera/falsification_v1/learned \
+  --adapter-rho 0.7 \
+  --output-dir outputs/iera/dual_head_pilot_v1 \
+  --retained-grid 14 \
+  --shots 1 3 5 10 \
+  --primary-shot 3 \
+  --seeds 0 1 2 3 4 \
+  --episodes-per-seed 100 \
+  --lambdas 0 0.25 0.5 0.75 1 \
+  --patch-temperatures 0.05 0.1 0.2 \
+  --query-temperature 0.1 \
+  --episode-batch-size 4 \
+  --device cuda
+```
+
+The four reported variants are global, current local, validation-selected
+global/current-local fusion, and validation-selected global/selected-local
+fusion. Continue to constrained dual-head training only when `decision.json`
+reports `proceed_to_constrained_dual_head`; otherwise revise or stop without
+changing resolution or retraining the adapter.
