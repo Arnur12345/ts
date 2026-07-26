@@ -19,7 +19,12 @@ RAD_DINO_MODEL = "microsoft/rad-dino"
 class StreamingPatchCache:
     """Tensor-like row reader that never maps the complete token file."""
 
-    def __init__(self, path: Path, shape: tuple[int, int, int]) -> None:
+    def __init__(
+        self,
+        path: Path,
+        shape: tuple[int, int, int],
+        global_indices=None,
+    ) -> None:
         import numpy as np
 
         self.path = path
@@ -28,6 +33,14 @@ class StreamingPatchCache:
         self._row_values = math.prod(shape[1:])
         self._row_bytes = self._row_values * np.dtype(np.float16).itemsize
         self._fd = os.open(path, os.O_RDONLY)
+        self._global_to_local = (
+            None
+            if global_indices is None
+            else {
+                int(global_index): local_index
+                for local_index, global_index in enumerate(global_indices)
+            }
+        )
 
     def __getitem__(self, indices):
         import torch
@@ -38,9 +51,21 @@ class StreamingPatchCache:
             return torch.empty(
                 (*index_tensor.shape, *self.shape[1:]), dtype=torch.float16
             )
-        if flat.min() < 0 or flat.max() >= self.shape[0]:
-            raise IndexError("patch-cache row index is out of bounds")
-        unique, inverse = self._np.unique(flat, return_inverse=True)
+        if self._global_to_local is None:
+            if flat.min() < 0 or flat.max() >= self.shape[0]:
+                raise IndexError("patch-cache row index is out of bounds")
+            local = flat
+        else:
+            try:
+                local = self._np.asarray(
+                    [self._global_to_local[int(index)] for index in flat],
+                    dtype=self._np.int64,
+                )
+            except KeyError as error:
+                raise IndexError(
+                    f"global row {int(error.args[0])} is absent from sparse cache"
+                ) from error
+        unique, inverse = self._np.unique(local, return_inverse=True)
         rows = self._np.empty(
             (len(unique), *self.shape[1:]), dtype=self._np.float16
         )
@@ -73,6 +98,82 @@ def _open_csv(path: Path):
 
 def _sha256(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
+def episode_cache_indices(
+    episode_path: Path,
+    manifest_hash: str,
+    seeds: list[int] | None,
+    targets: list[str] | None,
+    episode_count: int | None,
+    shots: list[int],
+) -> tuple[list[int], dict]:
+    """Return exact global rows needed by a fixed scoring-only episode subset."""
+    import torch
+
+    saved = torch.load(episode_path, map_location="cpu", weights_only=False)
+    signature = saved["signature"]
+    if signature["manifest_sha256"] != manifest_hash:
+        raise ValueError("episodes and manifest hashes differ")
+    available_seeds = list(signature["seeds"])
+    selected_seeds = available_seeds if seeds is None else list(seeds)
+    if not set(selected_seeds).issubset(set(available_seeds)):
+        raise ValueError("requested cache seeds are absent from saved episodes")
+    if not shots or min(shots) <= 0:
+        raise ValueError("episode cache shots must be positive")
+    maximum_shot = max(shots)
+    selected_pairs = {
+        pair_id: names
+        for pair_id, names in saved["pairs"].items()
+        if targets is None or names[0] in targets
+    }
+    if not selected_pairs:
+        raise ValueError("no saved episode pair matches episode-targets")
+    limit = signature["episodes"] if episode_count is None else episode_count
+    if limit <= 0 or limit > signature["episodes"]:
+        raise ValueError("episode-count exceeds the saved episode bank")
+    required = set()
+    for pair_id in selected_pairs:
+        for seed in selected_seeds:
+            for partition in ("validate", "test"):
+                episodes = saved["episodes"][(pair_id, seed, partition)]
+                required.update(
+                    int(index)
+                    for index in episodes["query"][:limit].flatten().tolist()
+                )
+                for class_name in ("positive", "negative"):
+                    panels = episodes[class_name][:limit]
+                    if 2 * maximum_shot > panels.shape[2]:
+                        raise ValueError(
+                            "episode cache shot exceeds candidate panel size"
+                        )
+                    required.update(
+                        int(index)
+                        for index in panels[:, :, : 2 * maximum_shot]
+                        .flatten()
+                        .tolist()
+                    )
+                    choices = episodes[
+                        f"random_{class_name}_env"
+                    ][:limit, : 2 * maximum_shot]
+                    for batch in range(len(panels)):
+                        counts = [0, 0]
+                        for environment in choices[batch].tolist():
+                            source = counts[int(environment)]
+                            required.add(
+                                int(panels[batch, int(environment), source])
+                            )
+                            counts[int(environment)] += 1
+    protocol = {
+        "episode_path": str(episode_path),
+        "episode_seeds": selected_seeds,
+        "episode_targets": [names[0] for names in selected_pairs.values()],
+        "episode_pair_ids": sorted(selected_pairs),
+        "episode_count": limit,
+        "episode_shots": sorted(set(shots)),
+        "partitions": ["validate", "test"],
+    }
+    return sorted(required), protocol
 
 
 def extract_patch_tokens(model, images, pool_grid: int):
@@ -145,11 +246,38 @@ def build(args: argparse.Namespace) -> None:
     token_path = args.output_dir / "patch_tokens.float16.bin"
     metadata_path = args.output_dir / "patch_cache.json"
     manifest_hash = _sha256(args.manifest)
+    if args.episodes is None:
+        global_indices = list(range(len(rows)))
+        episode_protocol = None
+    else:
+        global_indices, episode_protocol = episode_cache_indices(
+            args.episodes,
+            manifest_hash,
+            args.episode_seeds,
+            args.episode_targets,
+            args.episode_count,
+            args.episode_shots,
+        )
+        print(
+            f"native episode subset contains {len(global_indices):,}/"
+            f"{len(rows):,} manifest images",
+            flush=True,
+        )
+    global_index_hash = hashlib.sha256(
+        np.asarray(global_indices, dtype="<i8").tobytes()
+    ).hexdigest()
+    global_index_path = args.output_dir / "global_indices.int64.bin"
     mmap = None
     offset = 0
     if metadata_path.exists() and token_path.exists():
         saved = json.loads(metadata_path.read_text(encoding="utf-8"))
-        expected = {"manifest_sha256": manifest_hash, "model": args.model, "pool_grid": args.pool_grid}
+        expected = {
+            "manifest_sha256": manifest_hash,
+            "model": args.model,
+            "pool_grid": args.pool_grid,
+        }
+        if episode_protocol is not None:
+            expected["global_indices_sha256"] = global_index_hash
         if any(saved.get(key) != value for key, value in expected.items()):
             raise ValueError("existing patch cache metadata does not match this command; choose a new output directory")
         if saved.get("complete") is True:
@@ -190,15 +318,26 @@ def build(args: argparse.Namespace) -> None:
             crop_size["height"] if isinstance(crop_size, dict) else crop_size.height
         )
         native_grid = input_size // int(model.config.patch_size)
+    if args.pool_grid > native_grid:
+        raise ValueError("pool-grid exceeds the encoder's native token grid")
     model.to(device).eval().requires_grad_(False)
     start_offset = offset
+    if episode_protocol is not None:
+        if global_index_path.exists():
+            observed_index_hash = hashlib.sha256(
+                global_index_path.read_bytes()
+            ).hexdigest()
+            if observed_index_hash != global_index_hash:
+                raise ValueError("existing sparse-cache global indices changed")
+        else:
+            np.asarray(global_indices, dtype="<i8").tofile(global_index_path)
 
     class Images(Dataset):
         def __len__(self):
-            return len(rows) - start_offset
+            return len(global_indices) - start_offset
 
         def __getitem__(self, index):
-            actual = start_offset + index
+            actual = global_indices[start_offset + index]
             with Image.open(data_root / rows[actual]["relative_path"]) as image:
                 return prepare(image.convert("RGB")), actual
 
@@ -216,6 +355,17 @@ def build(args: argparse.Namespace) -> None:
                     "manifest_sha256": manifest_hash,
                     "model": args.model,
                     "encoder": args.encoder,
+                    "index_mode": (
+                        "dense" if episode_protocol is None else "sparse"
+                    ),
+                    "dataset_size": len(rows),
+                    "global_indices": (
+                        None
+                        if episode_protocol is None
+                        else global_index_path.name
+                    ),
+                    "global_indices_sha256": global_index_hash,
+                    "episode_protocol": episode_protocol,
                     "completed": offset,
                     "complete": complete,
                 },
@@ -231,17 +381,23 @@ def build(args: argparse.Namespace) -> None:
             with torch.autocast(device_type="cuda", dtype=torch.float16, enabled=device.type == "cuda"):
                 tokens = extract(model, images, args.pool_grid)
             if mmap is None:
-                shape = (len(rows), tokens.shape[1], tokens.shape[2])
+                shape = (len(global_indices), tokens.shape[1], tokens.shape[2])
                 mmap = np.memmap(token_path, dtype=np.float16, mode="w+", shape=shape)
             elif tuple(mmap.shape[1:]) != tuple(tokens.shape[1:]):
                 raise ValueError("resumed patch cache shape differs from encoder output")
             end = offset + len(tokens)
             mmap[offset:end] = tokens.cpu().numpy().astype(np.float16, copy=False)
             offset = end
-            if offset % (args.batch_size * 20) == 0 or offset == len(rows):
+            if (
+                offset % (args.batch_size * 20) == 0
+                or offset == len(global_indices)
+            ):
                 mmap.flush()
                 write_progress(False)
-            print(f"cached patches {offset:,}/{len(rows):,}", flush=True)
+            print(
+                f"cached patches {offset:,}/{len(global_indices):,}",
+                flush=True,
+            )
     mmap.flush()
     write_progress(True)
     print(f"saved patch cache metadata to {metadata_path}")
@@ -275,6 +431,26 @@ def load_patch_cache(
     expected_bytes = math.prod(shape) * torch.tensor([], dtype=torch.float16).element_size()
     if not token_path.is_file() or token_path.stat().st_size != expected_bytes:
         raise ValueError("patch cache file size does not match its metadata")
+    if metadata.get("index_mode", "dense") == "sparse":
+        index_path = cache_dir / metadata["global_indices"]
+        import numpy as np
+
+        if (
+            not index_path.is_file()
+            or index_path.stat().st_size
+            != shape[0] * np.dtype(np.int64).itemsize
+        ):
+            raise ValueError("sparse patch-cache global index file is invalid")
+        global_indices = np.fromfile(index_path, dtype=np.int64)
+        if hashlib.sha256(index_path.read_bytes()).hexdigest() != metadata.get(
+            "global_indices_sha256"
+        ):
+            raise ValueError("sparse patch-cache global indices changed")
+        if access_mode != "stream":
+            raise ValueError("sparse patch caches require access_mode='stream'")
+        return StreamingPatchCache(
+            token_path, shape, global_indices=global_indices
+        ), metadata
     if access_mode == "stream":
         return StreamingPatchCache(token_path, shape), metadata
     if access_mode not in {"private", "shared"}:
@@ -300,6 +476,17 @@ def main() -> None:
     parser.add_argument("--pool-grid", type=int, default=7)
     parser.add_argument("--batch-size", type=int, default=128)
     parser.add_argument("--workers", type=int, default=8)
+    parser.add_argument(
+        "--episodes",
+        type=Path,
+        help="Build a sparse cache containing only rows used by saved episodes",
+    )
+    parser.add_argument("--episode-seeds", type=int, nargs="+")
+    parser.add_argument("--episode-targets", nargs="+")
+    parser.add_argument("--episode-count", type=int)
+    parser.add_argument(
+        "--episode-shots", type=int, nargs="+", default=(1, 3, 5, 10)
+    )
     parser.add_argument("--device", default="auto")
     args = parser.parse_args()
     if args.model is None:

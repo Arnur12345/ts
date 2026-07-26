@@ -145,14 +145,14 @@ def _score(
             end = min(start + batch_size, len(episodes["positive"]))
             positive_panels = _gather(
                 patches,
-                episodes["positive"][start:end],
+                episodes["positive"][start:end, :, : 2 * shot],
                 metadata,
                 retained_grid,
                 device,
             )
             negative_panels = _gather(
                 patches,
-                episodes["negative"][start:end],
+                episodes["negative"][start:end, :, : 2 * shot],
                 metadata,
                 retained_grid,
                 device,
@@ -677,14 +677,18 @@ def _visualize(
             episode_index, query_index = divmod(flat_index, query_count)
             positive_panels = _gather(
                 patches,
-                current["positive"][episode_index : episode_index + 1],
+                current["positive"][
+                    episode_index : episode_index + 1, :, : 2 * shot
+                ],
                 metadata,
                 retained_grid,
                 device,
             )
             negative_panels = _gather(
                 patches,
-                current["negative"][episode_index : episode_index + 1],
+                current["negative"][
+                    episode_index : episode_index + 1, :, : 2 * shot
+                ],
                 metadata,
                 retained_grid,
                 device,
@@ -770,6 +774,11 @@ def main() -> None:
     parser.add_argument("--shots", type=int, nargs="+", default=(1, 3, 5, 10))
     parser.add_argument("--primary-shot", type=int, default=3)
     parser.add_argument("--seeds", type=int, nargs="+", default=(0, 1, 2, 3, 4))
+    parser.add_argument(
+        "--targets",
+        nargs="+",
+        help="Restrict the retry to saved pairs with these target names",
+    )
     parser.add_argument("--episodes-per-seed", type=int, default=100)
     parser.add_argument(
         "--tau-supports", type=float, nargs="+", default=(0.05, 0.1, 0.2)
@@ -802,6 +811,13 @@ def main() -> None:
         raise ValueError("requested seeds are absent from the saved episodes")
     if args.episodes_per_seed > signature["episodes"]:
         raise ValueError("saved episode bank is smaller than requested")
+    pair_names = {
+        pair_id: names
+        for pair_id, names in saved["pairs"].items()
+        if args.targets is None or names[0] in args.targets
+    }
+    if not pair_names:
+        raise ValueError("no saved episode pair matches --targets")
     episode_sets = {
         key: {
             name: (
@@ -814,9 +830,8 @@ def main() -> None:
             for name, value in current.items()
         }
         for key, current in saved["episodes"].items()
-        if key[1] in args.seeds
+        if key[0] in pair_names and key[1] in args.seeds
     }
-    pair_names = saved["pairs"]
     patches, metadata = load_patch_cache(
         args.rad_cache,
         signature["manifest_sha256"],
@@ -836,6 +851,9 @@ def main() -> None:
         "adapter_rho": args.adapter_rho,
         "adapter_dir": str(args.adapter_dir),
         "query_chunk_size": args.query_chunk_size,
+        "targets": (
+            None if args.targets is None else sorted(set(args.targets))
+        ),
     }
     scores = {}
     models = {}
@@ -1005,6 +1023,7 @@ def main() -> None:
                 "retained_grid": args.retained_grid,
                 "shots": args.shots,
                 "seeds": args.seeds,
+                "targets": args.targets,
                 "episodes_per_seed": args.episodes_per_seed,
                 "tau_supports": args.tau_supports,
                 "tau_queries": args.tau_queries,

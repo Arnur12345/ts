@@ -311,3 +311,49 @@ counterfactual field training is implemented or started unless this scoring
 gate passes. If the 14x14 quantitative gate fails, build one native-resolution
 Rad-DINO cache and rerun this same diagnostic once with its native retained
 grid.
+
+For the one permitted native-resolution retry, do not cache all 167,183
+studies. Build a sparse 37x37 cache containing only the five-seed,
+three-shot Pneumothorax validation/test episode rows:
+
+```bash
+PYTHONPATH=. python3 -m experiments.iera.patch_cache \
+  --encoder rad-dino \
+  --data-root ~/data/mimic-cxr-jpg-2.1.0 \
+  --manifest outputs/residuals/multilabel_manifest.csv \
+  --episodes outputs/iera/falsification_v1/episodes.pt \
+  --episode-seeds 0 1 2 3 4 \
+  --episode-targets Pneumothorax \
+  --episode-count 100 \
+  --episode-shots 3 \
+  --output-dir outputs/iera/patch_cache_rad_dino_37x37_pneumothorax \
+  --pool-grid 37 \
+  --batch-size 16 \
+  --workers 8 \
+  --device cuda
+```
+
+The sparse cache preserves global manifest indices and is resumable. Then run
+only the native-resolution gate:
+
+```bash
+PYTHONPATH=. python3 -m experiments.iera.evidence_field_diagnostic \
+  --episodes outputs/iera/falsification_v1/episodes.pt \
+  --rad-cache outputs/iera/patch_cache_rad_dino_37x37_pneumothorax \
+  --adapter-dir outputs/iera/falsification_v1/learned \
+  --adapter-rho 0.7 \
+  --manifest outputs/residuals/multilabel_manifest.csv \
+  --data-root ~/data/mimic-cxr-jpg-2.1.0 \
+  --output-dir outputs/iera/evidence_field_pilot_37x37_v1 \
+  --retained-grid 37 \
+  --shots 3 \
+  --primary-shot 3 \
+  --targets Pneumothorax \
+  --seeds 0 1 2 3 4 \
+  --episodes-per-seed 100 \
+  --tau-supports 0.05 0.1 0.2 \
+  --tau-queries 0.05 0.1 0.2 \
+  --episode-batch-size 1 \
+  --query-chunk-size 1 \
+  --device cuda
+```

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import unittest
+import hashlib
 import json
 import math
 import tempfile
@@ -34,6 +35,7 @@ from experiments.iera.episodes import generate_pair_episodes, validate_pair_epis
 from experiments.iera.model import IERA, METHODS
 from experiments.iera.patch_cache import (
     MODEL,
+    episode_cache_indices,
     extract_patch_tokens,
     extract_rad_dino_patch_tokens,
     load_patch_cache,
@@ -633,6 +635,93 @@ class IERATest(unittest.TestCase):
             )
             self.assertEqual(tuple(streamed[torch.tensor([1, 0])].shape), shape)
             streamed.close()
+
+    def test_sparse_patch_cache_resolves_global_episode_indices(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            shape = (2, 4, 3)
+            token_path = root / "tokens.bin"
+            tokens = torch.arange(math.prod(shape), dtype=torch.float16).reshape(
+                shape
+            )
+            tokens.numpy().tofile(token_path)
+            index_path = root / "global_indices.int64.bin"
+            indices = torch.tensor([7, 2], dtype=torch.int64)
+            indices.numpy().tofile(index_path)
+            metadata = {
+                "tokens": token_path.name,
+                "shape": list(shape),
+                "dtype": "float16",
+                "pool_grid": 2,
+                "manifest_sha256": "manifest",
+                "model": MODEL,
+                "completed": 2,
+                "complete": True,
+                "index_mode": "sparse",
+                "dataset_size": 10,
+                "global_indices": index_path.name,
+                "global_indices_sha256": hashlib.sha256(
+                    index_path.read_bytes()
+                ).hexdigest(),
+            }
+            (root / "patch_cache.json").write_text(
+                json.dumps(metadata), encoding="utf-8"
+            )
+            streamed, _ = load_patch_cache(
+                root, "manifest", expected_pool_grid=2, access_mode="stream"
+            )
+            torch.testing.assert_close(
+                streamed[torch.tensor([2, 7])],
+                torch.stack((tokens[1], tokens[0])),
+            )
+            with self.assertRaisesRegex(IndexError, "absent from sparse cache"):
+                streamed[torch.tensor([3])]
+            streamed.close()
+
+    def test_episode_cache_selects_only_required_scoring_rows(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            episode_path = Path(temporary) / "episodes.pt"
+            episodes = {
+                "positive": torch.arange(8).reshape(1, 2, 4),
+                "negative": torch.arange(8, 16).reshape(1, 2, 4),
+                "query": torch.tensor([[16, 17]]),
+                "random_positive_env": torch.tensor([[1, 1]]),
+                "random_negative_env": torch.tensor([[0, 0]]),
+            }
+            torch.save(
+                {
+                    "signature": {
+                        "manifest_sha256": "manifest",
+                        "seeds": [0],
+                        "episodes": 1,
+                    },
+                    "pairs": {
+                        0: ("Pneumothorax", "Support Devices"),
+                        1: ("Edema", "Cardiomegaly"),
+                    },
+                    "episodes": {
+                        (0, 0, "validate"): episodes,
+                        (0, 0, "test"): episodes,
+                        (1, 0, "validate"): episodes,
+                        (1, 0, "test"): episodes,
+                    },
+                },
+                episode_path,
+            )
+            indices, protocol = episode_cache_indices(
+                episode_path,
+                "manifest",
+                seeds=[0],
+                targets=["Pneumothorax"],
+                episode_count=1,
+                shots=[1],
+            )
+            self.assertEqual(
+                indices,
+                [0, 1, 4, 5, 8, 9, 12, 13, 16, 17],
+            )
+            self.assertEqual(protocol["episode_pair_ids"], [0])
+            self.assertEqual(protocol["episode_shots"], [1])
 
     def test_sms_is_independent_of_calibration_temperature(self) -> None:
         logits = torch.tensor([-1.0, -0.5, 0.5, 1.0])
