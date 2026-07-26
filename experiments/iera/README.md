@@ -168,7 +168,13 @@ PYTHONPATH=. python3 -m experiments.iera.falsification \
   --device cuda
 ```
 
-### 3. SMS-budget sweep
+### 3. Five-seed SMS-budget sweep
+
+This stage trains only adapter-only and full IERA. Random ProtoNet is rescored;
+the first five nuisance-balanced, REx, and cheap-baseline results are reused as
+fixed reference points. The BioMedCLIP text baseline remains in the comparison
+table but is excluded from the RAD-DINO Pareto plot because its SMS scale is not
+commensurate.
 
 ```bash
 PYTHONPATH=. python3 -m experiments.iera.falsification \
@@ -183,12 +189,21 @@ PYTHONPATH=. python3 -m experiments.iera.falsification \
   --shots 1 3 5 10 \
   --rhos 0.9 0.8 0.7 0.5 0.3 \
   --episodes 100 \
-  --seeds 0 1 2 3 4 5 6 7 8 9 \
+  --seeds 0 1 2 3 4 \
   --train-shot 3 \
   --base-validation-episodes 25 \
   --max-train-steps 300 \
   --episode-batch-size 4 \
   --device cuda
+```
+
+Render the primary three-shot figure:
+
+```bash
+PYTHONPATH=. python3 -m experiments.iera.plot_pareto \
+  --pareto outputs/iera/falsification_v1/sweep/pareto.csv \
+  --output outputs/iera/falsification_v1/sweep/pareto_3shot.pdf \
+  --shot 3
 ```
 
 Each stage writes per-seed and summary metrics in its own subdirectory. Learned

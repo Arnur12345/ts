@@ -44,6 +44,7 @@ from .robust_support import (
 
 LEARNED_METHODS = ("rex", "adapter_only", "anchor_only", "full_iera")
 CONSTRAINED_METHODS = ("adapter_only", "anchor_only", "full_iera")
+SWEEP_METHODS = ("adapter_only", "full_iera")
 
 
 def _ids(data, names: tuple[str, str]) -> tuple[int, int]:
@@ -964,6 +965,61 @@ def _learned_worker(
                 "methods": list(methods),
             },
         }
+        learned_progress_path = stage_dir.parent / "learned" / "progress.pt"
+        if args.stage == "sweep" and learned_progress_path.exists():
+            learned_progress = torch.load(
+                learned_progress_path, map_location="cpu", weights_only=False
+            )
+            learned_signature = learned_progress.get("signature", {})
+            compatible_keys = (
+                "manifest_sha256", "cache_model", "retained_grid",
+                "proposal_grid", "shots", "episodes", "train_shot",
+                "max_train_steps",
+            )
+            compatible = all(
+                learned_signature.get(key) == progress["signature"].get(key)
+                for key in compatible_keys
+            )
+            requested_seeds = set(args.seeds)
+            requested_rhos = set(rhos)
+            if compatible:
+                imported = {
+                    tuple(item)
+                    for item in learned_progress["completed"]
+                    if (
+                        item[0] == "binary_protonet_random"
+                        and item[2] in requested_seeds
+                    )
+                    or (
+                        item[0] in methods
+                        and item[1] in requested_rhos
+                        and item[2] in requested_seeds
+                    )
+                }
+                progress["completed"].extend(sorted(imported, key=str))
+                progress["rows"].extend(
+                    row for row in learned_progress["rows"]
+                    if (
+                        row["method"] == "binary_protonet_random"
+                        and int(row["seed"]) in requested_seeds
+                    )
+                    or (
+                        row["method"] in methods
+                        and float(row["rho"]) in requested_rhos
+                        and int(row["seed"]) in requested_seeds
+                    )
+                )
+                progress["training"].extend(
+                    run for run in learned_progress["training"]
+                    if run["method"] in methods
+                    and run["rho"] in requested_rhos
+                    and int(run["seed"]) in requested_seeds
+                )
+                print(
+                    f"imported {len(imported)} completed runs from "
+                    f"{learned_progress_path}",
+                    flush=True,
+                )
     expected_signature = {
         "manifest_sha256": manifest_hash,
         "cache_model": metadata["model"],
@@ -1081,6 +1137,10 @@ def _learned_worker(
 def _pareto(rows: list[dict]) -> list[dict]:
     by_point = defaultdict(dict)
     for row in rows:
+        if row["method"] == "text_direction_orthogonalization":
+            # BioMedCLIP is required for the text direction, so its SMS scale
+            # is not commensurate with the RAD-DINO random reference.
+            continue
         if row["metric"] not in {"auroc", "sms_fixed_reference"}:
             continue
         key = (
@@ -1204,18 +1264,63 @@ def _adapter_decision(rows: list[dict], primary_shot: int = 3) -> dict:
         )
         clear = clear or row["clear_full_improvement"]
         comparisons.append(row)
+    consistent_full_frontier = bool(comparisons) and all(
+        row["full_minus_adapter_auroc"] >= 0
+        and row["full_minus_adapter_sms"] < 0
+        for row in comparisons
+    )
+    pneumothorax = []
+    for method in ("adapter_only", "full_iera"):
+        method_rhos = {
+            key[2]
+            for key in values
+            if key[0] == method and key[1].startswith("Pneumothorax")
+        }
+        for rho in sorted(method_rhos):
+            aurocs = [
+                metrics["auroc"]
+                for key, metrics in values.items()
+                if key[0] == method
+                and key[1].startswith("Pneumothorax")
+                and key[2] == rho
+                and "auroc" in metrics
+            ]
+            if not aurocs:
+                continue
+            mean = statistics.mean(aurocs)
+            std = statistics.stdev(aurocs) if len(aurocs) > 1 else 0.0
+            low = mean - 1.96 * std / math.sqrt(len(aurocs))
+            pneumothorax.append(
+                {
+                    "method": method,
+                    "rho": rho,
+                    "mean_auroc": mean,
+                    "ci95_low": low,
+                    "credible_above_chance": low > 0.5,
+                }
+            )
+    pneumothorax_credible = any(
+        row["credible_above_chance"] for row in pneumothorax
+    )
+    status = (
+        "retain_evidence_ratio_mechanism"
+        if clear and consistent_full_frontier
+        else "prefer_simpler_constrained_adapter"
+    )
+    if pneumothorax and not pneumothorax_credible:
+        status = "pneumothorax_detector_not_credible"
     return {
         "primary_test": "adapter_only_vs_full_iera",
         "primary_shot": primary_shot,
-        "status": (
-            "retain_evidence_ratio_mechanism"
-            if clear
-            else "prefer_simpler_constrained_adapter"
-        ),
+        "status": status,
         "rule": (
-            "retain IERA only when the paired 95% CI for AUROC improvement "
-            "is above zero at no larger mean fixed-reference SMS"
+            "retain IERA only if it has at least one clear paired AUROC "
+            "improvement and has lower SMS at equal-or-better mean AUROC "
+            "at every evaluated frontier point"
         ),
+        "consistent_full_frontier": consistent_full_frontier,
+        "pneumothorax_credible": pneumothorax_credible,
+        "pneumothorax_runs": pneumothorax,
         "comparisons": comparisons,
     }
 
@@ -1313,7 +1418,15 @@ def main() -> None:
         saved_episodes = torch.load(
             episode_path, map_location="cpu", weights_only=False
         )
-        if saved_episodes.get("signature") != episode_signature:
+        saved_signature = saved_episodes.get("signature", {})
+        fixed_keys = set(episode_signature) - {"seeds"}
+        fixed_match = all(
+            saved_signature.get(key) == episode_signature[key]
+            for key in fixed_keys
+        )
+        requested_seeds = set(episode_signature["seeds"])
+        saved_seeds = set(saved_signature.get("seeds", []))
+        if not fixed_match or not requested_seeds.issubset(saved_seeds):
             raise ValueError(
                 "existing episodes.pt has different protocol arguments; "
                 "use another --output-dir"
@@ -1406,7 +1519,7 @@ def main() -> None:
             training_pairs[seed] = pairs
         methods = (
             LEARNED_METHODS if args.stage == "learned"
-            else CONSTRAINED_METHODS
+            else SWEEP_METHODS
         )
         payload_path = stage_dir / "worker_payload.pt"
         torch.save(
@@ -1441,6 +1554,7 @@ def main() -> None:
     summary = _summaries(rows)
     _write(stage_dir / "per_seed_metrics.csv", rows)
     _write(stage_dir / "summary_metrics.csv", summary)
+    comparison = rows
     if args.stage == "learned":
         cheap_path = args.output_dir / "cheap" / "per_seed_metrics.csv"
         if cheap_path.exists():
@@ -1450,22 +1564,63 @@ def main() -> None:
                     if row["method"] != "binary_protonet_random"
                 ]
             comparison = cheap_rows + rows
-            _write(stage_dir / "comparison_per_seed_metrics.csv", comparison)
-            _write(
-                stage_dir / "comparison_summary_metrics.csv",
-                _summaries(comparison),
+    elif args.stage == "sweep":
+        requested_seeds = {str(seed) for seed in args.seeds}
+        reference_rows = []
+        cheap_path = args.output_dir / "cheap" / "per_seed_metrics.csv"
+        if cheap_path.exists():
+            with cheap_path.open(newline="", encoding="utf-8") as handle:
+                reference_rows.extend(
+                    row for row in csv.DictReader(handle)
+                    if row["seed"] in requested_seeds
+                    and row["method"] != "binary_protonet_random"
+                )
+        learned_path = args.output_dir / "learned" / "per_seed_metrics.csv"
+        if learned_path.exists():
+            with learned_path.open(newline="", encoding="utf-8") as handle:
+                reference_rows.extend(
+                    row for row in csv.DictReader(handle)
+                    if row["seed"] in requested_seeds
+                    and row["method"] == "rex"
+                )
+        else:
+            learned_progress_path = (
+                args.output_dir / "learned" / "progress.pt"
             )
+            if learned_progress_path.exists():
+                learned_progress = torch.load(
+                    learned_progress_path,
+                    map_location="cpu",
+                    weights_only=False,
+                )
+                reference_rows.extend(
+                    row for row in learned_progress["rows"]
+                    if str(row["seed"]) in requested_seeds
+                    and row["method"] == "rex"
+                )
+        comparison = rows + reference_rows
+    if args.stage in {"learned", "sweep"} and comparison is not rows:
+        _write(stage_dir / "comparison_per_seed_metrics.csv", comparison)
+        _write(
+            stage_dir / "comparison_summary_metrics.csv",
+            _summaries(comparison),
+        )
     if args.stage in {"learned", "sweep"}:
-        pareto = _pareto(rows)
+        pareto = _pareto(comparison)
         if pareto:
             _write(stage_dir / "pareto.csv", pareto)
-        decision = _adapter_decision(rows)
+        decision = _adapter_decision(comparison)
         training = completed["training"]
         decision["base_validation_all_feasible"] = all(
             bool(item["best_validation"]["sms_budget_satisfied"])
             for item in training
             if item["method"] in CONSTRAINED_METHODS
         )
+        if not decision["base_validation_all_feasible"]:
+            decision["frontier_status_without_feasibility_override"] = (
+                decision["status"]
+            )
+            decision["status"] = "budget_infeasible_on_base_validation"
         (stage_dir / "decision.json").write_text(
             json.dumps(decision, indent=2) + "\n", encoding="utf-8"
         )
