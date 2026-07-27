@@ -1,0 +1,212 @@
+{
+  "pair": "Pneumothorax__Support Devices",
+  "selection_partition": "validate",
+  "selection_shot": 3,
+  "near_tie_auroc": 0.005,
+  "methods": {
+    "anchor_rho03": {
+      "candidate": "anchor_rho03",
+      "mean_auroc": 0.551324999332428,
+      "mean_sms_fixed_reference": 0.25302596390247345,
+      "mean_worst_device_auroc": 0.5423799991607666,
+      "mean_border_max_fraction": 0.2270000010728836,
+      "validation_constraint_feasible": null,
+      "candidates": [
+        {
+          "candidate": "anchor_rho03",
+          "mean_auroc": 0.551324999332428,
+          "mean_sms_fixed_reference": 0.25302596390247345,
+          "mean_worst_device_auroc": 0.5423799991607666,
+          "mean_border_max_fraction": 0.2270000010728836
+        }
+      ]
+    },
+    "dn4_hard_knn": {
+      "candidate": "dn4_hard_knn",
+      "mean_auroc": 0.5570650100708008,
+      "mean_sms_fixed_reference": 2.219060516357422,
+      "mean_worst_device_auroc": 0.550760006904602,
+      "mean_border_max_fraction": 0.10399999767541886,
+      "validation_constraint_feasible": null,
+      "candidates": [
+        {
+          "candidate": "dn4_hard_knn",
+          "mean_auroc": 0.5570650100708008,
+          "mean_sms_fixed_reference": 2.219060516357422,
+          "mean_worst_device_auroc": 0.550760006904602,
+          "mean_border_max_fraction": 0.10399999767541886
+        }
+      ]
+    },
+    "raw_witness": {
+      "candidate": "raw_witness|r=0.1",
+      "mean_auroc": 0.5239850163459778,
+      "mean_sms_fixed_reference": 4.544684600830078,
+      "mean_worst_device_auroc": 0.49769999384880065,
+      "mean_border_max_fraction": 0.26850000619888303,
+      "validation_constraint_feasible": null,
+      "candidates": [
+        {
+          "candidate": "raw_witness|r=0.1",
+          "mean_auroc": 0.5239850163459778,
+          "mean_sms_fixed_reference": 4.544684600830078,
+          "mean_worst_device_auroc": 0.49769999384880065,
+          "mean_border_max_fraction": 0.26850000619888303
+        },
+        {
+          "candidate": "raw_witness|r=0.01",
+          "mean_auroc": 0.5154249906539917,
+          "mean_sms_fixed_reference": 8.857537078857423,
+          "mean_worst_device_auroc": 0.48784000277519224,
+          "mean_border_max_fraction": 0.17449999749660491
+        },
+        {
+          "candidate": "raw_witness|r=0.05",
+          "mean_auroc": 0.5088424921035767,
+          "mean_sms_fixed_reference": 5.6602777481079105,
+          "mean_worst_device_auroc": 0.49207000732421874,
+          "mean_border_max_fraction": 0.3440000057220459
+        },
+        {
+          "candidate": "raw_witness|r=0.02",
+          "mean_auroc": 0.5075524926185608,
+          "mean_sms_fixed_reference": 7.379331970214844,
+          "mean_worst_device_auroc": 0.48939000368118285,
+          "mean_border_max_fraction": 0.2104999989271164
+        }
+      ]
+    },
+    "relational_witness": {
+      "candidate": "relational_witness|r=0.1",
+      "mean_auroc": 0.5208900094032287,
+      "mean_sms_fixed_reference": 4.536591815948486,
+      "mean_worst_device_auroc": 0.5014800071716309,
+      "mean_border_max_fraction": 0.281999996304512,
+      "validation_constraint_feasible": null,
+      "candidates": [
+        {
+          "candidate": "relational_witness|r=0.1",
+          "mean_auroc": 0.5208900094032287,
+          "mean_sms_fixed_reference": 4.536591815948486,
+          "mean_worst_device_auroc": 0.5014800071716309,
+          "mean_border_max_fraction": 0.281999996304512
+        },
+        {
+          "candidate": "relational_witness|r=0.01",
+          "mean_auroc": 0.5143549978733063,
+          "mean_sms_fixed_reference": 9.645775413513183,
+          "mean_worst_device_auroc": 0.49410001039505,
+          "mean_border_max_fraction": 0.1455000013113022
+        },
+        {
+          "candidate": "relational_witness|r=0.05",
+          "mean_auroc": 0.5115575015544891,
+          "mean_sms_fixed_reference": 5.5938492774963375,
+          "mean_worst_device_auroc": 0.48558999300003053,
+          "mean_border_max_fraction": 0.33949999809265136
+        },
+        {
+          "candidate": "relational_witness|r=0.02",
+          "mean_auroc": 0.5076174914836884,
+          "mean_sms_fixed_reference": 7.86497745513916,
+          "mean_worst_device_auroc": 0.49318999648094175,
+          "mean_border_max_fraction": 0.18850000202655792
+        }
+      ]
+    },
+    "anchor_plus_relational_witness": {
+      "candidate": "anchor_plus_relational_witness|r=0.1|gamma=0.1",
+      "mean_auroc": 0.5354249954223633,
+      "mean_sms_fixed_reference": 0.6169374942779541,
+      "mean_worst_device_auroc": 0.5172000110149384,
+      "mean_border_max_fraction": 0.2814999967813492,
+      "validation_constraint_feasible": false,
+      "candidates": [
+        {
+          "candidate": "anchor_plus_relational_witness|r=0.1|gamma=0.1",
+          "mean_auroc": 0.5354249954223633,
+          "mean_sms_fixed_reference": 0.6169374942779541,
+          "mean_worst_device_auroc": 0.5172000110149384,
+          "mean_border_max_fraction": 0.2814999967813492
+        },
+        {
+          "candidate": "anchor_plus_relational_witness|r=0.1|gamma=0.25",
+          "mean_auroc": 0.528089988231659,
+          "mean_sms_fixed_reference": 1.2770436525344848,
+          "mean_worst_device_auroc": 0.5087599933147431,
+          "mean_border_max_fraction": 0.281999996304512
+        },
+        {
+          "candidate": "anchor_plus_relational_witness|r=0.05|gamma=0.1",
+          "mean_auroc": 0.5271224975585938,
+          "mean_sms_fixed_reference": 0.7018692016601562,
+          "mean_worst_device_auroc": 0.5032599925994873,
+          "mean_border_max_fraction": 0.33949999809265136
+        },
+        {
+          "candidate": "anchor_plus_relational_witness|r=0.01|gamma=0.1",
+          "mean_auroc": 0.5254500031471252,
+          "mean_sms_fixed_reference": 1.0658671140670777,
+          "mean_worst_device_auroc": 0.505460000038147,
+          "mean_border_max_fraction": 0.1455000013113022
+        },
+        {
+          "candidate": "anchor_plus_relational_witness|r=0.1|gamma=0.5",
+          "mean_auroc": 0.5242799878120422,
+          "mean_sms_fixed_reference": 2.4004634380340577,
+          "mean_worst_device_auroc": 0.5050200045108795,
+          "mean_border_max_fraction": 0.281999996304512
+        },
+        {
+          "candidate": "anchor_plus_relational_witness|r=0.02|gamma=0.1",
+          "mean_auroc": 0.520484983921051,
+          "mean_sms_fixed_reference": 0.9030795454978943,
+          "mean_worst_device_auroc": 0.505379992723465,
+          "mean_border_max_fraction": 0.18900000154972077
+        },
+        {
+          "candidate": "anchor_plus_relational_witness|r=0.01|gamma=0.25",
+          "mean_auroc": 0.5185799956321716,
+          "mean_sms_fixed_reference": 2.4938003540039064,
+          "mean_worst_device_auroc": 0.49847999811172483,
+          "mean_border_max_fraction": 0.1455000013113022
+        },
+        {
+          "candidate": "anchor_plus_relational_witness|r=0.05|gamma=0.25",
+          "mean_auroc": 0.518149995803833,
+          "mean_sms_fixed_reference": 1.5165353536605835,
+          "mean_worst_device_auroc": 0.4933599829673767,
+          "mean_border_max_fraction": 0.33949999809265136
+        },
+        {
+          "candidate": "anchor_plus_relational_witness|r=0.01|gamma=0.5",
+          "mean_auroc": 0.5167500019073487,
+          "mean_sms_fixed_reference": 4.901094627380371,
+          "mean_worst_device_auroc": 0.49715999960899354,
+          "mean_border_max_fraction": 0.1455000013113022
+        },
+        {
+          "candidate": "anchor_plus_relational_witness|r=0.05|gamma=0.5",
+          "mean_auroc": 0.5145824909210205,
+          "mean_sms_fixed_reference": 2.9039700031280518,
+          "mean_worst_device_auroc": 0.4897999942302704,
+          "mean_border_max_fraction": 0.33949999809265136
+        },
+        {
+          "candidate": "anchor_plus_relational_witness|r=0.02|gamma=0.25",
+          "mean_auroc": 0.5133099913597107,
+          "mean_sms_fixed_reference": 2.06297345161438,
+          "mean_worst_device_auroc": 0.49875999689102174,
+          "mean_border_max_fraction": 0.18850000202655792
+        },
+        {
+          "candidate": "anchor_plus_relational_witness|r=0.02|gamma=0.5",
+          "mean_auroc": 0.5107050001621246,
+          "mean_sms_fixed_reference": 4.021397066116333,
+          "mean_worst_device_auroc": 0.49553999304771423,
+          "mean_border_max_fraction": 0.18850000202655792
+        }
+      ]
+    }
+  }
+}

@@ -60,6 +60,10 @@ from experiments.iera.robust_support import (
     environment_choices,
     select_supports,
 )
+from experiments.iera.representation_adaptation import (
+    RadDinoTail,
+    configure_tail,
+)
 from experiments.iera.stable_witness import (
     border_maximum,
     certified_witness_scores,
@@ -120,7 +124,45 @@ class _RadModel(nn.Module):
         return SimpleNamespace(last_hidden_state=hidden)
 
 
+class _FakeAttention(nn.Module):
+    def __init__(self, width: int):
+        super().__init__()
+        self.query = nn.Linear(width, width)
+        self.key = nn.Linear(width, width)
+        self.value = nn.Linear(width, width)
+
+    def forward(self, values):
+        return self.query(values) + self.key(values) + self.value(values)
+
+
+class _FakeBlock(nn.Module):
+    def __init__(self, width: int):
+        super().__init__()
+        self.attention = _FakeAttention(width)
+
+    def forward(self, hidden):
+        return (hidden + self.attention(hidden),)
+
+
 class IERATest(unittest.TestCase):
+    def test_last_block_and_lora_configuration_are_strictly_bounded(self) -> None:
+        layers = nn.ModuleList((_FakeBlock(4), _FakeBlock(4)))
+        last1 = configure_tail(layers, nn.LayerNorm(4), "last1", 2, 2)
+        self.assertFalse(any(p.requires_grad for p in last1.layers[0].parameters()))
+        self.assertTrue(any(p.requires_grad for p in last1.layers[1].parameters()))
+        lora = configure_tail(layers, nn.LayerNorm(4), "lora2", 2, 2)
+        trainable = [
+            name for name, parameter in lora.named_parameters()
+            if parameter.requires_grad
+        ]
+        self.assertTrue(trainable)
+        self.assertTrue(all(".down." in name or ".up." in name for name in trainable))
+        output = lora(torch.randn(2, 5, 4))
+        self.assertEqual(tuple(output.shape), (2, 4, 4))
+        torch.testing.assert_close(
+            output.norm(dim=-1), torch.ones(2, 4), atol=1e-5, rtol=1e-5
+        )
+
     def test_fixed_relational_descriptor_preserves_constant_regions(self) -> None:
         token = torch.tensor([1.0, 2.0, 3.0])
         tokens = token.expand(2, 9, 3).clone()

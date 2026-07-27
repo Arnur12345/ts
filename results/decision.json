@@ -1,36 +1,32 @@
 {
-  "status": "abandon_evidence_field",
+  "status": "stop_frozen_witness_matching_falsified",
   "stage_two_training_started": false,
-  "primary_shot": 3,
-  "retained_grid": 37,
-  "native_grid": 37,
   "visual_review": "pending",
   "gate": {
-    "minimum_pneumothorax_auroc_gain": 0.02,
-    "maximum_sms_ratio_to_current_adapter": 1.25,
-    "minimum_worst_device_auroc_change": -0.01,
-    "evidence_map_must_not_primarily_highlight_chest_tubes": true
+    "minimum_locked_test_auroc": 0.551,
+    "maximum_locked_test_sms": 0.321,
+    "minimum_worst_device_change": -0.01,
+    "falsification_auroc_floor": 0.541,
+    "evidence_must_be_less_border_or_device_dominated": true
   },
-  "comparisons": [
-    {
-      "pair": "Pneumothorax__Support Devices",
-      "current_adapter_auroc": 0.5333400011062622,
-      "evidence_field_auroc": 0.5289649963378906,
-      "paired_auroc_gain": -0.004375004768371582,
-      "paired_auroc_gain_ci95": [
-        -0.010605026564170068,
-        0.001855017027426905
-      ],
-      "current_adapter_sms": 0.5788855433464051,
-      "evidence_field_sms": 0.5290601968765258,
-      "sms_ratio_to_current_adapter": 0.9139288464834511,
-      "paired_worst_device_auroc_change": -0.010070008039474488,
-      "paired_worst_device_auroc_change_ci95": [
-        -0.019490835730424046,
-        -0.0006491803485249303
-      ],
-      "quantitative_gate_passed": false,
-      "credible_057_target_reached": false
-    }
-  ]
+  "anchor_rho03": {
+    "auroc": 0.5391625046730042,
+    "auprc": 0.538544774055481,
+    "sms_fixed_reference": 0.25039894580841066,
+    "support_swap_flip_rate": 0.017499999701976778,
+    "worst_nuisance_auroc": 0.5193600177764892,
+    "border_max_fraction": 0.24699999690055846
+  },
+  "locked_full_witness": {
+    "auroc": 0.5251849949359894,
+    "auprc": 0.5343919277191163,
+    "sms_fixed_reference": 0.6126858830451966,
+    "support_swap_flip_rate": 0.0,
+    "worst_nuisance_auroc": 0.5088300049304962,
+    "border_max_fraction": 0.22999999821186065
+  },
+  "full_minus_anchor_auroc": -0.013977509737014837,
+  "full_minus_anchor_worst_device_auroc": -0.010530012845992975,
+  "quantitative_gate_passed": false,
+  "device_overlap_fraction": "not_available_no_masks_or_detector_maps"
 }

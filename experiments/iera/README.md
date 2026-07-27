@@ -315,11 +315,64 @@ selection, and `decision.json`. Stage 2 is deliberately absent and must not be
 implemented or run unless the decision is
 `proceed_to_stage2_descriptor_training` after quantitative and visual review.
 
+## Representation adaptation pilot
+
+After witness matching is falsified, change only the representation. First
+cache the activations entering Rad-DINO's final two blocks for the base
+train/validation episodes and the locked Pneumothorax episodes:
+
+```bash
+PYTHONPATH=. python3 -m experiments.iera.representation_cache \
+  --embeddings outputs/residuals/biomedclip_multilabel.pt \
+  --manifest outputs/residuals/multilabel_manifest.csv \
+  --raw-labels ~/data/mimic-cxr-jpg-2.1.0/mimic-cxr-2.0.0-chexpert.csv.gz \
+  --episodes outputs/iera/falsification_v1/episodes.pt \
+  --data-root ~/data/mimic-cxr-jpg-2.1.0 \
+  --output-dir outputs/iera/rad_dino_prefix10_rep_v1 \
+  --seeds 0 1 2 3 4 \
+  --episodes-per-seed 100 \
+  --train-shot 3 \
+  --max-train-pairs 8 \
+  --max-train-steps 150 \
+  --base-validation-episodes 20 \
+  --prefix-blocks 10 \
+  --batch-size 8 \
+  --workers 8 \
+  --device cuda
+```
+
+Then compare full adaptation of the last block, full adaptation of the final
+two blocks, and rank-8 LoRA on Q/K/V in the final two blocks:
+
+```bash
+PYTHONPATH=. python3 -m experiments.iera.representation_adaptation \
+  --cache outputs/iera/rad_dino_prefix10_rep_v1 \
+  --adapter-dir outputs/iera/falsification_v1/sweep \
+  --output-dir outputs/iera/representation_pilot_v1 \
+  --variants last1 last2 lora2 \
+  --seeds 0 1 2 3 4 \
+  --train-shot 3 \
+  --max-train-steps 150 \
+  --validation-interval 25 \
+  --learning-rate 1e-5 \
+  --lora-learning-rate 1e-4 \
+  --sms-budget 0.30 \
+  --lora-rank 8 \
+  --lora-alpha 8 \
+  --image-batch-size 4 \
+  --device cuda
+```
+
+All variants retain the frozen rho=.3 support adapter and its existing
+positive-minus-negative prototype score. Training uses base-class episodic BCE
+plus adaptive normalized-SMS stability against one fixed, unadapted ProtoNet
+reference. Base validation chooses each checkpoint; locked novel validation
+chooses the representation variant; test is reported once. No DN4, witness
+matching, evidence map, or additional local head is used.
+
 The runner is resumable per seed and writes `candidate_metrics.csv`,
 `per_seed_metrics.csv`, `summary_metrics.csv`, `selection.json`, and
-`decision.json`. It also writes `evidence_maps.png` and `evidence_maps.pt`.
-Inspect the overlay before allowing stage-two training, then update the gate
-without recomputing scores:
+`decision.json`.
 
 ```bash
 PYTHONPATH=. python3 -m experiments.iera.evidence_field_diagnostic \
