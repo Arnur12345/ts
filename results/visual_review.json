@@ -1,6 +1,0 @@
-{
-  "status": "pending",
-  "criterion": "locked witness evidence must be visibly less border/chest-tube dominated than the rho=.3 anchor",
-  "artifact": "locked_witness_evidence.png",
-  "device_overlap": "unavailable: no masks/detector maps supplied"
-}
