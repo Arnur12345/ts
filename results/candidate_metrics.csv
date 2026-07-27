@@ -1,0 +1,9 @@
+method,C,validation_auroc
+class_balanced,0.01,0.7713944315910339
+class_balanced,0.1,0.7967755198478699
+class_balanced,1.0,0.8082486391067505
+class_balanced,10.0,0.8155712485313416
+four_group_balanced,0.01,0.7393444776535034
+four_group_balanced,0.1,0.7763824462890625
+four_group_balanced,1.0,0.7871084809303284
+four_group_balanced,10.0,0.788804829120636

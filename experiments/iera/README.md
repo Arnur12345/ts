@@ -397,6 +397,54 @@ The two deterministic probes use class-balanced and four-group-balanced
 logistic regression. `C` is selected using validation AUROC, each selected
 probe is refit on train plus validation, and the test set is read once.
 
+## CoMeD global probabilistic head
+
+Prepare the two frozen global feature caches, semantic prompt priors,
+standardized support nuisance matrix, device-probability model, and
+non-Pneumothorax population teachers:
+
+```bash
+PYTHONPATH=. python3 -m experiments.iera.comed_cache \
+  --embeddings outputs/residuals/biomedclip_multilabel.pt \
+  --manifest outputs/residuals/multilabel_manifest.csv \
+  --raw-labels ~/data/mimic-cxr-jpg-2.1.0/mimic-cxr-2.0.0-chexpert.csv.gz \
+  --rad-global outputs/iera/rad_dino_linear_probe_v1/rad_dino_global.float32.npy \
+  --rad-global-metadata outputs/iera/rad_dino_linear_probe_v1/rad_dino_global.json \
+  --output-dir outputs/iera/comed_cache_v1 \
+  --cs 0.01 0.1 1 10 \
+  --split-seed 2026 \
+  --device cuda
+```
+
+Then run the variants in their fixed order:
+
+```bash
+PYTHONPATH=. python3 -m experiments.iera.comed_run \
+  --cache outputs/iera/comed_cache_v1 \
+  --episodes outputs/iera/falsification_v1/episodes.pt \
+  --output-dir outputs/iera/comed_v1 \
+  --variants text_only comed_no_nuisance comed_nuisance comed_learned_metric full_comed \
+  --seeds 0 1 2 3 4 \
+  --episodes-per-seed 100 \
+  --shot 3 \
+  --rank 16 \
+  --lambda-teacher 0.3 \
+  --lambda-swap 0.3 \
+  --beta-rex 0.1 \
+  --learning-rate 1e-3 \
+  --train-steps 300 \
+  --validation-interval 25 \
+  --sms-budget 0.30 \
+  --device cuda
+```
+
+The runner evaluates `text_only` and the fixed-metric
+`comed_no_nuisance` first. It does not train or inspect the locked test if the
+support correction fails to beat both text-only and the 0.539 anchor on
+validation. If that gate passes, later variants are trained on base pathologies
+only and selected on Pneumothorax validation subject to SMS, worst-device, and
+ranking-stability constraints.
+
 ```bash
 PYTHONPATH=. python3 -m experiments.iera.evidence_field_diagnostic \
   --episodes outputs/iera/falsification_v1/episodes.pt \

@@ -16,6 +16,11 @@ from experiments.iera.detector_diagnostic import (
     _detector_logits,
     _pool,
 )
+from experiments.iera.comed import (
+    CoMeD,
+    grouped_rex_loss,
+    normalize_scores,
+)
 from experiments.iera.dual_head import (
     dual_scores,
     fused_score,
@@ -146,6 +151,47 @@ class _FakeBlock(nn.Module):
 
 
 class IERATest(unittest.TestCase):
+    def test_comed_transform_matches_explicit_psd_metric(self) -> None:
+        torch.manual_seed(4)
+        model = CoMeD(dim=5, rank=2, metric_mode="learned")
+        values = torch.nn.functional.normalize(torch.randn(3, 5), dim=-1)
+        transformed = model.transform(values)
+        diagonal = torch.nn.functional.softplus(model.log_diag) + 1e-4
+        metric = torch.diag(diagonal) + model.low_rank @ model.low_rank.T
+        expected = values @ metric @ values.T
+        torch.testing.assert_close(
+            transformed @ transformed.T, expected, atol=1e-5, rtol=1e-5
+        )
+
+    def test_comed_is_differentiable_and_uses_six_supports(self) -> None:
+        model = CoMeD(dim=4, rank=2)
+        support = torch.randn(6, 4)
+        query = torch.randn(8, 4)
+        scores = model(
+            support,
+            torch.tensor([1.0, 1.0, 1.0, -1.0, -1.0, -1.0]),
+            torch.randn(6, 3),
+            torch.zeros(6),
+            query,
+            torch.zeros(8),
+        )
+        self.assertEqual(tuple(scores.shape), (8,))
+        scores.square().mean().backward()
+        self.assertIsNotNone(model.low_rank.grad)
+        self.assertIsNotNone(model.log_tau.grad)
+
+    def test_grouped_rex_and_score_normalization_are_scale_safe(self) -> None:
+        target = torch.tensor([0.0, 0.0, 1.0, 1.0])
+        nuisance = torch.tensor([0, 1, 0, 1])
+        first = torch.tensor([-1.0, -0.5, 0.5, 1.0])
+        second = torch.tensor([-0.8, -0.4, 0.4, 0.8])
+        loss = grouped_rex_loss((first, second), target, nuisance, 0.1)
+        self.assertTrue(torch.isfinite(loss))
+        torch.testing.assert_close(
+            normalize_scores(first),
+            normalize_scores(first * 7),
+        )
+
     def test_four_group_probe_weights_equalize_total_group_mass(self) -> None:
         import numpy as np
 

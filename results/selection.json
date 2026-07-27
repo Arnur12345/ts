@@ -1,0 +1,25 @@
+{
+  "selection_partition": "validate",
+  "criterion": "highest AUROC",
+  "selected": {
+    "class_balanced": {
+      "method": "class_balanced",
+      "C": 10.0,
+      "validation_auroc": 0.8155712485313416,
+      "train_examples": 25254,
+      "train_group_counts": null
+    },
+    "four_group_balanced": {
+      "method": "four_group_balanced",
+      "C": 10.0,
+      "validation_auroc": 0.788804829120636,
+      "train_examples": 15393,
+      "train_group_counts": [
+        619,
+        11239,
+        256,
+        3279
+      ]
+    }
+  }
+}
