@@ -621,6 +621,7 @@ def _render_maps(
         draw.text(
             (x + 5, y + tile + 5),
             (
+                f"{record.get('method', '')} "
                 f"target={record['target']} device={record['nuisance']} "
                 f"logit={record['logit']:.3f}"
             ),

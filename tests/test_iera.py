@@ -60,6 +60,16 @@ from experiments.iera.robust_support import (
     environment_choices,
     select_supports,
 )
+from experiments.iera.stable_witness import (
+    border_maximum,
+    certified_witness_scores,
+    dn4_hard_knn_score,
+    relational_descriptor,
+    witness_confidence,
+)
+from experiments.iera.stable_witness_diagnostic import (
+    _decision as _witness_decision,
+)
 from experiments.residuals.data import ResidualDataset
 
 
@@ -111,6 +121,100 @@ class _RadModel(nn.Module):
 
 
 class IERATest(unittest.TestCase):
+    def test_fixed_relational_descriptor_preserves_constant_regions(self) -> None:
+        token = torch.tensor([1.0, 2.0, 3.0])
+        tokens = token.expand(2, 9, 3).clone()
+        observed = relational_descriptor(tokens)
+        expected = torch.nn.functional.normalize(tokens, dim=-1)
+        torch.testing.assert_close(observed, expected)
+
+    def test_witness_confidence_rewards_cross_image_class_specificity(self) -> None:
+        same = torch.tensor(
+            [[
+                [[1.0, 0.0], [0.0, 1.0]],
+                [[1.0, 0.0], [0.0, 1.0]],
+            ]]
+        )
+        opposite = torch.tensor(
+            [[
+                [[0.0, 1.0], [0.0, 1.0]],
+                [[0.0, 1.0], [0.0, 1.0]],
+            ]]
+        )
+        confidence = witness_confidence(same, opposite, token_chunk_size=1)
+        torch.testing.assert_close(
+            confidence,
+            torch.tensor([[[1.0, 0.0], [1.0, 0.0]]]),
+        )
+
+    def test_frozen_witness_and_dn4_scores_return_patch_fields(self) -> None:
+        positive = torch.tensor(
+            [[
+                [[1.0, 0.0], [1.0, 0.0], [1.0, 0.0], [1.0, 0.0]],
+                [[1.0, 0.0], [1.0, 0.0], [1.0, 0.0], [1.0, 0.0]],
+            ]]
+        )
+        negative = torch.tensor(
+            [[
+                [[0.0, 1.0], [0.0, 1.0], [0.0, 1.0], [0.0, 1.0]],
+                [[0.0, 1.0], [0.0, 1.0], [0.0, 1.0], [0.0, 1.0]],
+            ]]
+        )
+        query = positive[:, :1]
+        witnesses = certified_witness_scores(
+            positive,
+            negative,
+            query,
+            (0.25, 0.5),
+            token_chunk_size=2,
+        )
+        self.assertGreater(float(witnesses[0.25][0][0, 0]), 0.9)
+        self.assertEqual(tuple(witnesses[0.5][1].shape), (1, 1, 4))
+        dn4, field = dn4_hard_knn_score(
+            positive, negative, query, neighbours=3
+        )
+        self.assertGreater(float(dn4[0, 0]), 0.9)
+        self.assertTrue(bool(border_maximum(field)[0, 0]))
+
+    def test_stage1_witness_gate_never_starts_training_automatically(self) -> None:
+        rows = []
+        for seed in range(5):
+            for method, values in {
+                "anchor_rho03": {
+                    "auroc": 0.541,
+                    "auprc": 0.50,
+                    "sms_fixed_reference": 0.30,
+                    "worst_nuisance_auroc": 0.50,
+                    "support_swap_flip_rate": 0.10,
+                    "border_max_fraction": 0.20,
+                },
+                "anchor_plus_relational_witness": {
+                    "auroc": 0.56,
+                    "auprc": 0.52,
+                    "sms_fixed_reference": 0.31,
+                    "worst_nuisance_auroc": 0.50,
+                    "support_swap_flip_rate": 0.09,
+                    "border_max_fraction": 0.15,
+                },
+            }.items():
+                for metric, value in values.items():
+                    rows.append(
+                        {
+                            "partition": "test",
+                            "method": method,
+                            "seed": seed,
+                            "metric": metric,
+                            "value": value,
+                        }
+                    )
+        pending = _witness_decision(rows, "pending")
+        self.assertEqual(pending["status"], "await_witness_evidence_review")
+        self.assertFalse(pending["stage_two_training_started"])
+        passed = _witness_decision(rows, "pass")
+        self.assertEqual(
+            passed["status"], "proceed_to_stage2_descriptor_training"
+        )
+
     def test_image_match_is_log_mean_exp_per_support_image(self) -> None:
         query = torch.nn.functional.normalize(
             torch.tensor([[[[1.0, 0.0], [0.0, 1.0]]]]), dim=-1

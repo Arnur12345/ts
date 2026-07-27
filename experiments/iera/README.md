@@ -278,6 +278,43 @@ PYTHONPATH=. python3 -m experiments.iera.evidence_field_diagnostic \
   --device cuda
 ```
 
+## Stable Region Witnesses: Stage-1 falsification only
+
+This native 37x37 diagnostic uses the already cached Pneumothorax episode
+subset and the existing rho=.3 adapter checkpoints. It trains nothing. The
+fixed relational descriptor is
+`normalize((z + (z - mean3x3(z))) / sqrt(2))`; DN4 uses hard 3-NN. Validation
+selects the witness fraction and the 12 `(fraction, gamma)` fusion candidates.
+For the full method, feasible validation candidates satisfying SMS <= 0.321
+and no more than 0.01 worst-device degradation are preferred before ranking
+AUROC. Test results never select a candidate.
+
+```bash
+PYTHONPATH=. python3 -m experiments.iera.stable_witness_diagnostic \
+  --episodes outputs/iera/falsification_v1/episodes.pt \
+  --rad-cache outputs/iera/patch_cache_rad_dino_37x37_pneumothorax \
+  --adapter-dir outputs/iera/falsification_v1/sweep \
+  --adapter-rho 0.3 \
+  --manifest outputs/residuals/multilabel_manifest.csv \
+  --data-root ~/data/mimic-cxr-jpg-2.1.0 \
+  --output-dir outputs/iera/stable_witness_stage1_v1 \
+  --retained-grid 37 \
+  --shot 3 \
+  --seeds 0 1 2 3 4 \
+  --episodes-per-seed 100 \
+  --witness-fractions 0.01 0.02 0.05 0.1 \
+  --gammas 0.1 0.25 0.5 \
+  --support-token-chunk-size 128 \
+  --query-chunk-size 1 \
+  --device cuda
+```
+
+The run is resumable per seed. It writes all candidate and locked metrics,
+per-seed selected evidence maps, an anchor-versus-witness overlay, validation
+selection, and `decision.json`. Stage 2 is deliberately absent and must not be
+implemented or run unless the decision is
+`proceed_to_stage2_descriptor_training` after quantitative and visual review.
+
 The runner is resumable per seed and writes `candidate_metrics.csv`,
 `per_seed_metrics.csv`, `summary_metrics.csv`, `selection.json`, and
 `decision.json`. It also writes `evidence_maps.png` and `evidence_maps.pt`.

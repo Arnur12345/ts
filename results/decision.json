@@ -1,0 +1,36 @@
+{
+  "status": "abandon_evidence_field",
+  "stage_two_training_started": false,
+  "primary_shot": 3,
+  "retained_grid": 37,
+  "native_grid": 37,
+  "visual_review": "pending",
+  "gate": {
+    "minimum_pneumothorax_auroc_gain": 0.02,
+    "maximum_sms_ratio_to_current_adapter": 1.25,
+    "minimum_worst_device_auroc_change": -0.01,
+    "evidence_map_must_not_primarily_highlight_chest_tubes": true
+  },
+  "comparisons": [
+    {
+      "pair": "Pneumothorax__Support Devices",
+      "current_adapter_auroc": 0.5333400011062622,
+      "evidence_field_auroc": 0.5289649963378906,
+      "paired_auroc_gain": -0.004375004768371582,
+      "paired_auroc_gain_ci95": [
+        -0.010605026564170068,
+        0.001855017027426905
+      ],
+      "current_adapter_sms": 0.5788855433464051,
+      "evidence_field_sms": 0.5290601968765258,
+      "sms_ratio_to_current_adapter": 0.9139288464834511,
+      "paired_worst_device_auroc_change": -0.010070008039474488,
+      "paired_worst_device_auroc_change_ci95": [
+        -0.019490835730424046,
+        -0.0006491803485249303
+      ],
+      "quantitative_gate_passed": false,
+      "credible_057_target_reached": false
+    }
+  ]
+}
