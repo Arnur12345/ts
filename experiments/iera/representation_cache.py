@@ -48,6 +48,10 @@ def build(args: argparse.Namespace) -> None:
     )
     if locked["signature"]["manifest_sha256"] != data.manifest_sha256:
         raise ValueError("locked episodes and manifest differ")
+    # Reproduce the learned falsification split exactly. That runner excludes
+    # only the evaluation pairs that actually survived episode construction,
+    # rather than every nominal pilot pair.
+    args.evaluation_pair_names = list(locked["pairs"].values())
     pairs = {
         pair_id: names
         for pair_id, names in locked["pairs"].items()
@@ -101,6 +105,7 @@ def build(args: argparse.Namespace) -> None:
         "min_stratum_patients": args.min_stratum_patients,
         "locked_episode_count": args.episodes_per_seed,
         "locked_pair_id": pair_id,
+        "evaluation_pair_names": args.evaluation_pair_names,
     }
     if bank_path.exists():
         existing = torch.load(bank_path, map_location="cpu", weights_only=False)
