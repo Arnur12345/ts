@@ -64,6 +64,7 @@ from experiments.iera.representation_adaptation import (
     RadDinoTail,
     configure_tail,
 )
+from experiments.iera.linear_probe import four_group_weights
 from experiments.iera.stable_witness import (
     border_maximum,
     certified_witness_scores,
@@ -145,6 +146,19 @@ class _FakeBlock(nn.Module):
 
 
 class IERATest(unittest.TestCase):
+    def test_four_group_probe_weights_equalize_total_group_mass(self) -> None:
+        import numpy as np
+
+        target = np.asarray([0, 0, 0, 1, 1, 1, 1])
+        device = np.asarray([0, 0, 1, 0, 1, 1, 1])
+        weights, counts = four_group_weights(target, device)
+        groups = 2 * target + device
+        totals = np.asarray(
+            [weights[groups == group].sum() for group in range(4)]
+        )
+        np.testing.assert_allclose(totals, np.repeat(len(groups) / 4, 4))
+        np.testing.assert_array_equal(counts, np.asarray([2, 1, 1, 3]))
+
     def test_last_block_and_lora_configuration_are_strictly_bounded(self) -> None:
         layers = nn.ModuleList((_FakeBlock(4), _FakeBlock(4)))
         last1 = configure_tail(layers, nn.LayerNorm(4), "last1", 2, 2)

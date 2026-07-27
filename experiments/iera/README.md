@@ -374,6 +374,29 @@ The runner is resumable per seed and writes `candidate_metrics.csv`,
 `per_seed_metrics.csv`, `summary_metrics.csv`, `selection.json`, and
 `decision.json`.
 
+## Frozen global linear probe
+
+After the episodic representation pilot, diagnose whether frozen Rad-DINO
+contains linearly accessible Pneumothorax signal. This scans the existing dense
+patch cache once to save an L2-normalized mean-pooled global cache; it does not
+run the image encoder or sample episodes.
+
+```bash
+PYTHONPATH=. python3 -m experiments.iera.linear_probe \
+  --embeddings outputs/residuals/biomedclip_multilabel.pt \
+  --manifest outputs/residuals/multilabel_manifest.csv \
+  --raw-labels ~/data/mimic-cxr-jpg-2.1.0/mimic-cxr-2.0.0-chexpert.csv.gz \
+  --rad-cache outputs/iera/patch_cache_rad_dino_14x14 \
+  --output-dir outputs/iera/rad_dino_linear_probe_v1 \
+  --cs 0.01 0.1 1 10 \
+  --split-seed 2026 \
+  --max-iter 1000
+```
+
+The two deterministic probes use class-balanced and four-group-balanced
+logistic regression. `C` is selected using validation AUROC, each selected
+probe is refit on train plus validation, and the test set is read once.
+
 ```bash
 PYTHONPATH=. python3 -m experiments.iera.evidence_field_diagnostic \
   --episodes outputs/iera/falsification_v1/episodes.pt \
