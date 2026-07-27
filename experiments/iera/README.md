@@ -459,6 +459,32 @@ PYTHONPATH=. python3 -m experiments.iera.comed_sanity \
   --device cuda
 ```
 
+## Support-correction oracle headroom
+
+After closing CoMeD, run one validation-only oracle analysis before designing
+another support mechanism. It recomputes the global ProtoNet and both CoMeD
+residual scales, loads every candidate found in any supplied diagnostic score
+directory, and evaluates real, shuffled-label, and cross-episode supports over
+signed correction strengths.
+
+```bash
+PYTHONPATH=. python3 -m experiments.iera.oracle_headroom \
+  --cache outputs/iera/comed_cache_v1 \
+  --episodes outputs/iera/falsification_v1/episodes.pt \
+  --score-dir outputs/iera/stable_witness_stage1_v1 \
+  --output-dir outputs/iera/oracle_headroom_v1 \
+  --seeds 0 1 2 3 4 \
+  --episodes-per-seed 100 \
+  --shot 3 \
+  --gammas -1 0 0.01 0.03 0.1 0.3 1 \
+  --device cuda
+```
+
+Repeat `--score-dir PATH` for any other dual-head or evidence-field directory
+that still contains `scores_seed_*.pt`. The analysis saves all per-query logits,
+same-query and split-query oracle choices, matched support controls, and a
+validation-only decision. It never loads the test partition.
+
 ```bash
 PYTHONPATH=. python3 -m experiments.iera.evidence_field_diagnostic \
   --episodes outputs/iera/falsification_v1/episodes.pt \

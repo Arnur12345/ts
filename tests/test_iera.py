@@ -70,6 +70,7 @@ from experiments.iera.representation_adaptation import (
     configure_tail,
 )
 from experiments.iera.linear_probe import four_group_weights
+from experiments.iera.oracle_headroom import _global_protonet
 from experiments.iera.stable_witness import (
     border_maximum,
     certified_witness_scores,
@@ -151,6 +152,34 @@ class _FakeBlock(nn.Module):
 
 
 class IERATest(unittest.TestCase):
+    def test_oracle_global_protonet_uses_supplied_support_labels(self) -> None:
+        import numpy as np
+
+        arrays = {
+            "rad": np.asarray(
+                [
+                    [1.0, 0.0],
+                    [0.8, 0.2],
+                    [-1.0, 0.0],
+                    [-0.8, -0.2],
+                    [1.0, 0.1],
+                    [-1.0, -0.1],
+                ],
+                dtype=np.float32,
+            )
+        }
+        support = torch.tensor([0, 1, 2, 3])
+        query = torch.tensor([4, 5])
+        labels = torch.tensor([1, 1, 0, 0])
+        scores = _global_protonet(
+            arrays, support, labels, query, torch.device("cpu")
+        )
+        self.assertGreater(float(scores[0]), float(scores[1]))
+        reversed_scores = _global_protonet(
+            arrays, support, 1 - labels, query, torch.device("cpu")
+        )
+        torch.testing.assert_close(reversed_scores, -scores)
+
     def test_comed_transform_matches_explicit_psd_metric(self) -> None:
         torch.manual_seed(4)
         model = CoMeD(dim=5, rank=2, metric_mode="learned")
