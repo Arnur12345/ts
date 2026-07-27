@@ -445,6 +445,20 @@ validation. If that gate passes, later variants are trained on base pathologies
 only and selected on Pneumothorax validation subject to SMS, worst-device, and
 ranking-stability constraints.
 
+If the early gate fails, run one numerical sanity check before archiving the
+branch. It reads validation only and performs no training or sweep:
+
+```bash
+PYTHONPATH=. python3 -m experiments.iera.comed_sanity \
+  --cache outputs/iera/comed_cache_v1 \
+  --episodes outputs/iera/falsification_v1/episodes.pt \
+  --output-dir outputs/iera/comed_v1 \
+  --seeds 0 1 2 3 4 \
+  --episodes-per-seed 100 \
+  --shot 3 \
+  --device cuda
+```
+
 ```bash
 PYTHONPATH=. python3 -m experiments.iera.evidence_field_diagnostic \
   --episodes outputs/iera/falsification_v1/episodes.pt \
