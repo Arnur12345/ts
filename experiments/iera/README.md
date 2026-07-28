@@ -485,6 +485,50 @@ that still contains `scores_seed_*.pt`. The analysis saves all per-query logits,
 same-query and split-query oracle choices, matched support controls, and a
 validation-only decision. It never loads the test partition.
 
+## Few-Shot PAIR-CXR pilot
+
+The fully supervised Rad-DINO linear probe clears the representation oracle, so
+the next controlled pilot meta-trains a small local evidence router on
+non-hard base diseases. Rad-DINO remains frozen. Pneumothorax adaptation updates
+only one text-initialized disease query and its scale/bias:
+
+```bash
+PYTHONPATH=. python3 -m experiments.pair_cxr.run \
+  --comed-cache outputs/iera/comed_cache_v1 \
+  --rad-cache outputs/iera/patch_cache_rad_dino_14x14 \
+  --episodes outputs/iera/falsification_v1/episodes.pt \
+  --output-dir outputs/pair_cxr/pilot_v1 \
+  --seeds 0 1 2 3 4 \
+  --shots 1 3 5 10 20 \
+  --episodes-per-seed 100 \
+  --hard-diseases Pneumothorax "Lung Lesion" Fracture \
+  --alignment-samples 20000 \
+  --alignment-ridge 10 \
+  --router-bottleneck 64 \
+  --meta-steps 500 \
+  --meta-batch-per-group 4 \
+  --base-validation-per-group 40 \
+  --meta-learning-rate 1e-3 \
+  --validation-interval 50 \
+  --adapt-steps 30 \
+  --adapt-learning-rate 0.03 \
+  --beta-rex 0.1 \
+  --lambda-invariance 0.3 \
+  --lambda-responsiveness 0.3 \
+  --lambda-query-anchor 1 \
+  --lambda-calibration-anchor 0.1 \
+  --sms-budget 0.30 \
+  --primary-shot 10 \
+  --minimum-validation-gain 0.02 \
+  --device cuda
+```
+
+The existing episode cache contains twenty candidates per environment, so the
+same patient-disjoint queries support the complete 1/3/5/10/20-shot pilot.
+The run is resumable per partition, shot, and seed. Test remains untouched
+unless the 10-shot validation result improves the VLM text prior by at least
+0.02, satisfies SMS at 0.30, and does not reduce worst-device AUROC.
+
 ```bash
 PYTHONPATH=. python3 -m experiments.iera.evidence_field_diagnostic \
   --episodes outputs/iera/falsification_v1/episodes.pt \
