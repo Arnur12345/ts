@@ -26,9 +26,52 @@ from experiments.trace.evaluation import (
     score_episode_bank,
 )
 from experiments.trace import evaluation as trace_evaluation
+from experiments.trace.report_interventions import classify_transition
 
 
 class TraceTest(unittest.TestCase):
+    def test_report_extractor_requires_explicit_unambiguous_tube_change(self) -> None:
+        self.assertEqual(
+            classify_transition(
+                "No chest tube is present.",
+                "There has been interval placement of a right chest tube.",
+            )[0],
+            "inserted",
+        )
+        self.assertEqual(
+            classify_transition(
+                "A left chest tube remains in place.",
+                "The left chest tube has been removed.",
+            )[0],
+            "removed",
+        )
+        self.assertEqual(
+            classify_transition(
+                "A right chest tube is in place.",
+                "The right chest tube remains stable.",
+            )[0],
+            "stable_present",
+        )
+        self.assertEqual(
+            classify_transition(
+                "No chest tube is present.",
+                "No indwelling chest tube is present.",
+            )[0],
+            "stable_absent",
+        )
+        self.assertIsNone(
+            classify_transition(
+                "A chest tube is present.",
+                (
+                    "The old chest tube was removed. Interval placement of "
+                    "a new chest tube was performed."
+                ),
+            )
+        )
+        self.assertIsNone(
+            classify_transition("The lungs are clear.", "No focal opacity.")
+        )
+
     def test_chronology_uses_dates_and_never_study_id_order(self) -> None:
         rows = [
             {

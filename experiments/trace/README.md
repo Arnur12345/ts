@@ -38,6 +38,26 @@ Rows must come from Chest ImaGenome relations, a validated report extractor,
 or a validated chest-tube detector. Uncertain transitions should be omitted.
 The code rejects the temporal stage without both the table and its provenance.
 
+To create a conservative silver table from MIMIC-CXR reports only:
+
+```bash
+PYTHONPATH=. python3 -m experiments.trace.report_interventions \
+  --canonical-manifest ~/data/mimic-cxr-jpg-2.1.0/protocols/mimic-cxr-fsl-v1/study_manifest.csv.gz \
+  --metadata-csv ~/data/mimic-cxr-jpg-2.1.0/mimic-cxr-2.0.0-metadata.csv.gz \
+  --reports-root ~/data/mimic-cxr-2.0.0 \
+  --output outputs/trace/chest_tube_transitions.csv \
+  --audit-output outputs/trace/chest_tube_transition_audit.csv \
+  --review-output outputs/trace/chest_tube_transition_review.csv \
+  --summary outputs/trace/chest_tube_transition_summary.json
+```
+
+`--reports-root` must contain the original report tree
+`files/pXX/pXXXXXXXX/sXXXXXXXX.txt`. The extractor retains only explicit,
+unambiguous insertion, removal, unchanged/present, or explicit absence in both
+reports. It never converts a missing mention into absence. Review the
+stratified audit sample before using this result in a paper. Extraction and
+review sampling are restricted to the deterministic main-training patients.
+
 Run:
 
 ```bash
@@ -49,7 +69,7 @@ PYTHONPATH=. python3 -m experiments.trace.run \
   --canonical-manifest ~/data/mimic-cxr-jpg-2.1.0/protocols/mimic-cxr-fsl-v1/study_manifest.csv.gz \
   --metadata-csv ~/data/mimic-cxr-jpg-2.1.0/mimic-cxr-2.0.0-metadata.csv.gz \
   --chest-tube-transitions outputs/trace/chest_tube_transitions.csv \
-  --chest-tube-transition-source chest_imagenome \
+  --chest-tube-transition-source report_extraction \
   --rad-global outputs/iera/rad_dino_linear_probe_v1/rad_dino_global.float32.npy \
   --rad-global-metadata outputs/iera/rad_dino_linear_probe_v1/rad_dino_global.json \
   --episodes outputs/iera/falsification_v1/episodes.pt \
