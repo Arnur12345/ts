@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import unittest
+from unittest.mock import patch
 
 import numpy as np
 import torch
@@ -10,6 +11,7 @@ from experiments.trace.core import (
     apply_shrinkage_precision,
     canonical_pathology_atom,
     consecutive_transitions,
+    consecutive_transitions_from_canonical_timeline,
     covariance_eigendecomposition,
     localization_statistics,
     register_translation,
@@ -23,6 +25,7 @@ from experiments.trace.evaluation import (
     classification_metrics,
     score_episode_bank,
 )
+from experiments.trace import evaluation as trace_evaluation
 
 
 class TraceTest(unittest.TestCase):
@@ -82,6 +85,39 @@ class TraceTest(unittest.TestCase):
                 rows, ["1", "1", "1"], labels, known, 0, 1, range(3)
             )
 
+    def test_filtered_endpoint_cannot_jump_over_canonical_intermediate(self) -> None:
+        canonical = [
+            {
+                "subject_id": "1",
+                "study_id": str(index + 10),
+                "dicom_id": f"d{index}",
+                "StudyDate": f"2020010{index + 1}",
+                "StudyTime": "0",
+                "view": "AP",
+            }
+            for index in range(3)
+        ]
+        cached = [canonical[0], canonical[2]]
+        labels = torch.tensor([[0], [1]], dtype=torch.bool)
+        known = torch.ones_like(labels)
+        transitions = {
+            ("10", "11"): "stable_absent",
+            ("11", "12"): "stable_absent",
+            # This annotation must not make 10->12 consecutive.
+            ("10", "12"): "stable_absent",
+        }
+        with self.assertRaisesRegex(ValueError, "raw-consecutive"):
+            consecutive_transitions_from_canonical_timeline(
+                canonical,
+                cached,
+                ["1", "1"],
+                labels,
+                known,
+                target_id=0,
+                allowed_subjects={"1"},
+                intervention_transitions=transitions,
+            )
+
     def test_simultaneous_disease_device_changes_are_excluded(self) -> None:
         rows = [
             {
@@ -89,14 +125,15 @@ class TraceTest(unittest.TestCase):
                 "StudyTime": "0",
                 "study_id": str(index),
             }
-            for index in range(4)
+            for index in range(5)
         ]
         labels = torch.tensor(
-            [[0, 0], [1, 1], [1, 0], [1, 0]], dtype=torch.bool
+            [[0, 0], [1, 0], [1, 1], [1, 1], [0, 0]],
+            dtype=torch.bool,
         )
         known = torch.ones_like(labels)
         pairs = consecutive_transitions(
-            rows, ["1"] * 4, labels, known, 0, 1, range(4)
+            rows, ["1"] * 5, labels, known, 0, 1, range(5)
         )
         selected = select_transition_pairs(pairs, 10, seed=3)
         self.assertNotIn("both_change", [pair.stratum for pair in selected])
@@ -181,9 +218,15 @@ class TraceTest(unittest.TestCase):
             "targets": torch.tensor([[1.0, 0.0, 1.0, 0.0]]),
             "nuisance": torch.tensor([[0, 0, 1, 1]]),
         }
-        scores = score_episode_bank(
-            features, episodes, shot=1, device=torch.device("cpu")
-        )
+        with patch.object(
+            trace_evaluation,
+            "select_support_indices",
+            wraps=select_support_indices,
+        ) as selector:
+            scores = score_episode_bank(
+                features, episodes, shot=1, device=torch.device("cpu")
+            )
+        self.assertEqual([call.args[2] for call in selector.call_args_list], [1, 1])
         metrics = classification_metrics(
             scores, episodes["targets"], episodes["nuisance"]
         )

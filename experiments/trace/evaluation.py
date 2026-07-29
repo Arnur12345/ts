@@ -67,7 +67,9 @@ def score_episode_bank(
         eigenvalues is None or eigenvectors is None or ridge is None
     ):
         raise ValueError("LDA requires eigenvalues, eigenvectors, and ridge")
-    support_count = 2 * shot
+    # K means K supports per target class in the paper. Candidate panels
+    # remain stratified by device, but the sampled mixture totals exactly K.
+    support_count = shot
     positive_index = select_support_indices(
         episodes["positive"],
         episodes["random_positive_env"],
@@ -193,4 +195,3 @@ def summarize_metric_rows(
             }
         )
     return result
-

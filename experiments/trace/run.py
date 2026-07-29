@@ -27,7 +27,7 @@ from .core import (
     TransitionPair,
     apply_shrinkage_precision,
     canonical_pathology_atom,
-    consecutive_transitions,
+    consecutive_transitions_from_canonical_timeline,
     covariance_eigendecomposition,
     localization_statistics,
     select_transition_pairs,
@@ -369,9 +369,11 @@ def run_covariance(
         "test",
     )
     decision = {
+        "protocol_version": 2,
+        "shot_definition": "K total supports per target class",
         "status": (
             "anisotropic_estimation_is_a_major_bottleneck"
-            if selected_test >= args.existing_10shot_auroc + 0.03
+            if selected_test >= empirical_baseline + 0.03
             else "covariance_does_not_close_the_few_shot_gap"
         ),
         "selection_partition": "validate",
@@ -383,8 +385,9 @@ def run_covariance(
         "selected_ridge": winner,
         "test_auroc": selected_test,
         "same_episode_binary_protonet_test_auroc": empirical_baseline,
+        "same_episode_test_auroc_delta": selected_test - empirical_baseline,
         "published_existing_10shot_auroc": args.existing_10shot_auroc,
-        "substantial_gain_threshold": args.existing_10shot_auroc + 0.03,
+        "substantial_gain_threshold": empirical_baseline + 0.03,
         "covariance_examples": covariance["train_examples"],
         "labels_used_for_covariance": False,
     }
@@ -431,6 +434,88 @@ def _merge_metadata(rows: list[dict], path: Path | None) -> None:
         raise ValueError("metadata CSV did not match any manifest row")
 
 
+def _normalise_id(value) -> str:
+    raw = str(value).strip()
+    if not raw:
+        return ""
+    try:
+        return str(int(float(raw)))
+    except ValueError:
+        return raw
+
+
+def _complete_canonical_rows(
+    path: Path, metadata_path: Path | None
+) -> list[dict]:
+    with _open_csv(path) as handle:
+        rows = list(csv.DictReader(handle))
+    if not rows:
+        raise ValueError("complete canonical-study manifest is empty")
+    required = {"dicom_id", "study_id", "subject_id"}
+    missing = required - set(rows[0])
+    if missing:
+        raise ValueError(
+            "complete canonical-study manifest is missing "
+            f"{sorted(missing)}"
+        )
+    for row in rows:
+        row["study_id"] = _normalise_id(row["study_id"])
+        row["subject_id"] = _normalise_id(row["subject_id"])
+    _merge_metadata(rows, metadata_path)
+    return rows
+
+
+def _chest_tube_transitions(path: Path) -> dict[tuple[str, str], str]:
+    """Load validated raw-consecutive chest-tube state transitions."""
+
+    with _open_csv(path) as handle:
+        reader = csv.DictReader(handle)
+        required = {
+            "before_study_id",
+            "after_study_id",
+            "chest_tube_transition",
+        }
+        missing = required - set(reader.fieldnames or [])
+        if missing:
+            raise ValueError(
+                "chest-tube transition CSV is missing "
+                f"{sorted(missing)}"
+            )
+        result = {}
+        aliases = {
+            "stable absent": "stable_absent",
+            "stable_absent": "stable_absent",
+            "absent": "stable_absent",
+            "stable present": "stable_present",
+            "stable_present": "stable_present",
+            "present": "stable_present",
+            "inserted": "inserted",
+            "insertion": "inserted",
+            "removed": "removed",
+            "removal": "removed",
+        }
+        for row_number, row in enumerate(reader, start=2):
+            key = (
+                _normalise_id(row["before_study_id"]),
+                _normalise_id(row["after_study_id"]),
+            )
+            raw = str(row["chest_tube_transition"]).strip().lower()
+            value = aliases.get(raw)
+            if not all(key) or value is None:
+                raise ValueError(
+                    f"invalid chest-tube transition at row {row_number}: "
+                    f"{key} / {raw!r}"
+                )
+            previous = result.setdefault(key, value)
+            if previous != value:
+                raise ValueError(
+                    f"conflicting chest-tube transitions for {key}"
+                )
+    if not result:
+        raise ValueError("chest-tube transition CSV contains no transitions")
+    return result
+
+
 def _pair_signature(pairs: list[TransitionPair]) -> str:
     return _sha256_json(
         [
@@ -441,10 +526,29 @@ def _pair_signature(pairs: list[TransitionPair]) -> str:
                 pair.target_after,
                 pair.device_before,
                 pair.device_after,
+                pair.view_before,
+                pair.view_after,
+                round(pair.elapsed_hours, 6),
             )
             for pair in pairs
         ]
     )
+
+
+def _acquisition_counts(
+    pairs: list[TransitionPair], interval_edges_hours: list[float]
+) -> dict[str, int]:
+    counts = Counter()
+    for pair in pairs:
+        interval_bin = sum(
+            pair.elapsed_hours > edge for edge in interval_edges_hours
+        )
+        key = (
+            f"{pair.stratum}|{pair.view_before}->{pair.view_after}|"
+            f"time_bin_{interval_bin}"
+        )
+        counts[key] += 1
+    return dict(sorted(counts.items()))
 
 
 def _extract_transition_split(
@@ -531,6 +635,11 @@ def _extract_transition_split(
         "view_changed": torch.tensor(
             [pair.view_changed for pair in pairs], dtype=torch.bool
         ),
+        "view_before": [pair.view_before for pair in pairs],
+        "view_after": [pair.view_after for pair in pairs],
+        "elapsed_hours": torch.tensor(
+            [pair.elapsed_hours for pair in pairs], dtype=torch.float32
+        ),
         "group": [pair.stratum for pair in pairs],
     }
     torch.save(payload, path)
@@ -590,7 +699,7 @@ def _fit_transition_classifier(
     for c_value in args.transition_cs:
         model = LogisticRegression(
             C=c_value,
-            class_weight="balanced",
+            class_weight=None,
             solver="lbfgs",
             max_iter=args.transition_max_iter,
             random_state=args.seed,
@@ -598,10 +707,14 @@ def _fit_transition_classifier(
         model.fit(x_fit, y_fit, sample_weight=sample_weight)
         score = model.decision_function(x_validation)
         stable_device = ~validation["device_changed"].numpy()
+        same_view = ~validation["view_changed"].numpy()
+        primary_mask = stable_device & same_view
         primary = _binary_auc(
-            y_validation[stable_device], score[stable_device]
+            y_validation[primary_mask], score[primary_mask]
         )
-        disease_stable = ~validation["target_changed"].numpy()
+        disease_stable = (
+            ~validation["target_changed"].numpy() & same_view
+        )
         device_target = validation["device_changed"].numpy()[disease_stable]
         device_score = score[disease_stable]
         device_auc = (
@@ -614,13 +727,15 @@ def _fit_transition_classifier(
                 {
                     "partition": "validate",
                     "C": c_value,
-                    "metric": "disease_change_auroc_device_stable",
+                    "metric": (
+                        "disease_change_auroc_device_stable_same_view"
+                    ),
                     "value": primary,
                 },
                 {
                     "partition": "validate",
                     "C": c_value,
-                    "metric": "device_only_activation_auroc",
+                    "metric": "device_only_activation_auroc_same_view",
                     "value": device_auc,
                 },
             ]
@@ -640,9 +755,14 @@ def _fit_transition_classifier(
     )
     test_score = model.decision_function(x_test)
     stable_device = ~test["device_changed"].numpy()
-    primary = _binary_auc(y_test[stable_device], test_score[stable_device])
+    same_view = ~test["view_changed"].numpy()
+    primary_mask = stable_device & same_view
+    primary = _binary_auc(y_test[primary_mask], test_score[primary_mask])
+    stable_device_all_view = _binary_auc(
+        y_test[stable_device], test_score[stable_device]
+    )
     overall = _binary_auc(y_test, test_score)
-    disease_stable = ~test["target_changed"].numpy()
+    disease_stable = ~test["target_changed"].numpy() & same_view
     device_target = test["device_changed"].numpy()[disease_stable]
     device_score = test_score[disease_stable]
     device_auc = (
@@ -655,8 +775,14 @@ def _fit_transition_classifier(
             {
                 "partition": "test",
                 "C": selected_c,
-                "metric": "disease_change_auroc_device_stable",
+                "metric": "disease_change_auroc_device_stable_same_view",
                 "value": primary,
+            },
+            {
+                "partition": "test",
+                "C": selected_c,
+                "metric": "disease_change_auroc_device_stable_all_views",
+                "value": stable_device_all_view,
             },
             {
                 "partition": "test",
@@ -667,7 +793,7 @@ def _fit_transition_classifier(
             {
                 "partition": "test",
                 "C": selected_c,
-                "metric": "device_only_activation_auroc",
+                "metric": "device_only_activation_auroc_same_view",
                 "value": device_auc,
             },
         ]
@@ -687,11 +813,14 @@ def _fit_transition_classifier(
         "fit_disease_by_device_change_counts": group_counts.tolist(),
         "fit_group_weighting": (
             "equal total mass for both-stable, device-only, and disease-only "
-            "strata; simultaneous changes excluded"
+            "strata; simultaneous changes excluded; no class_weight"
         ),
-        "test_disease_change_auroc_device_stable": primary,
+        "test_disease_change_auroc_device_stable_same_view": primary,
+        "test_disease_change_auroc_device_stable_all_views": (
+            stable_device_all_view
+        ),
         "test_disease_change_auroc_all": overall,
-        "test_device_only_activation_auroc": device_auc,
+        "test_device_only_activation_auroc_same_view": device_auc,
         "device_only_deviation_from_chance": abs(device_auc - 0.5),
     }
     return decision, test_score
@@ -805,62 +934,85 @@ def _temporal_atom_fewshot(
     output_dir: Path,
     device: torch.device,
 ) -> dict:
-    atom = canonical_pathology_atom(
+    raw_atom = canonical_pathology_atom(
         fit["signed_mean"],
         fit["target_before"],
         fit["target_after"],
         fit["device_changed"],
     )
-    atom = apply_shrinkage_precision(
-        atom[None],
+    lda_atom = apply_shrinkage_precision(
+        raw_atom[None],
         covariance["eigenvalues"],
         covariance["eigenvectors"],
         selected_ridge,
     )[0]
     torch.save(
         {
-            "atom": atom,
+            "protonet_atom": raw_atom,
+            "lda_atom": lda_atom,
             "construction": (
                 "onset-oriented mean registered residual from "
-                "disease-change/device-stable training-patient pairs, then "
-                "the validation-selected unlabeled covariance precision"
+                "disease-change/chest-tube-stable training-patient pairs; "
+                "the LDA branch additionally applies the validation-selected "
+                "unlabeled covariance precision"
             ),
             "diagnostic_only": True,
         },
         output_dir / "pneumothorax_temporal_atom.pt",
     )
+    base_configuration = {
+        "protonet": {
+            "eigenvalues": None,
+            "eigenvectors": None,
+            "ridge": None,
+            "atom": raw_atom,
+        },
+        "lda": {
+            "eigenvalues": covariance["eigenvalues"],
+            "eigenvectors": covariance["eigenvectors"],
+            "ridge": selected_ridge,
+            "atom": lda_atom,
+        },
+    }
     validation_rows = []
-    for weight in args.atom_weights:
-        for seed in args.seeds:
-            bank = episodes[(seed, "validate")]
-            scores = score_episode_bank(
-                features,
-                bank,
-                args.temporal_primary_shot,
-                device,
-                covariance["eigenvalues"],
-                covariance["eigenvectors"],
-                selected_ridge,
-                atom,
-                weight,
-            )
-            validation_rows.extend(
-                _method_rows(
-                    "temporal_atom_lda",
-                    scores,
+    for base, configuration in base_configuration.items():
+        method = f"temporal_atom_{base}"
+        for weight in args.atom_weights:
+            for seed in args.seeds:
+                bank = episodes[(seed, "validate")]
+                scores = score_episode_bank(
+                    features,
                     bank,
-                    seed,
                     args.temporal_primary_shot,
-                    "validate",
+                    device,
+                    configuration["eigenvalues"],
+                    configuration["eigenvectors"],
+                    configuration["ridge"],
+                    configuration["atom"],
                     weight,
                 )
-            )
-    feasible = [
-        weight
+                validation_rows.extend(
+                    _method_rows(
+                        method,
+                        scores,
+                        bank,
+                        seed,
+                        args.temporal_primary_shot,
+                        "validate",
+                        weight,
+                    )
+                )
+    all_candidates = [
+        (base, weight)
+        for base in base_configuration
         for weight in args.atom_weights
+    ]
+    feasible = [
+        (base, weight)
+        for base, weight in all_candidates
         if _mean_metric(
             validation_rows,
-            "temporal_atom_lda",
+            f"temporal_atom_{base}",
             weight,
             args.temporal_primary_shot,
             "sms_fixed_reference",
@@ -868,44 +1020,52 @@ def _temporal_atom_fewshot(
         )
         <= args.sms_budget
     ]
-    candidates = feasible if feasible else args.atom_weights
-    selected_weight = max(
+    candidates = feasible if feasible else all_candidates
+    selected_base, selected_weight = max(
         candidates,
-        key=lambda weight: _mean_metric(
+        key=lambda candidate: _mean_metric(
             validation_rows,
-            "temporal_atom_lda",
-            weight,
+            f"temporal_atom_{candidate[0]}",
+            candidate[1],
             args.temporal_primary_shot,
             "auroc",
             "validate",
         ),
     )
+    test_configurations = {
+        ("protonet", 0.0),
+        ("lda", 0.0),
+        (selected_base, float(selected_weight)),
+    }
     test_rows = []
-    for seed in args.seeds:
-        bank = episodes[(seed, "test")]
-        for shot in args.shots:
-            scores = score_episode_bank(
-                features,
-                bank,
-                shot,
-                device,
-                covariance["eigenvalues"],
-                covariance["eigenvectors"],
-                selected_ridge,
-                atom,
-                selected_weight,
-            )
-            test_rows.extend(
-                _method_rows(
-                    "temporal_atom_lda",
-                    scores,
+    for base, weight in sorted(test_configurations):
+        configuration = base_configuration[base]
+        method = f"temporal_atom_{base}"
+        for seed in args.seeds:
+            bank = episodes[(seed, "test")]
+            for shot in args.shots:
+                scores = score_episode_bank(
+                    features,
                     bank,
-                    seed,
                     shot,
-                    "test",
-                    selected_weight,
+                    device,
+                    configuration["eigenvalues"],
+                    configuration["eigenvectors"],
+                    configuration["ridge"],
+                    configuration["atom"],
+                    weight,
                 )
-            )
+                test_rows.extend(
+                    _method_rows(
+                        method,
+                        scores,
+                        bank,
+                        seed,
+                        shot,
+                        "test",
+                        weight,
+                    )
+                )
     all_rows = validation_rows + test_rows
     _write_csv(output_dir / "temporal_fewshot_per_seed.csv", all_rows)
     _write_csv(
@@ -915,9 +1075,10 @@ def _temporal_atom_fewshot(
             ("partition", "method", "candidate", "shot", "metric"),
         ),
     )
+    selected_method = f"temporal_atom_{selected_base}"
     test_auroc = _mean_metric(
         test_rows,
-        "temporal_atom_lda",
+        selected_method,
         selected_weight,
         args.temporal_primary_shot,
         "auroc",
@@ -925,19 +1086,44 @@ def _temporal_atom_fewshot(
     )
     test_sms = _mean_metric(
         test_rows,
-        "temporal_atom_lda",
+        selected_method,
         selected_weight,
         args.temporal_primary_shot,
         "sms_fixed_reference",
         "test",
     )
+    protonet_auroc = _mean_metric(
+        test_rows,
+        "temporal_atom_protonet",
+        0.0,
+        args.temporal_primary_shot,
+        "auroc",
+        "test",
+    )
+    selected_base_auroc = _mean_metric(
+        test_rows,
+        selected_method,
+        0.0,
+        args.temporal_primary_shot,
+        "auroc",
+        "test",
+    )
     return {
+        "selected_base": selected_base,
         "selected_atom_weight": selected_weight,
         "validation_sms_feasible": bool(feasible),
         "test_3shot_auroc": test_auroc,
         "test_3shot_sms_fixed_reference": test_sms,
-        "existing_3shot_auroc": args.existing_3shot_auroc,
-        "required_3shot_auroc": args.existing_3shot_auroc + 0.05,
+        "same_episode_protonet_3shot_auroc": protonet_auroc,
+        "selected_base_without_atom_3shot_auroc": selected_base_auroc,
+        "atom_delta_vs_same_episode_protonet": test_auroc - protonet_auroc,
+        "atom_delta_vs_selected_base": test_auroc - selected_base_auroc,
+        "published_3shot_auroc_for_context": args.existing_3shot_auroc,
+        "required_3shot_auroc": protonet_auroc + 0.05,
+        "selection_grid": {
+            "bases": list(base_configuration),
+            "atom_weights": list(args.atom_weights),
+        },
         "diagnostic_only_target_labels_used_for_atom": True,
     }
 
@@ -954,21 +1140,35 @@ def run_temporal(
 ) -> dict:
     output_dir = output_root / "temporal"
     output_dir.mkdir(parents=True, exist_ok=True)
-    _merge_metadata(data.rows, args.metadata_csv)
     target_id = data.class_names.index(args.target)
-    device_id = data.class_names.index(args.confounder)
     main_train = split_indices(data, "train", args.split_seed)
-    all_pairs = consecutive_transitions(
+    canonical_rows = _complete_canonical_rows(
+        args.canonical_manifest, args.metadata_csv
+    )
+    intervention_transitions = _chest_tube_transitions(
+        args.chest_tube_transitions
+    )
+    train_subjects = {
+        data.subject_ids[index] for index in main_train.tolist()
+    }
+    all_pairs = consecutive_transitions_from_canonical_timeline(
+        canonical_rows,
         data.rows,
         data.subject_ids,
         data.labels,
         data.known,
         target_id,
-        device_id,
-        main_train.tolist(),
+        train_subjects,
+        intervention_transitions,
     )
     count_payload = {
-        "all_main_training_patients": transition_counts(all_pairs),
+        "complete_canonical_studies": len(canonical_rows),
+        "chest_tube_transition_annotations": len(
+            intervention_transitions
+        ),
+        "eligible_annotated_raw_consecutive_pairs": transition_counts(
+            all_pairs
+        ),
         "internal_partitions": {},
     }
     partitions = {}
@@ -985,10 +1185,16 @@ def run_temporal(
             available,
             args.max_pairs_per_stratum,
             args.seed + partition_index * 10_000,
+            args.interval_edges_hours,
         )
         count_payload["internal_partitions"][partition][
             "selected_for_feature_pilot"
         ] = len(partitions[partition])
+        count_payload["internal_partitions"][partition][
+            "selected_acquisition_cells"
+        ] = _acquisition_counts(
+            partitions[partition], list(args.interval_edges_hours)
+        )
     (output_dir / "transition_counts.json").write_text(
         json.dumps(count_payload, indent=2) + "\n", encoding="utf-8"
     )
@@ -1043,7 +1249,10 @@ def run_temporal(
     )
     gates = {
         "disease_change_auroc_at_least_0_75": (
-            classifier["test_disease_change_auroc_device_stable"] >= 0.75
+            classifier[
+                "test_disease_change_auroc_device_stable_same_view"
+            ]
+            >= 0.75
         ),
         "device_only_activation_near_chance": (
             classifier["device_only_deviation_from_chance"]
@@ -1068,13 +1277,29 @@ def run_temporal(
     elif all(gates.values()):
         status = "continue_to_target_masked_trace_pretraining"
     else:
-        status = "stop_trace_temporal_identifiability_not_supported"
+        status = (
+            "stop_repaired_trace_temporal_identifiability_not_supported"
+        )
     decision = {
         "status": status,
+        "protocol_version": 2,
         "scope": "diagnostic kill test only",
         "main_dataset": "MIMIC-CXR-JPG",
         "target": args.target,
-        "confounder": args.confounder,
+        "episode_confounder": args.confounder,
+        "temporal_intervention": "chest tube",
+        "temporal_intervention_provenance": (
+            args.chest_tube_transition_source
+        ),
+        "chronology_source": str(args.canonical_manifest),
+        "chronology_policy": (
+            "adjacency formed on every canonical frontal study before "
+            "checking endpoint cache/label eligibility"
+        ),
+        "acquisition_control": (
+            "transition strata exactly matched by AP/PA transition and "
+            "elapsed-time bin; primary classifier gate is same-view only"
+        ),
         "registered_grid": args.retained_grid,
         "classifier": classifier,
         "fewshot": fewshot,
@@ -1109,6 +1334,12 @@ def _validate_args(parser: argparse.ArgumentParser, args) -> None:
         parser.error("temporal-primary-shot must be present in shots")
     if any(value < 0 for value in args.atom_weights):
         parser.error("atom-weights must be nonnegative")
+    if (
+        any(value <= 0 for value in args.interval_edges_hours)
+        or list(args.interval_edges_hours)
+        != sorted(set(args.interval_edges_hours))
+    ):
+        parser.error("interval-edges-hours must be unique, positive, increasing")
     if not 0 < args.sms_budget:
         parser.error("sms-budget must be positive")
 
@@ -1123,9 +1354,30 @@ def main() -> None:
     parser.add_argument("--episodes", type=Path, required=True)
     parser.add_argument("--rad-cache", type=Path)
     parser.add_argument(
+        "--canonical-manifest",
+        type=Path,
+        help=(
+            "Complete one-frontal-image-per-study manifest, including studies "
+            "excluded from the embedding cache"
+        ),
+    )
+    parser.add_argument(
         "--metadata-csv",
         type=Path,
         help="Optional MIMIC metadata CSV with StudyDate/StudyTime",
+    )
+    parser.add_argument(
+        "--chest-tube-transitions",
+        type=Path,
+        help=(
+            "CSV keyed by before_study_id/after_study_id with validated "
+            "chest_tube_transition"
+        ),
+    )
+    parser.add_argument(
+        "--chest-tube-transition-source",
+        choices=("chest_imagenome", "report_extraction", "validated_detector"),
+        help="Provenance of the chest-tube transition CSV",
     )
     parser.add_argument(
         "--output-dir",
@@ -1156,6 +1408,12 @@ def main() -> None:
     parser.add_argument("--retained-grid", type=int, default=14)
     parser.add_argument("--max-registration-shift", type=int, default=2)
     parser.add_argument("--max-pairs-per-stratum", type=int, default=2000)
+    parser.add_argument(
+        "--interval-edges-hours",
+        type=float,
+        nargs="+",
+        default=(24, 72, 168, 720),
+    )
     parser.add_argument("--transition-batch-size", type=int, default=16)
     parser.add_argument(
         "--transition-cs",
@@ -1177,8 +1435,24 @@ def main() -> None:
     parser.add_argument("--device", default="auto")
     args = parser.parse_args()
     _validate_args(parser, args)
-    if args.stage in {"temporal", "both"} and args.rad_cache is None:
-        parser.error("temporal stage requires --rad-cache")
+    if args.stage in {"temporal", "both"}:
+        missing_temporal = [
+            name
+            for name, value in (
+                ("--rad-cache", args.rad_cache),
+                ("--canonical-manifest", args.canonical_manifest),
+                ("--chest-tube-transitions", args.chest_tube_transitions),
+                (
+                    "--chest-tube-transition-source",
+                    args.chest_tube_transition_source,
+                ),
+            )
+            if value is None
+        ]
+        if missing_temporal:
+            parser.error(
+                "temporal stage requires " + ", ".join(missing_temporal)
+            )
     started = time.perf_counter()
     device = _device(args.device)
     args.output_dir.mkdir(parents=True, exist_ok=True)

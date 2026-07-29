@@ -23,7 +23,9 @@ class TransitionPair:
     target_after: int
     device_before: int
     device_after: int
-    view_changed: bool
+    view_before: str
+    view_after: str
+    elapsed_hours: float
 
     @property
     def target_changed(self) -> bool:
@@ -40,6 +42,10 @@ class TransitionPair:
     @property
     def device_remains(self) -> bool:
         return self.device_before == 1 and self.device_after == 1
+
+    @property
+    def view_changed(self) -> bool:
+        return self.view_before != self.view_after
 
     @property
     def stratum(self) -> str:
@@ -133,6 +139,39 @@ def study_timestamp(row: Mapping[str, str]) -> tuple[int, float] | None:
     return int(date_digits[:8]), time_number
 
 
+def timestamp_hours(row: Mapping[str, str]) -> float | None:
+    """Convert a MIMIC date/time pair to monotonic hours."""
+
+    timestamp = study_timestamp(row)
+    if timestamp is None:
+        return None
+    date_value, time_value = timestamp
+    year = date_value // 10_000
+    month = (date_value // 100) % 100
+    day = date_value % 100
+    time_integer = int(time_value)
+    hour = time_integer // 10_000
+    minute = (time_integer // 100) % 100
+    second = time_integer % 100
+    fraction = time_value - time_integer
+    try:
+        parsed = datetime(
+            year, month, day, hour, minute, second,
+            int(round(fraction * 1_000_000)),
+        )
+    except ValueError as error:
+        raise ValueError(
+            f"invalid StudyDate/StudyTime values {timestamp}"
+        ) from error
+    return (
+        parsed.toordinal() * 24
+        + parsed.hour
+        + parsed.minute / 60
+        + parsed.second / 3600
+        + parsed.microsecond / 3_600_000_000
+    )
+
+
 def _view(row: Mapping[str, str]) -> str:
     return _first(row, ("ViewPosition", "view", "view_position")).upper()
 
@@ -191,13 +230,121 @@ def consecutive_transitions(
                     target_after=int(labels[after, target_id]),
                     device_before=int(labels[before, device_id]),
                     device_after=int(labels[after, device_id]),
-                    view_changed=_view(rows[before]) != _view(rows[after]),
+                    view_before=_view(rows[before]),
+                    view_after=_view(rows[after]),
+                    elapsed_hours=float(
+                        timestamp_hours(rows[after])
+                        - timestamp_hours(rows[before])
+                    ),
                 )
             )
     if not pairs:
         raise ValueError(
             "chronological studies exist but no consecutive pair has known "
             "target and device labels at both time points"
+        )
+    return pairs
+
+
+def consecutive_transitions_from_canonical_timeline(
+    canonical_rows: Sequence[Mapping[str, str]],
+    cached_rows: Sequence[Mapping[str, str]],
+    cached_subject_ids: Sequence[str],
+    labels: torch.Tensor,
+    known: torch.Tensor,
+    target_id: int,
+    allowed_subjects: set[str],
+    intervention_transitions: Mapping[tuple[str, str], str],
+) -> list[TransitionPair]:
+    """Form adjacency on all canonical studies before endpoint filtering.
+
+    `intervention_transitions` must encode chest-tube-specific state as one of
+    stable_absent, stable_present, inserted, or removed for the exact raw
+    consecutive study pair.
+    """
+
+    cached_by_dicom = {
+        str(row.get("dicom_id", "")).strip(): index
+        for index, row in enumerate(cached_rows)
+    }
+    cached_by_study = {
+        str(row.get("study_id", "")).strip(): index
+        for index, row in enumerate(cached_rows)
+    }
+    grouped: dict[str, list[tuple[float, Mapping[str, str]]]] = {}
+    for row in canonical_rows:
+        subject = str(row.get("subject_id", "")).strip()
+        if subject not in allowed_subjects:
+            continue
+        timestamp = timestamp_hours(row)
+        if timestamp is None:
+            continue
+        grouped.setdefault(subject, []).append((timestamp, row))
+    if not grouped:
+        raise ValueError("complete canonical timeline has no dated train patient")
+    state = {
+        "stable_absent": (0, 0),
+        "stable_present": (1, 1),
+        "inserted": (0, 1),
+        "removed": (1, 0),
+    }
+    pairs = []
+    for subject, studies in grouped.items():
+        studies.sort(
+            key=lambda item: (
+                item[0],
+                str(item[1].get("study_id", "")),
+                str(item[1].get("dicom_id", "")),
+            )
+        )
+        for (before_time, before_row), (after_time, after_row) in zip(
+            studies, studies[1:]
+        ):
+            before_study = str(before_row.get("study_id", "")).strip()
+            after_study = str(after_row.get("study_id", "")).strip()
+            relation = intervention_transitions.get(
+                (before_study, after_study)
+            )
+            if relation not in state:
+                continue
+            before_dicom = str(before_row.get("dicom_id", "")).strip()
+            after_dicom = str(after_row.get("dicom_id", "")).strip()
+            before = cached_by_dicom.get(
+                before_dicom, cached_by_study.get(before_study)
+            )
+            after = cached_by_dicom.get(
+                after_dicom, cached_by_study.get(after_study)
+            )
+            # Critically, no later row is paired when an adjacent endpoint is
+            # absent from the filtered embedding cache.
+            if before is None or after is None:
+                continue
+            if (
+                cached_subject_ids[before] != subject
+                or cached_subject_ids[after] != subject
+            ):
+                raise ValueError("canonical and embedding subject IDs differ")
+            if not (bool(known[before, target_id]) and bool(known[after, target_id])):
+                continue
+            device_before, device_after = state[relation]
+            pairs.append(
+                TransitionPair(
+                    before=before,
+                    after=after,
+                    subject_id=subject,
+                    target_before=int(labels[before, target_id]),
+                    target_after=int(labels[after, target_id]),
+                    device_before=device_before,
+                    device_after=device_after,
+                    view_before=_view(before_row),
+                    view_after=_view(after_row),
+                    elapsed_hours=float(after_time - before_time),
+                )
+            )
+    if not pairs:
+        raise ValueError(
+            "no raw-consecutive cached endpoints have known target labels and "
+            "a chest-tube-specific transition annotation"
         )
     return pairs
 
@@ -225,26 +372,61 @@ def select_transition_pairs(
     pairs: Sequence[TransitionPair],
     maximum_per_stratum: int,
     seed: int,
+    interval_edges_hours: Sequence[float] = (24, 72, 168, 720),
 ) -> list[TransitionPair]:
-    """Cap the three interpretable strata and exclude simultaneous changes."""
+    """Acquisition-match three interpretable transition strata.
+
+    Matching is exact on AP/PA transition and on elapsed-time bin. Cells that
+    do not contain all three strata are not used.
+    """
 
     if maximum_per_stratum <= 0:
         raise ValueError("maximum_per_stratum must be positive")
-    grouped: dict[tuple[bool, bool], list[TransitionPair]] = {}
+    grouped: dict[
+        tuple[str, str, int], dict[tuple[bool, bool], list[TransitionPair]]
+    ] = {}
     for pair in pairs:
         if pair.target_changed and pair.device_changed:
             continue
-        grouped.setdefault(
+        interval_bin = sum(
+            pair.elapsed_hours > edge for edge in interval_edges_hours
+        )
+        cell = (pair.view_before, pair.view_after, interval_bin)
+        grouped.setdefault(cell, {}).setdefault(
             (pair.target_changed, pair.device_changed), []
         ).append(pair)
     generator = torch.Generator().manual_seed(seed)
     selected = []
-    for key in sorted(grouped):
-        values = grouped[key]
-        order = torch.randperm(len(values), generator=generator)[
-            :maximum_per_stratum
-        ]
-        selected.extend(values[int(index)] for index in order)
+    required = ((False, False), (False, True), (True, False))
+    remaining = maximum_per_stratum
+    for cell in sorted(
+        grouped, key=lambda value: (value[0] != value[1], value)
+    ):
+        values = grouped[cell]
+        if not all(key in values for key in required):
+            continue
+        count = min(len(values[key]) for key in required)
+        count = min(count, remaining)
+        if count <= 0:
+            continue
+        for key in required:
+            order = torch.randperm(
+                len(values[key]), generator=generator
+            )[:count]
+            selected.extend(values[key][int(index)] for index in order)
+        remaining -= count
+        if remaining == 0:
+            break
+    if not selected:
+        raise ValueError(
+            "no acquisition/time-matched cells contain stable, device-only, "
+            "and disease-only transitions"
+        )
+    if not any(not pair.view_changed for pair in selected):
+        raise ValueError(
+            "matched transition set contains no same-view cell for the "
+            "primary acquisition-controlled analysis"
+        )
     selected.sort(key=lambda pair: (pair.subject_id, pair.before, pair.after))
     return selected
 
