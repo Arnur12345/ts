@@ -1,0 +1,34 @@
+{
+  "version": "lidc-scale-pilot-v1",
+  "seed": 20260805,
+  "selection": {
+    "n_nodules": 60,
+    "min_readers": 4,
+    "min_diameter_mm": 4.0,
+    "max_diameter_mm": 20.0,
+    "max_nodules_per_scan": 1,
+    "diameter_bins": [
+      {"name": "4.0-5.5", "lower": 4.0, "upper": 5.5, "quota": 8},
+      {"name": "5.5-6.5", "lower": 5.5, "upper": 6.5, "quota": 12},
+      {"name": "6.5-7.5", "lower": 6.5, "upper": 7.5, "quota": 8},
+      {"name": "7.5-8.5", "lower": 7.5, "upper": 8.5, "quota": 12},
+      {"name": "8.5-12.0", "lower": 8.5, "upper": 12.0, "quota": 10},
+      {"name": "12.0-20.0", "lower": 12.0, "upper": 20.000001, "quota": 10}
+    ]
+  },
+  "render": {
+    "target_spacings_mm": [0.5, 0.75, 1.0],
+    "output_size_px": 448,
+    "window_center_hu": -600.0,
+    "window_width_hu": 1500.0,
+    "interpolation": "scipy.ndimage.map_coordinates(order=3,prefilter=true)",
+    "outside_hu": -1350.0,
+    "image_format": "PNG",
+    "marker": {"radius_px": 32, "width_px": 2, "color_rgb": [255, 80, 80]},
+    "scale_bar": {"length_mm": 10.0, "width_px": 3, "margin_px": 24}
+  },
+  "questions": {
+    "threshold_mm": 6.0,
+    "paraphrases_per_question": 3
+  }
+}

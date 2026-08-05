@@ -16,11 +16,33 @@ embedding = [
   "open-clip-torch==2.23.0",
   "transformers==4.35.2",
 ]
+lidc-scale = [
+  "numpy>=1.26",
+  "Pillow>=10",
+  "pylidc>=0.2.3",
+  "scipy>=1.11",
+  "setuptools<81",
+]
+lidc-models = [
+  "accelerate>=1.1",
+  "lm-format-enforcer>=0.10",
+  "torch>=2.4",
+  "transformers>=4.57",
+]
+lidc-frontier = [
+  "google-genai>=1.0",
+]
 
 [project.scripts]
 mimic-build-protocol = "mimic_cxr_protocol.protocol:build_main"
 mimic-validate-protocol = "mimic_cxr_protocol.protocol:validate_main"
 mimic-embed-pairs = "mimic_cxr_protocol.embed_pairs:main"
+lidc-scale-build = "lidc_scale.build:main"
+lidc-scale-audit = "lidc_scale.audit:main"
+lidc-scale-requests = "lidc_scale.requests:main"
+lidc-scale-run-local = "lidc_scale.run_local:main"
+lidc-scale-run-gemini = "lidc_scale.run_gemini:main"
+lidc-scale-score = "lidc_scale.score:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]

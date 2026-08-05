@@ -135,3 +135,10 @@ PYTHONPATH=. python3 -m experiments.run_controls \
   --manifest outputs/biomedclip_pairs_7000.csv \
   --output-dir outputs/controls_v2
 ```
+
+## LIDC physical-scale pilot
+
+The controlled 2D scale-perception experiment (four-reader nodule selection,
+0.50/0.75/1.00 mm/px stimulus arms, Qwen3-VL, MedGemma, Gemini, and
+acquisition-versus-paraphrase metrics) is documented in
+[`docs/lidc_scale_pilot.md`](docs/lidc_scale_pilot.md).
