@@ -56,6 +56,29 @@ def configure_pylidc_root(data_root: Path) -> None:
     scan_module._get_dicom_file_path_from_config_file = lambda: str(data_root.resolve())
 
 
+def resolve_pylidc_root(data_root: Path, patient_id: str) -> Path:
+    """Find the directory that directly contains pylidc patient folders."""
+    direct = data_root / patient_id
+    if direct.is_dir():
+        return data_root.resolve()
+    conventional = data_root / "LIDC-IDRI" / patient_id
+    if conventional.is_dir():
+        return (data_root / "LIDC-IDRI").resolve()
+    matches = sorted(
+        path for path in data_root.rglob(patient_id) if path.is_dir()
+    )
+    if not matches:
+        raise FileNotFoundError(
+            f"could not find patient directory {patient_id} anywhere under {data_root}"
+        )
+    if len(matches) > 1:
+        shown = ", ".join(str(path) for path in matches[:5])
+        raise ValueError(
+            f"found multiple directories for {patient_id} under {data_root}: {shown}"
+        )
+    return matches[0].parent.resolve()
+
+
 def enumerate_candidates(pl: Any, selection: dict[str, Any]) -> list[Candidate]:
     candidates: list[Candidate] = []
     minimum = float(selection["min_diameter_mm"])
@@ -119,11 +142,38 @@ def _write_jsonl(path: Path, rows: Iterable[dict[str, Any]]) -> None:
             handle.write(canonical_json(row) + "\n")
 
 
+def _load_candidate_cache(path: Path) -> list[Candidate]:
+    rows: list[Candidate] = []
+    with path.open(encoding="utf-8") as handle:
+        for line in handle:
+            if not line.strip():
+                continue
+            row = json.loads(line)
+            rows.append(
+                Candidate(
+                    nodule_id=str(row["nodule_id"]),
+                    scan_id=int(row["scan_id"]),
+                    patient_id=str(row["patient_id"]),
+                    annotation_ids=tuple(int(value) for value in row["annotation_ids"]),
+                    reader_diameters_mm=tuple(
+                        float(value) for value in row["reader_diameters_mm"]
+                    ),
+                    diameter_mm=float(row["diameter_mm"]),
+                )
+            )
+    return rows
+
+
 def _prepare_output(output_dir: Path, config: dict[str, Any]) -> None:
     if output_dir.exists() and any(output_dir.iterdir()):
         contents = {path.name for path in output_dir.iterdir()}
         config_path = output_dir / "config.json"
-        same_failed_config = contents == {"config.json"} and config_path.is_file()
+        allowed_restart_files = {"config.json", "candidate_pool.jsonl"}
+        same_failed_config = (
+            contents.issubset(allowed_restart_files)
+            and "config.json" in contents
+            and config_path.is_file()
+        )
         if same_failed_config:
             try:
                 same_failed_config = json.loads(config_path.read_text(encoding="utf-8")) == config
@@ -133,7 +183,10 @@ def _prepare_output(output_dir: Path, config: dict[str, Any]) -> None:
             raise ValueError(
                 f"refusing to overwrite non-empty output directory: {output_dir}"
             )
-        print("[resume] found only the matching config from a failed build; restarting safely", flush=True)
+        print(
+            "[resume] found only restart-safe metadata from a failed build",
+            flush=True,
+        )
     output_dir.mkdir(parents=True, exist_ok=True)
 
 
@@ -145,9 +198,22 @@ def build_stimuli(
         raise FileNotFoundError(f"LIDC DICOM root does not exist: {data_root}")
     config = json.loads(config_path.read_text(encoding="utf-8"))
     _prepare_output(output_dir, config)
-    configure_pylidc_root(data_root)
+    shutil.copyfile(config_path, output_dir / "config.json")
 
-    all_candidates = enumerate_candidates(pl, config["selection"])
+    candidate_cache = output_dir / "candidate_pool.jsonl"
+    if candidate_cache.is_file():
+        all_candidates = _load_candidate_cache(candidate_cache)
+        print(
+            f"[resume] loaded {len(all_candidates)} cached eligible nodules",
+            flush=True,
+        )
+    else:
+        all_candidates = enumerate_candidates(pl, config["selection"])
+        _write_jsonl(candidate_cache, (asdict(candidate) for candidate in all_candidates))
+        print(
+            f"[selection] cached {len(all_candidates)} eligible nodules",
+            flush=True,
+        )
     selected, achieved = select_candidates(
         all_candidates,
         config["selection"]["diameter_bins"],
@@ -155,7 +221,13 @@ def build_stimuli(
         int(config["seed"]),
         int(config["selection"]["max_nodules_per_scan"]),
     )
-    shutil.copyfile(config_path, output_dir / "config.json")
+    effective_data_root = resolve_pylidc_root(data_root, selected[0].patient_id)
+    configure_pylidc_root(effective_data_root)
+    if effective_data_root != data_root.resolve():
+        print(
+            f"[dicom] discovered pylidc patient root: {effective_data_root}",
+            flush=True,
+        )
 
     nodule_rows: list[dict[str, Any]] = []
     image_rows: list[dict[str, Any]] = []

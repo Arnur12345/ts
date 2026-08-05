@@ -7,7 +7,7 @@ import unittest
 from pathlib import Path
 
 from lidc_scale.audit import record_audit
-from lidc_scale.build import _prepare_output
+from lidc_scale.build import _load_candidate_cache, _prepare_output, resolve_pylidc_root
 from lidc_scale.core import Candidate, median, pair_orientations, parse_json_object, physical_grid, select_candidates
 from lidc_scale.requests import build_requests, select_frontier_blocks
 from lidc_scale.score import score_rows
@@ -16,6 +16,16 @@ IMAGING_AVAILABLE = all(importlib.util.find_spec(name) for name in ("numpy", "PI
 
 
 class LIDCScaleCoreTest(unittest.TestCase):
+    def test_nested_patient_root_is_discovered(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            patient_parent = root / "manifest" / "LIDC-IDRI"
+            (patient_parent / "LIDC-IDRI-0442").mkdir(parents=True)
+            self.assertEqual(
+                resolve_pylidc_root(root, "LIDC-IDRI-0442"),
+                patient_parent.resolve(),
+            )
+
     def test_matching_config_only_output_is_safe_to_retry(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
             output = Path(temporary)
@@ -25,6 +35,20 @@ class LIDCScaleCoreTest(unittest.TestCase):
             (output / "unexpected.png").write_bytes(b"x")
             with self.assertRaisesRegex(ValueError, "refusing to overwrite"):
                 _prepare_output(output, config)
+
+    def test_candidate_cache_round_trip(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            path = Path(temporary) / "candidate_pool.jsonl"
+            candidate = Candidate("n1", 1, "p1", (2, 3), (5.0, 6.0), 5.5)
+            path.write_text(json.dumps({
+                "nodule_id": candidate.nodule_id,
+                "scan_id": candidate.scan_id,
+                "patient_id": candidate.patient_id,
+                "annotation_ids": candidate.annotation_ids,
+                "reader_diameters_mm": candidate.reader_diameters_mm,
+                "diameter_mm": candidate.diameter_mm,
+            }) + "\n", encoding="utf-8")
+            self.assertEqual(_load_candidate_cache(path), [candidate])
 
     def test_physical_grid_preserves_requested_spacing_and_center(self) -> None:
         rows, cols = physical_grid((100.25, 200.75), 0.5, 1.0, 5)

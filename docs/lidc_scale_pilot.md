@@ -20,7 +20,10 @@ preventing anisotropic resize in fixed-square model processors.
 overrides pylidc's DICOM root only inside its process, so it does not create or
 modify `~/.pylidcrc`. It also restores the removed `np.int`, `np.float`, and
 `np.bool` dtype aliases in-process because pylidc 0.2.3 still uses them; the
-server's NumPy installation is not downgraded or modified.
+server's NumPy installation is not downgraded or modified. Patient folders may
+be nested below the supplied root: the builder locates the first selected
+patient and configures pylidc with the directory that directly contains the
+patient folders.
 
 ```bash
 python -m venv .venv
@@ -34,7 +37,9 @@ lidc-scale-build \
 
 The build refuses to overwrite a non-empty output directory. It writes 180
 single-image acquisitions, 180 no-growth acquisition pairs, SHA-256 hashes,
-all physical metadata, and `audit/contact_sheet_20.png`.
+all physical metadata, and `audit/contact_sheet_20.png`. Candidate enumeration
+is cached in `candidate_pool.jsonl`; a failed build containing only the matching
+config and candidate cache restarts safely without repeating all 1,018 scans.
 
 Stop here and inspect the contact sheet. Confirm that the red ring is centered
 on the same nodule, the lung window is correct, anatomy is not transposed, and
