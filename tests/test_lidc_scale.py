@@ -7,6 +7,7 @@ import unittest
 from pathlib import Path
 
 from lidc_scale.audit import record_audit
+from lidc_scale.build import _prepare_output
 from lidc_scale.core import Candidate, median, pair_orientations, parse_json_object, physical_grid, select_candidates
 from lidc_scale.requests import build_requests, select_frontier_blocks
 from lidc_scale.score import score_rows
@@ -15,6 +16,16 @@ IMAGING_AVAILABLE = all(importlib.util.find_spec(name) for name in ("numpy", "PI
 
 
 class LIDCScaleCoreTest(unittest.TestCase):
+    def test_matching_config_only_output_is_safe_to_retry(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            output = Path(temporary)
+            config = {"version": "test"}
+            (output / "config.json").write_text(json.dumps(config), encoding="utf-8")
+            _prepare_output(output, config)
+            (output / "unexpected.png").write_bytes(b"x")
+            with self.assertRaisesRegex(ValueError, "refusing to overwrite"):
+                _prepare_output(output, config)
+
     def test_physical_grid_preserves_requested_spacing_and_center(self) -> None:
         rows, cols = physical_grid((100.25, 200.75), 0.5, 1.0, 5)
         self.assertEqual(rows, [96.25, 98.25, 100.25, 102.25, 104.25])

@@ -61,7 +61,9 @@ def enumerate_candidates(pl: Any, selection: dict[str, Any]) -> list[Candidate]:
     minimum = float(selection["min_diameter_mm"])
     maximum = float(selection["max_diameter_mm"])
     min_readers = int(selection["min_readers"])
-    for scan in pl.query(pl.Scan).order_by(pl.Scan.id):
+    scans = pl.query(pl.Scan).order_by(pl.Scan.id)
+    total_scans = scans.count()
+    for scan_index, scan in enumerate(scans, start=1):
         for cluster_index, annotations in enumerate(scan.cluster_annotations(verbose=False)):
             if len(annotations) < min_readers:
                 continue
@@ -80,15 +82,19 @@ def enumerate_candidates(pl: Any, selection: dict[str, Any]) -> list[Candidate]:
                     diameter_mm=diameter,
                 )
             )
+        if scan_index == 1 or scan_index % 25 == 0 or scan_index == total_scans:
+            print(
+                f"[selection {scan_index}/{total_scans}] "
+                f"eligible four-reader nodules: {len(candidates)}",
+                flush=True,
+            )
     return candidates
 
 
 def consensus_location(
     np: Any, consensus: Any, annotations: list[Any]
 ) -> tuple[int, tuple[float, float], int]:
-    mask, bbox = consensus(
-        annotations, clevel=0.5, pad=None, ret_masks=False, verbose=False
-    )
+    mask, bbox = consensus(annotations, clevel=0.5, pad=None, ret_masks=False)
     areas = mask.sum(axis=(0, 1))
     local_slice = int(np.argmax(areas))
     points = np.argwhere(mask[:, :, local_slice])
@@ -113,9 +119,21 @@ def _write_jsonl(path: Path, rows: Iterable[dict[str, Any]]) -> None:
             handle.write(canonical_json(row) + "\n")
 
 
-def _prepare_output(output_dir: Path) -> None:
+def _prepare_output(output_dir: Path, config: dict[str, Any]) -> None:
     if output_dir.exists() and any(output_dir.iterdir()):
-        raise ValueError(f"refusing to overwrite non-empty output directory: {output_dir}")
+        contents = {path.name for path in output_dir.iterdir()}
+        config_path = output_dir / "config.json"
+        same_failed_config = contents == {"config.json"} and config_path.is_file()
+        if same_failed_config:
+            try:
+                same_failed_config = json.loads(config_path.read_text(encoding="utf-8")) == config
+            except (OSError, json.JSONDecodeError):
+                same_failed_config = False
+        if not same_failed_config:
+            raise ValueError(
+                f"refusing to overwrite non-empty output directory: {output_dir}"
+            )
+        print("[resume] found only the matching config from a failed build; restarting safely", flush=True)
     output_dir.mkdir(parents=True, exist_ok=True)
 
 
@@ -126,7 +144,7 @@ def build_stimuli(
     if not data_root.is_dir():
         raise FileNotFoundError(f"LIDC DICOM root does not exist: {data_root}")
     config = json.loads(config_path.read_text(encoding="utf-8"))
-    _prepare_output(output_dir)
+    _prepare_output(output_dir, config)
     configure_pylidc_root(data_root)
 
     all_candidates = enumerate_candidates(pl, config["selection"])
@@ -145,6 +163,11 @@ def build_stimuli(
     image_lookup: dict[tuple[str, float, str], Path] = {}
 
     for index, candidate in enumerate(selected, start=1):
+        print(
+            f"[render {index}/{len(selected)}] {candidate.nodule_id} "
+            f"diameter={candidate.diameter_mm:.2f} mm",
+            flush=True,
+        )
         scan = pl.query(pl.Scan).filter(pl.Scan.id == candidate.scan_id).one()
         annotation_by_id = {int(ann.id): ann for ann in scan.annotations}
         annotations = [annotation_by_id[value] for value in candidate.annotation_ids]
