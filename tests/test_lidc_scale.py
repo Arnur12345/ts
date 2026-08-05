@@ -109,6 +109,9 @@ class RequestAndScoreTest(unittest.TestCase):
     def test_full_factorial_and_frontier_blocks(self) -> None:
         rows = build_requests(self.root)
         self.assertEqual(len(rows), 486)  # 6 nodules * 81 requests each
+        self.assertEqual({row["prompt_version"] for row in rows}, {"target-explicit-v2"})
+        self.assertTrue(all("not" in row["prompt"] or "must not" in row["prompt"] for row in rows))
+        self.assertTrue(all("red" in row["prompt"] for row in rows))
         frontier = select_frontier_blocks(rows, 7, blocks=6)
         self.assertEqual(len(frontier), 54)
         self.assertEqual(len({row["nodule_id"] for row in frontier}), 6)

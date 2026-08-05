@@ -25,7 +25,10 @@ def run(
         from google import genai
         from google.genai import types
     except ImportError as error:
-        raise SystemExit('Missing Gemini dependency. Install with: pip install -e ".[lidc-frontier]"') from error
+        raise SystemExit(
+            f"Gemini dependency import failed: {error}. Install with the same "
+            'Python that runs this command: python -m pip install -e ".[lidc-frontier]"'
+        ) from error
 
     client = genai.Client()
     requests = _read_jsonl(requests_path)

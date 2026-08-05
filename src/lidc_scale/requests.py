@@ -10,19 +10,19 @@ from .core import canonical_json, stable_key
 
 QUESTION_TEXT = {
     "q1_absolute": [
-        'The pulmonary nodule to measure is centered inside the thin red circle. What is its largest axial diameter in millimetres? Return only JSON: {"mm": <number>}',
-        'Measure the maximum axial width of the pulmonary nodule inside the thin red circle. Report millimetres only as JSON: {"mm": <number>}',
-        'Estimate the longest in-plane diameter of the circled pulmonary nodule, in mm. Output only: {"mm": <number>}',
+        'The thin red circle is only a location marker, not the nodule boundary. Do not measure the red circle. Measure the gray/white pulmonary nodule at its center. What is the nodule\'s largest axial diameter in millimetres? Return only JSON: {"mm": <number>}',
+        'The red circle only identifies the location and must not be measured. Measure the maximum axial width of the gray/white pulmonary nodule at the center of the marker. Report millimetres only as JSON: {"mm": <number>}',
+        'Ignore the size of the red location marker; it is not the nodule outline. Estimate the longest in-plane diameter of the gray/white tissue nodule at its center, in mm. Output only: {"mm": <number>}',
     ],
     "q2_threshold": [
-        'The pulmonary nodule is centered inside the thin red circle. Is its largest diameter at least 6 mm? Return only JSON: {"answer": "yes"} or {"answer": "no"}',
-        'Does the maximum axial width of the circled pulmonary nodule meet or exceed 6 mm? Output only JSON with answer equal to "yes" or "no".',
-        'Classify the marked pulmonary nodule by the 6 mm cutoff: is it 6 mm or larger? Reply only as JSON: {"answer": "yes"|"no"}',
+        'The thin red circle is only a location marker, not the nodule boundary. Do not measure the red circle. Is the largest diameter of the gray/white pulmonary nodule at its center at least 6 mm? Return only JSON: {"answer": "yes"} or {"answer": "no"}',
+        'The red circle only identifies the location and must not be measured. Does the maximum axial width of the gray/white pulmonary nodule at its center meet or exceed 6 mm? Output only JSON with answer equal to "yes" or "no".',
+        'Ignore the size of the red location marker; it is not the nodule outline. Is the gray/white tissue nodule at its center 6 mm or larger? Reply only as JSON: {"answer": "yes"|"no"}',
     ],
     "q3_growth": [
-        'The left panel is earlier and the right panel is later. Both red circles mark the same pulmonary nodule. Did the nodule grow? Return only JSON: {"answer": "yes"} or {"answer": "no"}',
-        'Compare the circled pulmonary nodule from the earlier left image with the later right image. Has its largest diameter increased? Output only JSON with answer equal to "yes" or "no".',
-        'These panels show the same marked pulmonary nodule, earlier on the left and later on the right. Is there interval growth? Reply only as JSON: {"answer": "yes"|"no"}',
+        'The left panel is earlier and the right panel is later. Both red circles are location markers only, not nodule boundaries; do not compare or measure the circles. Did the gray/white pulmonary nodule at their centers grow? Return only JSON: {"answer": "yes"} or {"answer": "no"}',
+        'The red circles only identify location and must not be measured. Compare the gray/white pulmonary nodule at their centers in the earlier left and later right images. Has its largest diameter increased? Output only JSON with answer equal to "yes" or "no".',
+        'Ignore the size of the red location markers; they are not nodule outlines. These panels show the same gray/white tissue nodule, earlier on the left and later on the right. Is there interval growth? Reply only as JSON: {"answer": "yes"|"no"}',
     ],
 }
 
@@ -48,6 +48,7 @@ SCHEMAS = {
 }
 
 CONDITIONS = ("A_bare", "B_spacing_text", "C_spacing_scale_bar")
+PROMPT_VERSION = "target-explicit-v2"
 
 
 def _read_jsonl(path: Path) -> list[dict[str, Any]]:
@@ -83,6 +84,7 @@ def build_requests(stimulus_dir: Path) -> list[dict[str, Any]]:
                         prompt += " A 10 mm scale bar is also rendered in the image."
                     request = {
                         "request_id": f"{stimulus['stimulus_id']}__{question}__{condition}__p{paraphrase_index}",
+                        "prompt_version": PROMPT_VERSION,
                         "question": question,
                         "condition": condition,
                         "paraphrase": paraphrase_index,

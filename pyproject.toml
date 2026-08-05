@@ -27,7 +27,8 @@ lidc-models = [
   "accelerate>=1.1",
   "lm-format-enforcer>=0.10",
   "torch>=2.4",
-  "transformers>=4.57",
+  "torchvision",
+  "transformers>=4.57,<5",
 ]
 lidc-frontier = [
   "google-genai>=1.0",

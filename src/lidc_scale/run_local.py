@@ -29,20 +29,23 @@ def run(
 ) -> None:
     try:
         import torch
+        import torchvision
         from lmformatenforcer import JsonSchemaParser
         from lmformatenforcer.integrations.transformers import build_transformers_prefix_allowed_tokens_fn
         from PIL import Image
         from transformers import AutoModelForImageTextToText, AutoProcessor, set_seed
     except ImportError as error:
         raise SystemExit(
-            'Missing model dependencies. Install with: pip install -e ".[lidc-scale,lidc-models]"'
+            "Model dependency import failed: "
+            f"{error}. Install with the same Python that runs this command: "
+            'python -m pip install -e ".[lidc-scale,lidc-models]"'
         ) from error
 
     set_seed(seed)
     torch.manual_seed(seed)
     processor = AutoProcessor.from_pretrained(model_id)
     model = AutoModelForImageTextToText.from_pretrained(
-        model_id, torch_dtype="auto", device_map="auto"
+        model_id, dtype="auto", device_map="auto"
     ).eval()
     requests = _load_requests(requests_path)
     if limit is not None:
