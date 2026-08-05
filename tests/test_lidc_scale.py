@@ -120,6 +120,16 @@ class RequestAndScoreTest(unittest.TestCase):
 
 @unittest.skipUnless(IMAGING_AVAILABLE, "optional LIDC imaging dependencies are not installed")
 class RenderTest(unittest.TestCase):
+    def test_pylidc_legacy_numpy_aliases_are_restored(self) -> None:
+        import numpy as np
+
+        from lidc_scale.build import patch_pylidc_numpy_compatibility
+
+        patch_pylidc_numpy_compatibility(np)
+        self.assertIs(np.int, int)
+        self.assertIs(np.float, float)
+        self.assertTrue("bool" in np.__dict__)
+
     def test_rendered_footprint_tracks_spacing_and_pair_is_square(self) -> None:
         import numpy as np
         from PIL import Image

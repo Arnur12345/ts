@@ -18,7 +18,9 @@ preventing anisotropic resize in fixed-square model processors.
 
 `pylidc` ships the annotation database but needs the DICOM files. The builder
 overrides pylidc's DICOM root only inside its process, so it does not create or
-modify `~/.pylidcrc`.
+modify `~/.pylidcrc`. It also restores the removed `np.int`, `np.float`, and
+`np.bool` dtype aliases in-process because pylidc 0.2.3 still uses them; the
+server's NumPy installation is not downgraded or modified.
 
 ```bash
 python -m venv .venv

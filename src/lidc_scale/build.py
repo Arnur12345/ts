@@ -24,9 +24,23 @@ from .render import make_contact_sheet, make_pair, save_render_arms
 DEFAULT_CONFIG = Path(__file__).parents[2] / "configs" / "lidc_scale_pilot_v1.json"
 
 
+def patch_pylidc_numpy_compatibility(np: Any) -> None:
+    """Restore aliases still used internally by pylidc 0.2.3.
+
+    NumPy removed these aliases in 1.24. pylidc uses them only as dtype
+    spellings, so mapping them to the corresponding Python scalar types
+    preserves the original behavior without changing array precision.
+    """
+    for name, scalar_type in (("int", int), ("float", float), ("bool", bool)):
+        if name not in np.__dict__:
+            setattr(np, name, scalar_type)
+
+
 def _require_dependencies() -> tuple[Any, Any, Any]:
     try:
         import numpy as np
+
+        patch_pylidc_numpy_compatibility(np)
         import pylidc as pl
         from pylidc.utils import consensus
     except ImportError as error:
